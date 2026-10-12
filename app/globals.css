@@ -1,0 +1,93 @@
+@import "tailwindcss";
+
+/* =====================================================================
+   Maya Memories — design tokens
+   Base neutra e quente; rosa e sálvia reservados para detalhes.
+   ===================================================================== */
+:root {
+  --cream: #faf7f2;
+  --warm-white: #fffdf9;
+  --rose: #e8c7cc;
+  --rose-deep: #b97988;
+  --sage: #a8b5a0;
+  --taupe: #776c67;
+  --ink: #383431;
+  --line: #e9e1da;
+
+  --sage-soft: #eef1ea;
+  --rose-soft: #f7ecee;
+  --amber-soft: #f8f0e1;
+  --amber: #a27b3c;
+  --danger: #a2493f;
+  --danger-soft: #f8e9e6;
+}
+
+@theme inline {
+  --color-cream: var(--cream);
+  --color-paper: var(--warm-white);
+  --color-rose: var(--rose);
+  --color-rose-deep: var(--rose-deep);
+  --color-rose-soft: var(--rose-soft);
+  --color-sage: var(--sage);
+  --color-sage-soft: var(--sage-soft);
+  --color-taupe: var(--taupe);
+  --color-ink: var(--ink);
+  --color-line: var(--line);
+  --color-amber: var(--amber);
+  --color-amber-soft: var(--amber-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+
+  --font-serif: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  --font-sans: var(--font-inter), Inter, ui-sans-serif, system-ui, sans-serif;
+
+  --radius-card: 1.25rem;
+  --shadow-soft: 0 1px 2px rgb(56 52 49 / 0.04), 0 8px 24px -12px rgb(56 52 49 / 0.12);
+}
+
+html {
+  background: var(--cream);
+  color: var(--ink);
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--cream);
+  min-height: 100dvh;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, .font-display {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+/* Cartas: serifada, entrelinha generosa, legível */
+.letter-body {
+  font-family: var(--font-serif);
+  font-size: 1.2rem;
+  line-height: 1.7;
+  white-space: pre-wrap;
+}
+
+:focus-visible {
+  outline: 2px solid var(--rose-deep);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+input, textarea, select {
+  font-size: 16px; /* evita zoom automático no iOS */
+}
+
+.paper-grain {
+  background-image:
+    radial-gradient(circle at 20% 0%, rgb(232 199 204 / 0.25), transparent 45%),
+    radial-gradient(circle at 100% 30%, rgb(168 181 160 / 0.18), transparent 40%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
