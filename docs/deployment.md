@@ -43,13 +43,18 @@ Tempo estimado: 30–40 min. Faça primeiro em um projeto de **desenvolvimento**
    | `NEXT_PUBLIC_SITE_URL` | `https://seu-dominio.com.br` | sim |
    | `SUPABASE_SERVICE_ROLE_KEY` | service role | **não** — nunca prefixe com `NEXT_PUBLIC_` |
    | `AUTOMATION_WEBHOOK_SECRET` | `openssl rand -hex 32` | **não** |
+   | `ADMIN_BOOTSTRAP_EMAILS` | seu e-mail (primeiro acesso) | **não** |
 
 3. Deploy. `vercel.json` fixa a região `gru1` (São Paulo), perto do banco.
 4. **Domains**: adicione o domínio próprio. Ele precisa ser **estável** — é ele que vai gravado nos corações NFC.
 
 ## 3. Primeiro administrador (uma única vez)
 
-No seu computador, com `.env.local` apontando para o projeto de produção:
+**Pelo site (mais simples):** adicione na Vercel `ADMIN_BOOTSTRAP_EMAILS=seu@email.com`, faça redeploy, abra
+`/entrar` e peça o link com esse e-mail. Ao clicar no e-mail você cai em `/primeiro-acesso` e vira admin.
+Funciona só enquanto não existir nenhum administrador. Diagnóstico: `/api/health` mostra o que falta configurar.
+
+**Ou pelo terminal:** no seu computador, com `.env.local` apontando para o projeto de produção:
 
 ```bash
 npm run bootstrap:admin -- cesar@email.com "Cesar" pai

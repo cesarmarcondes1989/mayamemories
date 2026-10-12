@@ -7,6 +7,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { publicEnv } from "@/lib/env";
 import { emailSchema, safeNextPath } from "@/lib/validation/schemas";
 import { friendlyError } from "@/lib/errors";
+import { canBootstrap } from "@/lib/bootstrap";
 
 export type LoginState = { status: "idle" | "sent" | "error"; message?: string };
 
@@ -26,8 +27,7 @@ async function sendMagicLink(email: string, next: string, allowCreate: boolean) 
     const { error } = await admin.auth.admin.inviteUserByEmail(email, { redirectTo });
     if (!error) return;
     if (!/already|registered|exists/i.test(error.message)) {
-      console.error("[auth] inviteUserByEmail", error.message);
-      return;
+      throw new Error(`inviteUserByEmail: ${error.message}`);
     }
   }
   const supabase = await createClient();
@@ -48,11 +48,20 @@ export async function requestLoginLink(_prev: LoginState, formData: FormData): P
   if (!parsed.success) return { status: "error", message: "Informe um e-mail válido." };
   const next = safeNextPath(String(formData.get("next") ?? ""), "/inicio");
   try {
+    if (await canBootstrap(parsed.data)) {
+      await sendMagicLink(parsed.data, "/primeiro-acesso", true);
+      return { status: "sent" };
+    }
     const admin = createAdminClient();
-    const { data: invited } = await admin.rpc("email_has_pending_invitation", { p_email: parsed.data });
+    const { data: invited, error } = await admin.rpc("email_has_pending_invitation", { p_email: parsed.data });
+    if (error) throw new Error(`invitation check failed: ${error.message}`);
     await sendMagicLink(parsed.data, invited ? "/convite/concluir" : next, Boolean(invited));
   } catch (e) {
-    return { status: "error", message: e instanceof Error && e.message.startsWith("Muitas") ? e.message : friendlyError(e) };
+    const message = e instanceof Error ? e.message : String(e);
+    if (message.startsWith("Muitas")) return { status: "error", message };
+    // Falha de configuração (variáveis, migrações): registra para aparecer nos logs da Vercel
+    console.error("[auth] requestLoginLink", message);
+    return { status: "error", message: "Não foi possível enviar o link agora. Tente novamente em instantes." };
   }
   return { status: "sent" };
 }

@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Cormorant_Garamond, Inter } from "next/font/google";
 import "./globals.css";
+import { HashSessionHandler } from "@/components/auth/hash-session";
 
 const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
@@ -28,7 +29,10 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="pt-BR" className={`${cormorant.variable} ${inter.variable}`}>
-      <body className="text-ink antialiased">{children}</body>
+      <body className="text-ink antialiased">
+        <HashSessionHandler />
+        {children}
+      </body>
     </html>
   );
 }
