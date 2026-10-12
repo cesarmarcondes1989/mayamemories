@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
-import { createNfcToken, replaceNfcToken, setNfcStatus } from "@/features/admin/actions";
+import { createNfcToken, linkNfcToPerson, replaceNfcToken, setNfcStatus } from "@/features/admin/actions";
 import { CopyButton } from "@/components/admin/copy-button";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -15,7 +15,7 @@ import { formatDate, formatDateTime } from "@/lib/format";
 
 export const metadata: Metadata = { title: "Tokens NFC" };
 
-export default async function TokensPage({ searchParams }: { searchParams: Promise<{ erro?: string; criado?: string; substituido?: string }> }) {
+export default async function TokensPage({ searchParams }: { searchParams: Promise<{ erro?: string; criado?: string; substituido?: string; vinculado?: string }> }) {
   const sp = await searchParams;
   const supabase = await createClient();
   const [{ data: tokens }, { data: people }] = await Promise.all([
@@ -36,17 +36,19 @@ export default async function TokensPage({ searchParams }: { searchParams: Promi
         description="Cada coração guarda apenas uma URL com um identificador aleatório. Ele abre a porta — não concede acesso, e abrir não registra visita."
       />
       {sp.erro && <div className="mb-4"><Alert tone="error">{sp.erro}</Alert></div>}
+      {sp.vinculado && <div className="mb-4"><Alert tone="success">Ursinho vinculado. Agora ele abre direto como essa pessoa.</Alert></div>}
       {sp.substituido && <div className="mb-4"><Alert tone="success">Token substituído. Grave a nova URL no chaveiro novo — as memórias da pessoa continuam intactas.</Alert></div>}
       <div className="grid gap-6 lg:grid-cols-[340px_1fr]">
         <Card className="h-fit p-5">
           <h2 className="mb-3 text-2xl">Novo token</h2>
           <form action={createNfcToken} className="space-y-4">
-            <Field label="Pessoa" htmlFor="personId" optional hint="Ou deixe sem pessoa para uma campanha.">
-              <Select id="personId" name="personId">
-                <option value="">— Campanha / sem pessoa —</option>
+            <Field label="Dono do ursinho" htmlFor="personId" hint="O ursinho abre direto como esta pessoa. Cadastre-a antes em Pessoas.">
+              <Select id="personId" name="personId" required defaultValue="">
+                <option value="" disabled>Escolha a pessoa…</option>
                 {(people ?? []).map((p) => (
                   <option key={p.id} value={p.id}>{p.display_name}</option>
                 ))}
+                <option value="campaign">— Sem dono (campanha, pede e-mail) —</option>
               </Select>
             </Field>
             <Field label="Nome" htmlFor="label" optional>
@@ -78,6 +80,19 @@ export default async function TokensPage({ searchParams }: { searchParams: Promi
                   </div>
                   <Badge tone={t.status === "active" ? "ok" : t.status === "prepared" ? "pending" : "neutral"}>{NFC_STATUS_LABELS[t.status]}</Badge>
                 </div>
+                {!t.person && !["revoked", "replaced"].includes(t.status) && (
+                  <form action={linkNfcToPerson} className="mt-3 flex flex-wrap gap-2 rounded-xl bg-amber-soft p-3">
+                    <input type="hidden" name="id" value={t.id} />
+                    <span className="w-full text-sm text-[#7a5b26]">Sem dono: este ursinho ainda não abre direto.</span>
+                    <Select name="personId" className="h-10 flex-1" aria-label="Pessoa" required defaultValue="">
+                      <option value="" disabled>Vincular a…</option>
+                      {(people ?? []).map((p) => (
+                        <option key={p.id} value={p.id}>{p.display_name}</option>
+                      ))}
+                    </Select>
+                    <Button size="sm" type="submit">Vincular</Button>
+                  </form>
+                )}
                 {!["revoked", "replaced"].includes(t.status) && (
                   <div className="mt-3 flex flex-wrap gap-2">
                     <CopyButton text={url} label="Copiar URL" />

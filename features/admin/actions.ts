@@ -342,6 +342,20 @@ export async function replaceNfcToken(formData: FormData) {
   redirect("/admin/tokens?substituido=1");
 }
 
+export async function linkNfcToPerson(formData: FormData) {
+  await requireAdmin();
+  const personId = id(formData, "personId");
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("nfc_tokens")
+    .update({ person_id: personId })
+    .eq("id", id(formData))
+    .is("person_id", null); // token é intransferível: só vincula quem ainda não tem dono
+  if (error) fail("/admin/tokens", error);
+  revalidatePath("/admin/tokens");
+  redirect("/admin/tokens?vinculado=1");
+}
+
 export async function updateNfcNotes(formData: FormData) {
   await requireAdmin();
   const supabase = await createClient();
