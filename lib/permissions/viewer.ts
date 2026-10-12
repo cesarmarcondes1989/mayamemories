@@ -61,11 +61,16 @@ export const getViewer = cache(async (): Promise<Viewer | null> => {
 });
 
 /** Exige um participante ativo (contribuinte, admin ou Maya). */
+/**
+ * O termo de contribuição não bloqueia a navegação: ele é exibido junto ao
+ * botão de envio e registrado (com finalidade e versão) no primeiro envio.
+ * `needsConsent: true` força a tela de boas-vindas quando for desejado.
+ */
 export async function requireMember(opts: { needsConsent?: boolean } = {}): Promise<Viewer> {
   const viewer = await getViewer();
   if (!viewer) redirect("/entrar");
   if (!viewer.personId || viewer.roles.length === 0) redirect("/acesso-indisponivel?motivo=sem-convite");
-  if (opts.needsConsent !== false && !viewer.hasConsent && !viewer.isAdmin) redirect("/boas-vindas");
+  if (opts.needsConsent === true && !viewer.hasConsent && !viewer.isAdmin) redirect("/boas-vindas");
   return viewer;
 }
 

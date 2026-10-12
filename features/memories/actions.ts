@@ -11,6 +11,10 @@ import { checkFileAgainstLimits, MIME_EXTENSION, type MediaKind } from "@/lib/st
 import { signatureMatchesDeclared } from "@/lib/storage/signature";
 import { friendlyError, type ActionResult } from "@/lib/errors";
 import { purgeMemoryFiles } from "./purge";
+import { POLICY_VERSION } from "@/lib/constants";
+
+const CONTRIBUTION_PURPOSE =
+  "Guardar e exibir minhas contribuições na plataforma Maya Memories, conforme as regras de visibilidade e após revisão dos pais (aceito ao enviar).";
 
 const BUCKET = "memories";
 
@@ -20,7 +24,19 @@ export type DraftResult = { memoryId: string; uploads: UploadTicket[]; submitted
 async function contributorOrError() {
   const viewer = await getViewer();
   if (!viewer?.canContribute || !viewer.profileId) return { viewer: null, error: "Você não tem permissão para contribuir." };
-  if (!viewer.hasConsent && !viewer.isAdmin) return { viewer: null, error: "Aceite o termo de contribuição antes de enviar." };
+  if (!viewer.hasConsent && !viewer.isAdmin) {
+    // Consentimento pelo ato de enviar: o termo é exibido junto ao botão.
+    const supabase = await createClient();
+    const { error } = await supabase.from("consents").insert({
+      person_id: viewer.personId!,
+      consent_type: "contribution_terms",
+      purpose: CONTRIBUTION_PURPOSE,
+      status: "granted",
+      policy_version: POLICY_VERSION,
+    });
+    if (error) return { viewer: null, error: friendlyError(error) };
+    viewer.hasConsent = true;
+  }
   return { viewer, error: null };
 }
 

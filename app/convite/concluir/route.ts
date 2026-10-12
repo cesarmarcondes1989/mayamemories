@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     ? await supabase.rpc("accept_invitation", { p_secret: secret })
     : await supabase.rpc("accept_invitations_for_my_email");
 
-  let target = "/boas-vindas";
+  let target = "/inicio";
   if (error) {
     const { data: personId } = await supabase.rpc("current_person_id");
     target = personId ? "/inicio" : `/acesso-indisponivel?motivo=${encodeURIComponent(friendlyError(error))}`;

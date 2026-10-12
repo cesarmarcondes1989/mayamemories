@@ -456,6 +456,12 @@ export function MemoryComposer({
 
       {error && <Alert tone="error">{error}</Alert>}
 
+      <p className="text-xs leading-relaxed text-taupe">
+        Ao enviar, você concorda que esta lembrança seja guardada e mostrada conforme a visibilidade escolhida, depois da
+        revisão dos pais da Maya. Você pode pedir correção ou exclusão quando quiser.{" "}
+        <a href="/privacidade" className="underline">Privacidade</a>
+      </p>
+
       <Button type="submit" size="lg" className="w-full sm:w-auto">
         {kind === "visit" ? "Registrar visita" : kind === "letter" ? "Guardar carta" : "Enviar com carinho"}
       </Button>

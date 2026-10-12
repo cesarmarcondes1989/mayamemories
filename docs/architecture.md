@@ -60,6 +60,7 @@ Vídeos ficam `ready` após verificação; miniaturas/transcodificação ficam p
 6. **Comentários sempre moderados no MVP.**
 7. **Localização de visitas não é coletada** no MVP (minimização de dados). O campo pode ser adicionado com consentimento específico.
 8. **Futuro acesso da Maya**: papel `future_subject` já existe; ela vê o que um membro da família vê (via grupo) e as concessões explícitas. A experiência dedicada vem depois, sem reestruturar o banco.
+10. **Ursinho = identidade (decisão do produto).** O token NFC ativo abre sessão direta como a pessoa vinculada (`/m/[token]/entrar`, Admin API + `nfc_link_person`). Nunca para administradores. O termo de contribuição é exibido junto ao botão de envio e registrado no primeiro envio.
 9. **Notificações por outbox** (`notification_jobs` com `dedupe_key`): idempotentes e auditáveis; o n8n apenas consome.
 
 ## Limitações conhecidas do MVP

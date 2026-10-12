@@ -98,7 +98,7 @@ export async function acceptInviteNow(formData: FormData) {
   const supabase = await createClient();
   const { error } = await supabase.rpc("accept_invitation", { p_secret: secret });
   if (error) redirect(`/acesso-indisponivel?motivo=${encodeURIComponent(friendlyError(error))}`);
-  redirect("/boas-vindas");
+  redirect("/inicio");
 }
 
 export async function signOut() {

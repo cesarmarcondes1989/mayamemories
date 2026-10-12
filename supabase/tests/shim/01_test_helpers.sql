@@ -3,7 +3,7 @@ create schema if not exists tests;
 grant usage on schema tests to anon, authenticated, service_role;
 
 create table tests.kv (k text primary key, v text);
-grant select, insert on tests.kv to anon, authenticated;
+grant select, insert on tests.kv to anon, authenticated, service_role;
 
 create or replace function tests.login(p_user uuid) returns void language plpgsql as $$
 begin
