@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Alert } from "@/components/ui/misc";
 
 function pickMime(): string {
-  const candidates = ["audio/webm;codecs=opus", "audio/webm", "audio/mp4", "audio/ogg;codecs=opus"];
+  // MP4/AAC primeiro: toca em iPhone, Android e computador. WebM só como reserva.
+  const candidates = ["audio/mp4;codecs=mp4a.40.2", "audio/mp4", "audio/aac", "audio/webm;codecs=opus", "audio/webm", "audio/ogg;codecs=opus"];
   for (const c of candidates) {
     if (typeof MediaRecorder !== "undefined" && MediaRecorder.isTypeSupported?.(c)) return c;
   }

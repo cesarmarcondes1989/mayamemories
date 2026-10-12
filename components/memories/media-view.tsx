@@ -34,7 +34,12 @@ export function MediaView({ asset, compact = false }: { asset: MediaAsset; compa
     return (
       <div className={compact ? "bg-rose-soft/60 p-4" : "rounded-2xl bg-rose-soft/60 p-5"}>
         <p className="mb-2 text-sm text-taupe">🎙️ Mensagem de voz</p>
-        <audio src={asset.url} controls preload="metadata" className="w-full" />
+        <audio controls preload="metadata" className="w-full">
+          <source src={asset.url} type={asset.mime_type === "audio/x-m4a" ? "audio/mp4" : asset.mime_type} />
+        </audio>
+        <a href={asset.url} target="_blank" rel="noreferrer noopener" className="mt-2 inline-block text-xs text-rose-deep underline">
+          Não está tocando? Abrir o áudio
+        </a>
       </div>
     );
   }
