@@ -51,8 +51,8 @@ export default async function NfcEntryPage({
   if (sp.admin && viewer?.isAdmin) redirect("/admin");
   return (
     <div className="mx-auto max-w-md pt-4 text-center">
-      <p className="font-display text-7xl text-rose-deep italic">Maya</p>
-      <h1 className="mt-4 text-4xl leading-tight">Você faz parte da história dela.</h1>
+      <p className="font-display text-8xl">Maya</p>
+      <h1 className="mt-2 text-4xl">Você faz parte da história dela</h1>
       <Card className="mt-8 p-6 text-left">
         {sp.admin ? (
           <p className="mb-4 text-[15px] text-taupe">

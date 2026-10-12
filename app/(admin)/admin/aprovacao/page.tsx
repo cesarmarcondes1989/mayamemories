@@ -44,7 +44,7 @@ export default async function ApprovalPage({
           <Link
             key={f.key}
             href={f.key ? `/admin/aprovacao?filtro=${f.key}` : "/admin/aprovacao"}
-            className={cn("rounded-full border px-3 py-1.5 text-sm", f.key === filter.key ? "border-ink bg-ink text-paper" : "border-line bg-paper text-taupe hover:text-ink")}
+            className={cn("rounded-full border px-3 py-1.5 text-sm", f.key === filter.key ? "border-rose-deep bg-rose-deep text-white" : "border-line bg-paper text-taupe hover:text-ink")}
           >
             {f.label}
           </Link>

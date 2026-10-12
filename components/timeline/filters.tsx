@@ -56,7 +56,7 @@ export function TimelineFiltersForm({
         <input type="checkbox" name="highlight" value="1" defaultChecked={filters.highlight === "1"} className="accent-[var(--rose-deep)]" />
         Destaques
       </label>
-      <button type="submit" className="h-10 rounded-full bg-ink px-4 text-sm text-paper">
+      <button type="submit" className="h-10 rounded-full bg-rose-deep px-4 text-sm text-white">
         Filtrar
       </button>
     </form>

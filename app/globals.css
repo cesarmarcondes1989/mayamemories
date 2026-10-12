@@ -5,21 +5,22 @@
    Base neutra e quente; rosa e sálvia reservados para detalhes.
    ===================================================================== */
 :root {
-  --cream: #faf7f2;
-  --warm-white: #fffdf9;
-  --rose: #e8c7cc;
-  --rose-deep: #b97988;
-  --sage: #a8b5a0;
-  --taupe: #776c67;
-  --ink: #383431;
-  --line: #e9e1da;
+  /* Base rosada e suave; rosa mais vivo só nos destaques */
+  --cream: #fdf3f4;
+  --warm-white: #fffafa;
+  --rose: #f6d3da;
+  --rose-deep: #d97a92;
+  --sage: #a8c3b0;
+  --taupe: #8a7178;
+  --ink: #4a3b40;
+  --line: #f1dfe3;
 
-  --sage-soft: #eef1ea;
-  --rose-soft: #f7ecee;
-  --amber-soft: #f8f0e1;
-  --amber: #a27b3c;
-  --danger: #a2493f;
-  --danger-soft: #f8e9e6;
+  --sage-soft: #eef5ef;
+  --rose-soft: #fbe8ec;
+  --amber-soft: #fbf1e3;
+  --amber: #a97a3a;
+  --danger: #b4475a;
+  --danger-soft: #fbe7ea;
 }
 
 @theme inline {
@@ -38,11 +39,13 @@
   --color-danger: var(--danger);
   --color-danger-soft: var(--danger-soft);
 
-  --font-serif: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
-  --font-sans: var(--font-inter), Inter, ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-display), "Amatic SC", cursive;
+  --font-display: var(--font-display), "Amatic SC", cursive;
+  --font-sans: var(--font-body), Nunito, ui-rounded, system-ui, sans-serif;
+  --font-hand: var(--font-hand), Caveat, cursive;
 
-  --radius-card: 1.25rem;
-  --shadow-soft: 0 1px 2px rgb(56 52 49 / 0.04), 0 8px 24px -12px rgb(56 52 49 / 0.12);
+  --radius-card: 1.75rem;
+  --shadow-soft: 0 1px 2px rgb(217 122 146 / 0.06), 0 10px 28px -14px rgb(217 122 146 / 0.28);
 }
 
 html {
@@ -59,16 +62,18 @@ body {
 }
 
 h1, h2, h3, .font-display {
-  font-family: var(--font-serif);
-  font-weight: 500;
-  letter-spacing: -0.01em;
+  font-family: var(--font-display), "Amatic SC", cursive;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1.05;
+  color: var(--rose-deep);
 }
 
 /* Cartas: serifada, entrelinha generosa, legível */
 .letter-body {
-  font-family: var(--font-serif);
-  font-size: 1.2rem;
-  line-height: 1.7;
+  font-family: var(--font-hand), Caveat, cursive;
+  font-size: 1.55rem;
+  line-height: 1.5;
   white-space: pre-wrap;
 }
 
@@ -84,9 +89,13 @@ input, textarea, select {
 
 .paper-grain {
   background-image:
-    radial-gradient(circle at 20% 0%, rgb(232 199 204 / 0.25), transparent 45%),
-    radial-gradient(circle at 100% 30%, rgb(168 181 160 / 0.18), transparent 40%);
+    radial-gradient(circle at 15% 0%, rgb(246 211 218 / 0.55), transparent 45%),
+    radial-gradient(circle at 100% 35%, rgb(251 232 236 / 0.9), transparent 45%);
 }
+
+/* Títulos de cartão/seção um pouco maiores: a fonte é condensada */
+h2.text-2xl, h3.text-2xl { font-size: 1.85rem; }
+h3.text-xl { font-size: 1.6rem; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }

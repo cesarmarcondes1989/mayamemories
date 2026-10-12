@@ -25,7 +25,7 @@ export default async function AdminMemoriesPage({ searchParams }: { searchParams
           <Link
             key={t}
             href={`/admin/memorias?status=${t}`}
-            className={cn("rounded-full border px-3 py-1.5 text-sm", t === status ? "border-ink bg-ink text-paper" : "border-line bg-paper text-taupe")}
+            className={cn("rounded-full border px-3 py-1.5 text-sm", t === status ? "border-rose-deep bg-rose-deep text-white" : "border-line bg-paper text-taupe")}
           >
             {t === "all" ? "Todas" : MODERATION_LABELS[t].label}
           </Link>

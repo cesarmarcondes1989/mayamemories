@@ -36,7 +36,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         <div className="flex items-center justify-between gap-2 px-4 py-4">
           <Link href="/admin" className="flex items-center gap-2">
             <Logo className="size-8" />
-            <span className="font-display text-xl">Administração</span>
+            <span className="font-display text-2xl text-rose-deep">Administração</span>
           </Link>
           <Link href="/inicio" className="text-sm text-taupe underline-offset-4 hover:underline lg:hidden">
             Sair do painel

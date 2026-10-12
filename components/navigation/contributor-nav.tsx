@@ -17,7 +17,7 @@ export function ContributorNav({ isAdmin }: { isAdmin: boolean }) {
       <div className="mx-auto flex max-w-5xl items-center gap-4 px-4 py-3">
         <Link href="/inicio" className="flex shrink-0 items-center gap-2" aria-label="Maya Memories — início">
           <Logo className="size-8" />
-          <span className="hidden font-display text-xl sm:inline">Maya Memories</span>
+          <span className="hidden font-display text-2xl text-rose-deep sm:inline">Maya Memories</span>
         </Link>
         <NavLinks links={links} />
       </div>

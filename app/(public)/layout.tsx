@@ -7,7 +7,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
       <header className="mx-auto flex w-full max-w-5xl items-center justify-between px-5 py-5">
         <Link href="/" className="flex items-center gap-2.5">
           <Logo className="size-9" />
-          <span className="font-display text-2xl text-ink">Maya Memories</span>
+          <span className="font-display text-3xl">Maya Memories</span>
         </Link>
       </header>
       <main className="mx-auto w-full max-w-5xl flex-1 px-5 pb-16">{children}</main>

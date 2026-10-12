@@ -29,7 +29,7 @@ export default async function AuditPage({ searchParams }: { searchParams: Promis
       <nav className="mb-4 flex flex-wrap gap-2 text-sm">
         <Link href="/admin/auditoria" className="rounded-full border border-line bg-paper px-3 py-1">Tudo</Link>
         {types.map((t) => (
-          <Link key={t} href={`/admin/auditoria?tipo=${t}`} className={`rounded-full border px-3 py-1 ${sp.tipo === t ? "border-ink bg-ink text-paper" : "border-line bg-paper"}`}>
+          <Link key={t} href={`/admin/auditoria?tipo=${t}`} className={`rounded-full border px-3 py-1 ${sp.tipo === t ? "border-rose-deep bg-rose-deep text-white" : "border-line bg-paper"}`}>
             {t}
           </Link>
         ))}

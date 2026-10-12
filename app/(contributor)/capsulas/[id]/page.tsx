@@ -29,7 +29,7 @@ export default async function CapsulePage({ params }: { params: Promise<{ id: st
         <p className="text-xs font-medium tracking-[0.2em] text-rose-deep uppercase">{CAPSULE_STATE_LABELS[state]}</p>
         <h1 className="mt-2 text-5xl">{capsule.title}</h1>
         {capsule.description && <p className="mx-auto mt-3 max-w-xl text-taupe">{capsule.description}</p>}
-        {capsule.theme && <p className="mt-2 font-display text-xl text-rose-deep italic">“{capsule.theme}”</p>}
+        {capsule.theme && <p className="mt-2 font-hand text-2xl text-rose-deep">“{capsule.theme}”</p>}
       </header>
       {isOpen ? (
         memories.length ? (

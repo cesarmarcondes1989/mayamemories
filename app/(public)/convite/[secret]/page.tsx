@@ -21,7 +21,7 @@ export default async function InvitePage({ params }: { params: Promise<{ secret:
   return (
     <div className="mx-auto mt-4 max-w-md text-center">
       <p className="text-xs font-medium tracking-[0.2em] text-rose-deep uppercase">Um convite especial</p>
-      <h1 className="mt-3 text-5xl leading-tight">
+      <h1 className="mt-3 text-5xl">
         {invite.first_name ? `${invite.first_name}, você` : "Você"} faz parte da história da Maya.
       </h1>
       <p className="mt-4 text-taupe">

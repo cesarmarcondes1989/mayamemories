@@ -17,12 +17,12 @@ export function NavLinks({ links, vertical = false }: { links: Array<{ href: str
                 aria-current={active ? "page" : undefined}
                 className={cn(
                   "flex items-center justify-between gap-2 rounded-full px-3 py-1.5 text-sm transition-colors",
-                  active ? "bg-ink text-paper" : "text-taupe hover:bg-paper hover:text-ink",
+                  active ? "bg-rose-deep text-white" : "text-taupe hover:bg-paper hover:text-ink",
                 )}
               >
                 {l.label}
                 {l.badge ? (
-                  <span className={cn("rounded-full px-1.5 text-xs", active ? "bg-paper/20" : "bg-rose-soft text-rose-deep")}>{l.badge}</span>
+                  <span className={cn("rounded-full px-1.5 text-xs", active ? "bg-white/25" : "bg-rose-soft text-rose-deep")}>{l.badge}</span>
                 ) : null}
               </Link>
             </li>

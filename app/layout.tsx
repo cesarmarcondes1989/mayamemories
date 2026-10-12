@@ -1,16 +1,12 @@
 import type { Metadata, Viewport } from "next";
-import { Cormorant_Garamond, Inter } from "next/font/google";
+import { Amatic_SC, Caveat, Nunito } from "next/font/google";
 import "./globals.css";
 import { HashSessionHandler } from "@/components/auth/hash-session";
 
-const cormorant = Cormorant_Garamond({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  style: ["normal", "italic"],
-  variable: "--font-cormorant",
-  display: "swap",
-});
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
+// Títulos: letra desenhada à mão. Texto: sans arredondada. Cartas: manuscrita.
+const display = Amatic_SC({ subsets: ["latin"], weight: ["400", "700"], variable: "--font-display", display: "swap" });
+const body = Nunito({ subsets: ["latin"], weight: ["400", "500", "600", "700"], variable: "--font-body", display: "swap" });
+const hand = Caveat({ subsets: ["latin"], weight: ["400", "500"], variable: "--font-hand", display: "swap" });
 
 export const metadata: Metadata = {
   title: { default: "Maya Memories", template: "%s · Maya Memories" },
@@ -21,14 +17,14 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#faf7f2",
+  themeColor: "#fdf3f4",
   width: "device-width",
   initialScale: 1,
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt-BR" className={`${cormorant.variable} ${inter.variable}`}>
+    <html lang="pt-BR" className={`${display.variable} ${body.variable} ${hand.variable}`}>
       <body className="text-ink antialiased">
         <HashSessionHandler />
         {children}

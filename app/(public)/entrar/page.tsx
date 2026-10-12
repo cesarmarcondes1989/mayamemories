@@ -11,7 +11,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
   const { next, erro } = await searchParams;
   return (
     <div className="mx-auto mt-6 max-w-md">
-      <h1 className="text-center text-5xl">Que bom ter você aqui</h1>
+      <h1 className="text-center text-6xl">Que bom ter você aqui</h1>
       <p className="mt-3 text-center text-taupe">Entre com o e-mail que os pais da Maya cadastraram.</p>
       <Card className="mt-8 p-6">
         {erro === "link" && (

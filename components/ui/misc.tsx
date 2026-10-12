@@ -15,8 +15,8 @@ export function PageHeader({
   return (
     <header className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
       <div>
-        {eyebrow && <p className="mb-1 text-xs font-medium tracking-[0.18em] text-rose-deep uppercase">{eyebrow}</p>}
-        <h1 className="text-4xl leading-tight text-ink sm:text-5xl">{title}</h1>
+        {eyebrow && <p className="mb-1 text-xs font-bold tracking-[0.18em] text-taupe uppercase">♡ {eyebrow}</p>}
+        <h1 className="text-5xl sm:text-6xl">{title}</h1>
         {description && <p className="mt-2 max-w-2xl text-[15px] leading-relaxed text-taupe">{description}</p>}
       </div>
       {actions && <div className="flex flex-wrap gap-2">{actions}</div>}
@@ -31,7 +31,7 @@ export function EmptyState({ title, children, action }: { title: string; childre
       <div aria-hidden="true" className="mx-auto mb-4 grid size-12 place-items-center rounded-full bg-rose-soft text-xl text-rose-deep">
         ♡
       </div>
-      <h3 className="text-2xl text-ink">{title}</h3>
+      <h3 className="text-3xl">{title}</h3>
       {children && <p className="mx-auto mt-2 max-w-md text-[15px] text-taupe">{children}</p>}
       {action && <div className="mt-6">{action}</div>}
     </div>
@@ -95,7 +95,7 @@ export function Stat({ label, value, hint, href }: { label: string; value: React
   const inner = (
     <>
       <p className="text-sm text-taupe">{label}</p>
-      <p className="mt-1 font-display text-4xl text-ink">{value}</p>
+      <p className="mt-1 font-display text-5xl">{value}</p>
       {hint && <p className="mt-1 text-xs text-taupe">{hint}</p>}
     </>
   );
@@ -130,13 +130,13 @@ export function ProgressBar({ value, label }: { value: number; label?: string })
 export function Logo({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 64 64" className={className} aria-hidden="true">
-      <circle cx="20" cy="18" r="7" fill="#776C67" />
-      <circle cx="44" cy="18" r="7" fill="#776C67" />
-      <circle cx="32" cy="32" r="17" fill="#776C67" />
+      <circle cx="20" cy="18" r="7" fill="#E7A9B8" />
+      <circle cx="44" cy="18" r="7" fill="#E7A9B8" />
+      <circle cx="32" cy="32" r="17" fill="#E7A9B8" />
       <path
         d="M32 47c-6-4.4-10-8-10-12a5 5 0 0 1 10-1.2A5 5 0 0 1 42 35c0 4-4 7.6-10 12z"
-        fill="#E8C7CC"
-        stroke="#B97988"
+        fill="#FFFAFA"
+        stroke="#D97A92"
         strokeWidth="1.5"
       />
     </svg>
