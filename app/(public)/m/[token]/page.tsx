@@ -60,7 +60,12 @@ export default async function NfcEntryPage({
           </p>
         ) : (
           <div className="mb-4">
-            <Alert tone="warn">Não conseguimos abrir o acesso direto agora. Você pode entrar com seu e-mail.</Alert>
+            <Alert tone="warn">
+              {sp.falha === "sem-pessoa"
+                ? "Este ursinho ainda não está ligado a uma pessoa. Peça aos pais da Maya para vinculá-lo."
+                : "Não conseguimos abrir o acesso direto agora. Você pode entrar com seu e-mail."}
+              <span className="mt-1 block text-xs opacity-70">Código: {sp.falha}</span>
+            </Alert>
           </div>
         )}
         <EmailLinkForm action={requestLoginLink} hidden={{ next: `/m/${token}` }} submitLabel="Continuar" />

@@ -15,15 +15,20 @@ export async function GET() {
   };
   let database: "ok" | "migrations_missing" | "unreachable" = "unreachable";
   let hasAdmin: boolean | null = null;
+  let nfcMigration: boolean | null = null;
   if (env.NEXT_PUBLIC_SUPABASE_URL && env.SUPABASE_SERVICE_ROLE_KEY) {
     try {
       const { error } = await createAdminClient().from("app_settings").select("id").limit(1);
       database = error ? (/does not exist|schema cache/i.test(error.message) ? "migrations_missing" : "unreachable") : "ok";
-      if (database === "ok") hasAdmin = await adminExists();
+      if (database === "ok") {
+        hasAdmin = await adminExists();
+        const { error: fnError } = await createAdminClient().rpc("nfc_login_target", { p_public_id: "health-check-0000" });
+        nfcMigration = !fnError;
+      }
     } catch {
       database = "unreachable";
     }
   }
   const ok = Object.values(env).every(Boolean) && database === "ok";
-  return NextResponse.json({ ok, env, database, hasAdmin }, { headers: { "Cache-Control": "no-store" } });
+  return NextResponse.json({ ok, env, database, hasAdmin, nfcMigration }, { headers: { "Cache-Control": "no-store" } });
 }
