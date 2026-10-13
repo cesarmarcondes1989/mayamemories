@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getViewer } from "@/lib/permissions/viewer";
 import { Card } from "@/components/ui/card";
+import { ButtonLink } from "@/components/ui/button";
 import { Alert } from "@/components/ui/misc";
 import { EmailLinkForm } from "@/components/auth/email-form";
 import { requestLoginLink } from "@/features/auth/actions";
@@ -39,6 +40,13 @@ export default async function NfcEntryPage({
       <div className="mx-auto max-w-3xl pt-2">
         <HomeHero name={resolved.greeting_name ?? viewer?.displayName.split(" ")[0]} />
         <HomeActions />
+        {viewer?.isAdmin && (
+          <div className="mt-8 text-center">
+            <ButtonLink href="/admin" variant="secondary">
+              ⚙︎ Ir para o painel de administração
+            </ButtonLink>
+          </div>
+        )}
       </div>
     );
   }

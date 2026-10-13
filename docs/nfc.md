@@ -27,7 +27,7 @@ Na primeira vez o sistema cria a conta da pessoa automaticamente (sem enviar e-m
 Travas de segurança:
 - só tokens **ativos** e ligados a uma pessoa entram direto (token de campanha pede e-mail);
 - o acesso é de **contribuinte**: tudo que a pessoa envia continua passando pela aprovação;
-- ursinho de **administrador** nunca abre o painel — admins entram por e-mail;
+- ursinho de **administrador** também entra direto, na página do ursinho, com um atalho para o painel (acesso marcado na auditoria);
 - revogar, suspender ou substituir o token corta novos acessos na hora;
 - cada acesso direto fica na auditoria (`nfc.direct_access`).
 

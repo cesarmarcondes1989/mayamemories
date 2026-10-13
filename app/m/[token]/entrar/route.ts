@@ -10,7 +10,7 @@ type Target = { person_id: string; display_name: string; auth_email: string | nu
 /**
  * Acesso direto pelo ursinho: o token É a identidade da pessoa.
  * Cria (uma vez) a conta dela, abre a sessão sem enviar e-mail e volta para
- * a página do ursinho. Nunca abre sessão de administrador.
+ * a página do ursinho. Ursinho de admin abre a mesma página, com atalho para o painel.
  */
 export async function GET(request: NextRequest, { params }: { params: Promise<{ token: string }> }) {
   const { token } = await params;
@@ -25,7 +25,6 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     if (error) throw error;
     const target = (data as Target[] | null)?.[0];
     if (!target) return back("?falha=sem-pessoa");
-    if (target.is_admin) return back("?admin=1");
 
     const host = new URL(publicEnv.siteUrl()).hostname;
     const email = target.auth_email ?? target.invitation_email ?? `nfc-${target.person_id}@${host}`;

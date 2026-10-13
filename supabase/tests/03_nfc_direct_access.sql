@@ -27,8 +27,10 @@ set local role service_role;
 select tests.expect_true((select person_id from public.nfc_login_target((select v from tests.kv where k = 'tok'))) = '10000000-0000-0000-0000-0000000000b2', 'token resolves to its person');
 select tests.expect_count($$ select 1 from public.nfc_login_target((select v from tests.kv where k = 'campaign')) $$, 0, 'campaign token has no identity');
 select tests.expect_true((select is_admin from public.nfc_login_target((select v from tests.kv where k = 'admintok'))), 'admin token is flagged');
-select tests.expect_error($$ select public.nfc_link_person((select v from tests.kv where k = 'admintok'), '00000000-0000-0000-0000-0000000000a2') $$,
-  'token never logs in as an administrator');
+select tests.expect_ok($$ select public.nfc_link_person((select v from tests.kv where k = 'admintok'), '00000000-0000-0000-0000-0000000000a2') $$,
+  'admin bear opens directly as its admin (product decision)');
+select tests.expect_error($$ select public.nfc_link_person((select v from tests.kv where k = 'admintok'), '00000000-0000-0000-0000-0000000000b3') $$,
+  'admin bear cannot be bound to another account');
 select tests.expect_true(public.nfc_link_person((select v from tests.kv where k = 'tok'), '00000000-0000-0000-0000-0000000000b2') = '10000000-0000-0000-0000-0000000000b2', 'first access links the person');
 select tests.expect_ok($$ select public.nfc_link_person((select v from tests.kv where k = 'tok'), '00000000-0000-0000-0000-0000000000b2') $$, 'subsequent accesses are idempotent');
 select tests.expect_error($$ select public.nfc_link_person((select v from tests.kv where k = 'tok'), '00000000-0000-0000-0000-0000000000b3') $$,
@@ -49,7 +51,8 @@ set local role service_role;
 select tests.expect_count($$ select 1 from public.nfc_login_target((select v from tests.kv where k = 'tok')) $$, 0, 'revoked token cannot log in');
 select tests.expect_error($$ select public.nfc_link_person((select v from tests.kv where k = 'tok'), '00000000-0000-0000-0000-0000000000b2') $$, 'revoked token cannot link');
 reset role;
-select tests.expect_count($$ select 1 from public.audit_events where action = 'nfc.direct_access' $$, 2, 'direct accesses are audited');
+select tests.expect_count($$ select 1 from public.audit_events where action = 'nfc.direct_access' $$, 3, 'direct accesses are audited');
+select tests.expect_count($$ select 1 from public.audit_events where action = 'nfc.direct_access' and (metadata ->> 'admin')::boolean $$, 1, 'admin bear access flagged in audit');
 
 select 'nfc direct access tests passed' as result;
 rollback;
