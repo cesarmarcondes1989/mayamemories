@@ -48,7 +48,6 @@ export default async function NfcEntryPage({
 
   // Ursinho de administrador (ou falha de configuração): entra por e-mail.
   const viewer = await getViewer();
-  if (sp.admin && viewer?.isAdmin) redirect("/admin");
   return (
     <div className="mx-auto max-w-md pt-4 text-center">
       <p className="font-display text-8xl">Maya</p>
@@ -56,7 +55,13 @@ export default async function NfcEntryPage({
       <Card className="mt-8 p-6 text-left">
         {sp.admin ? (
           <p className="mb-4 text-[15px] text-taupe">
-            Este ursinho pertence a um administrador. Por segurança, o painel só abre com o link enviado ao seu e-mail.
+            Este ursinho é de um <strong className="text-rose-deep">administrador</strong>. Por segurança, ursinhos de
+            administradores não abrem sozinhos: entre com o link enviado ao e-mail dessa pessoa.
+            {viewer?.displayName && (
+              <span className="mt-2 block text-sm">
+                Neste celular você está conectado como <strong>{viewer.displayName}</strong>, que não é o dono deste ursinho.
+              </span>
+            )}
           </p>
         ) : (
           <div className="mb-4">
