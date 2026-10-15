@@ -2,6 +2,7 @@ import Link from "next/link";
 import { requireAdmin } from "@/lib/permissions/viewer";
 import { createClient } from "@/lib/supabase/server";
 import { NavLinks } from "@/components/navigation/nav-links";
+import { MobileMenu } from "@/components/navigation/mobile-menu";
 import { Logo } from "@/components/ui/misc";
 
 export const dynamic = "force-dynamic";
@@ -32,18 +33,22 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   ];
   return (
     <div className="min-h-dvh lg:grid lg:grid-cols-[240px_1fr]">
-      <aside className="border-b border-line bg-paper lg:sticky lg:top-0 lg:h-dvh lg:overflow-y-auto lg:border-r lg:border-b-0">
-        <div className="flex items-center justify-between gap-2 px-4 py-4">
+      <aside className="sticky top-0 z-30 border-b border-line bg-paper/95 backdrop-blur lg:h-dvh lg:overflow-y-auto lg:border-r lg:border-b-0">
+        <div className="flex h-16 items-center justify-between gap-2 px-4">
           <Link href="/admin" className="flex items-center gap-2">
             <Logo className="size-8" />
             <span className="font-display text-2xl text-rose-deep">Administração</span>
           </Link>
-          <Link href="/inicio" className="text-sm text-taupe underline-offset-4 hover:underline lg:hidden">
-            Sair do painel
-          </Link>
-        </div>
-        <div className="px-3 pb-3 lg:hidden">
-          <NavLinks links={links} />
+          <div className="lg:hidden">
+            <MobileMenu
+              links={links}
+              footer={
+                <Link href="/inicio" className="block rounded-full border border-rose/70 bg-paper px-5 py-3.5 text-center text-[15px] font-semibold text-rose-deep">
+                  ← Voltar para a visão de usuário
+                </Link>
+              }
+            />
+          </div>
         </div>
         <div className="hidden px-3 pb-6 lg:block">
           <NavLinks links={links} vertical />

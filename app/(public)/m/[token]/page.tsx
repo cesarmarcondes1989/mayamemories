@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getViewer } from "@/lib/permissions/viewer";
 import { Card } from "@/components/ui/card";
 import { ButtonLink } from "@/components/ui/button";
+import { BottomTabs } from "@/components/navigation/bottom-tabs";
 import { Alert } from "@/components/ui/misc";
 import { EmailLinkForm } from "@/components/auth/email-form";
 import { requestLoginLink } from "@/features/auth/actions";
@@ -37,7 +38,8 @@ export default async function NfcEntryPage({
     const viewer = await getViewer();
     await supabase.rpc("touch_last_seen");
     return (
-      <div className="mx-auto max-w-3xl pt-2">
+      <div className="mx-auto max-w-3xl pt-2 pb-24 md:pb-0">
+        <BottomTabs />
         <HomeHero name={resolved.greeting_name ?? viewer?.displayName.split(" ")[0]} />
         <HomeActions />
         {viewer?.isAdmin && (

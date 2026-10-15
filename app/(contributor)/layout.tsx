@@ -8,7 +8,7 @@ export default async function ContributorLayout({ children }: { children: React.
   return (
     <div className="min-h-dvh">
       <ContributorNav isAdmin={Boolean(viewer?.isAdmin)} />
-      <main className="mx-auto max-w-5xl px-4 pt-8 pb-20">{children}</main>
+      <main className="mx-auto max-w-5xl px-4 pt-8 pb-32 md:pb-20">{children}</main>
     </div>
   );
 }

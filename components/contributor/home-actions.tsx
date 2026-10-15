@@ -17,7 +17,7 @@ export function HomeActions() {
         <li key={a.href}>
           <Link
             href={a.href}
-            className="group flex items-center gap-4 rounded-full border border-line bg-paper py-3 pr-5 pl-3 shadow-[var(--shadow-soft)] transition hover:-translate-y-0.5 hover:border-rose-deep/40"
+            className="group flex items-center gap-4 rounded-[1.75rem] border border-line bg-paper py-3 pr-5 pl-3 shadow-[var(--shadow-soft)] transition hover:-translate-y-0.5 hover:border-rose-deep/40"
           >
             <span aria-hidden="true" className="grid size-12 shrink-0 place-items-center rounded-full bg-rose-soft text-2xl">
               {a.icon}
