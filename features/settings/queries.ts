@@ -9,6 +9,7 @@ export type AppSettings = {
   birth_date: string | null;
   require_comment_moderation: boolean;
   public_landing_enabled: boolean;
+  nudges_enabled: boolean;
   limits: UploadLimits;
 };
 
@@ -22,6 +23,7 @@ export async function getSettings(): Promise<AppSettings> {
     birth_date: data?.birth_date ?? null,
     require_comment_moderation: data?.require_comment_moderation ?? true,
     public_landing_enabled: data?.public_landing_enabled ?? true,
+    nudges_enabled: data?.nudges_enabled ?? true,
     limits: normalizeLimits(data?.upload_limits),
   };
 }

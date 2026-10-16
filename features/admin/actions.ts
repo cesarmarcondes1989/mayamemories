@@ -510,6 +510,7 @@ export async function updateSettings(formData: FormData) {
       expected_birth_date: date("expectedBirthDate"),
       birth_date: date("birthDate"),
       require_comment_moderation: true, // MVP: moderação de comentários é obrigatória
+      nudges_enabled: formData.get("nudgesEnabled") === "on",
       upload_limits: limits,
       updated_at: new Date().toISOString(),
     })

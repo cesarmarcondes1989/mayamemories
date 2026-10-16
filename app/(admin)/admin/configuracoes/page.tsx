@@ -57,6 +57,13 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
             </p>
           </section>
           <section>
+            <h2 className="text-2xl">Incentivos na página inicial</h2>
+            <label className="mt-2 flex items-center gap-2 text-[15px]">
+              <input type="checkbox" name="nudgesEnabled" defaultChecked={s.nudges_enabled} className="size-5 accent-[var(--rose-deep)]" />
+              Mostrar números da própria pessoa e mensagens carinhosas (“faz 12 dias da sua última foto…”). Sem ranking.
+            </label>
+          </section>
+          <section>
             <h2 className="text-2xl">Regras de aprovação</h2>
             <p className="mt-1 text-[15px] text-taupe">Nesta versão, toda contribuição e todo comentário passam por aprovação. Conteúdo público está desativado.</p>
           </section>

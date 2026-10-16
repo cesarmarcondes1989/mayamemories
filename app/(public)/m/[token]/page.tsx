@@ -5,6 +5,8 @@ import { getViewer } from "@/lib/permissions/viewer";
 import { Card } from "@/components/ui/card";
 import { ButtonLink } from "@/components/ui/button";
 import { BottomTabs } from "@/components/navigation/bottom-tabs";
+import { NudgeCard } from "@/components/contributor/nudge-card";
+import { getMyStats } from "@/features/memories/stats";
 import { Alert } from "@/components/ui/misc";
 import { EmailLinkForm } from "@/components/auth/email-form";
 import { requestLoginLink } from "@/features/auth/actions";
@@ -35,12 +37,12 @@ export default async function NfcEntryPage({
   }
 
   if (resolved.is_my_token) {
-    const viewer = await getViewer();
-    await supabase.rpc("touch_last_seen");
+    const [viewer, , stats] = await Promise.all([getViewer(), supabase.rpc("touch_last_seen"), getMyStats()]);
     return (
       <div className="mx-auto max-w-3xl pt-2 pb-24 md:pb-0">
         <BottomTabs />
         <HomeHero name={resolved.greeting_name ?? viewer?.displayName.split(" ")[0]} />
+        <NudgeCard stats={stats} />
         <HomeActions />
         {viewer?.isAdmin && (
           <div className="mt-8 text-center">
