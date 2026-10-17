@@ -21,7 +21,7 @@ export default async function DemoPage({ searchParams }: { searchParams: Promise
         Uma família de mentirinha, com 5 meses de memórias: ultrassom, primeiro banho, a vó cantando, cartas trancadas até os 18…
         Passeie à vontade — nada que você fizer aqui é salvo.
       </p>
-      {indisponivel && <div className="mt-6 text-left"><Alert tone="warn">A demonstração está sendo preparada. Tente de novo em instantes.</Alert></div>}
+      {indisponivel && <div className="mt-6 text-left"><Alert tone="warn">A demonstração ainda não está no ar. Se você é o dono da plataforma, crie em Plataforma → Demonstração.</Alert></div>}
       <div className="mt-8 grid gap-4 text-left sm:grid-cols-2">
         <Card className="flex flex-col p-6">
           <span className="text-4xl" aria-hidden="true">👵</span>

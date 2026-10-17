@@ -16,15 +16,22 @@ export async function GET(request: NextRequest) {
   const fail = () => NextResponse.redirect(new URL("/demo?indisponivel=1", origin));
   try {
     const admin = createAdminClient();
-    const { data: vaultId } = await admin.rpc("demo_vault_id");
+    const { data: vaultId, error: demoError } = await admin.rpc("demo_vault_id");
+    if (demoError) console.error("[demo] demo_vault_id", demoError.message);
     if (!vaultId) return fail();
     const email = asAdmin ? DEMO_EMAILS.admin : DEMO_EMAILS.family;
     const { data: link, error } = await admin.auth.admin.generateLink({ type: "magiclink", email });
-    if (error || !link?.properties?.hashed_token) return fail();
+    if (error || !link?.properties?.hashed_token) {
+      console.error("[demo] generateLink", error?.message);
+      return fail();
+    }
     const supabase = await createClient();
     await supabase.auth.signOut();
     const { error: verifyError } = await supabase.auth.verifyOtp({ token_hash: link.properties.hashed_token, type: "magiclink" });
-    if (verifyError) return fail();
+    if (verifyError) {
+      console.error("[demo] verifyOtp", verifyError.message);
+      return fail();
+    }
     const res = NextResponse.redirect(new URL(asAdmin ? "/admin" : "/inicio", origin));
     res.cookies.set(CURRENT_VAULT_COOKIE, vaultId as string, { httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production", path: "/", maxAge: 60 * 60 * 24 });
     return res;
