@@ -18,9 +18,9 @@ export function ContributorNav({ isAdmin, vaultTitle, showVaults }: { isAdmin: b
     <>
       <header className="sticky top-0 z-20 border-b border-line bg-cream/90 backdrop-blur">
         <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-3">
-          <Link href="/inicio" className="flex shrink-0 items-center gap-2" aria-label="Maya Memories — início">
+          <Link href="/inicio" className="flex shrink-0 items-center gap-2" aria-label="Início">
             <Logo className="size-8" />
-            <span className="max-w-[46vw] truncate font-display text-2xl text-rose-deep">{vaultTitle ?? "Maya Memories"}</span>
+            <span className="max-w-[46vw] truncate font-display text-2xl text-rose-deep">{vaultTitle ?? "Guardei pra você"}</span>
           </Link>
           {/* Computador: menu completo no topo */}
           <div className="hidden min-w-0 flex-1 md:block">

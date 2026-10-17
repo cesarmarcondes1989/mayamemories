@@ -8,7 +8,7 @@ export default function PrivacyPage() {
       <h1 className="text-5xl">Privacidade e cuidado</h1>
       <div className="mt-6 space-y-4 text-[15px] leading-relaxed text-ink/90">
         <p>
-          O Maya Memories é um arquivo de família privado. Ele guarda dados e imagens de uma criança e, por isso, foi
+          O Guardei pra você é um arquivo de família privado. Ele guarda dados e imagens de uma criança e, por isso, foi
           desenhado para minimizar riscos desde a primeira versão, em linha com a LGPD e com os direitos da criança e do
           adolescente.
         </p>

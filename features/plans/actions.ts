@@ -120,7 +120,7 @@ export async function updateBrand(formData: FormData) {
   const { error } = await supabase
     .from("app_settings")
     .update({
-      brand_name: get("brand_name").slice(0, 60) || "Baú de Memórias",
+      brand_name: get("brand_name").slice(0, 60) || "Guardei pra você",
       brand_slogan: get("brand_slogan").slice(0, 160),
       contact_whatsapp: whatsapp ? (whatsapp.length <= 11 ? `55${whatsapp}` : whatsapp) : null,
       contact_email: get("contact_email") || null,

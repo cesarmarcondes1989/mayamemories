@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Guardei pra você — motion</title>
+<link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&family=Caveat:wght@500;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root { --cream:#fdf3f4; --paper:#fffafa; --rose:#f6d3da; --rose-deep:#d97a92; --rose-soft:#fbe8ec; --ink:#4a3b40; --taupe:#8a7178; --line:#f1dfe3; --sage:#a8c3b0; }
+  * { box-sizing: border-box; margin: 0; }
+  html, body { width: 1080px; height: 1920px; overflow: hidden; }
+  body { background: radial-gradient(120% 80% at 50% 10%, #fff7f8 0%, var(--cream) 55%, #f9e4e9 100%); color: var(--ink); font-family: Nunito, sans-serif; position: relative; }
+  .abs { position: absolute; left: 0; right: 0; text-align: center; }
+  .display { font-family: "Amatic SC", cursive; font-weight: 700; line-height: .95; }
+  .hand { font-family: Caveat, cursive; }
+  .scene { position: absolute; inset: 0; display: none; }
+  .grain { position:absolute; inset:0; opacity:.35; background-image: radial-gradient(rgba(217,122,146,.08) 1px, transparent 1px); background-size: 6px 6px; }
+
+  /* A — gancho */
+  #a1 { top: 520px; font-size: 120px; }
+  #a2 { top: 650px; font-size: 230px; color: var(--rose-deep); }
+  #a3 { top: 880px; font-size: 120px; }
+  #a4 { top: 1120px; font-size: 64px; font-weight: 800; padding: 0 90px; line-height: 1.2; }
+
+  /* B — tudo se perde */
+  #b-title { top: 330px; font-size: 110px; }
+  .lost { position: absolute; width: 420px; padding: 26px; border-radius: 40px; background: var(--paper); box-shadow: 0 30px 60px rgba(150,80,100,.15); font-size: 34px; font-weight: 700; }
+  .lost .ico { width: 90px; height: 90px; border-radius: 28px; background: var(--rose-soft); display:grid; place-items:center; font-size: 50px; margin-bottom: 18px; }
+  .lost small { display:block; font-weight: 600; color: var(--taupe); font-size: 26px; margin-top: 6px; }
+  .lost.dashed { background: transparent; border: 5px dashed var(--rose); box-shadow:none; color: var(--taupe); }
+
+  /* C — logo */
+  #logo-heart { position:absolute; left: 50%; top: 520px; width: 260px; margin-left: -130px; }
+  #logo-word { top: 840px; font-size: 180px; color: var(--rose-deep); }
+  #logo-tag { top: 1110px; font-size: 52px; font-weight: 700; padding: 0 120px; line-height: 1.3; color: var(--ink); }
+
+  /* phone */
+  #phone { position:absolute; left: 50%; top: 560px; width: 640px; height: 1240px; margin-left: -320px; border-radius: 90px; background: #3b3035; padding: 22px; box-shadow: 0 60px 120px rgba(120,60,80,.25); }
+  #screen { position: relative; width: 100%; height: 100%; border-radius: 70px; background: var(--cream); overflow: hidden; }
+  .notch { position:absolute; top: 18px; left: 50%; width: 180px; height: 40px; margin-left: -90px; background:#3b3035; border-radius: 30px; z-index: 5; }
+  .scr { position:absolute; inset: 0; padding: 110px 44px 40px; visibility: hidden; }
+  .scr h4 { font-family: "Amatic SC"; font-size: 84px; text-align:center; color: var(--ink); line-height: 1; }
+  .scr .sub { text-align:center; color: var(--taupe); font-size: 26px; margin-top: 8px; }
+  .field { margin-top: 34px; }
+  .field label { font-size: 24px; font-weight: 700; }
+  .field .inp { margin-top: 10px; height: 82px; border: 3px solid var(--line); border-radius: 28px; background: var(--paper); font-size: 34px; padding: 18px 26px; }
+  .btn { margin-top: 44px; height: 96px; border-radius: 60px; background: var(--rose-deep); color: #fff; font-weight: 800; font-size: 34px; display:grid; place-items:center; box-shadow: 0 16px 30px rgba(217,122,146,.35); }
+  .caption { top: 250px; font-size: 64px; font-weight: 800; padding: 0 80px; line-height: 1.15; }
+  .caption b { color: var(--rose-deep); }
+  .avatar { position:absolute; width: 150px; text-align:center; font-size: 24px; font-weight: 700; }
+  .avatar .c { width: 120px; height: 120px; margin: 0 auto 10px; border-radius: 50%; display:grid; place-items:center; font-size: 46px; font-weight: 800; color: #fff; }
+  #bear { position:absolute; left: 70px; top: 1500px; font-size: 200px; }
+  .ripple { position:absolute; left: 210px; top: 1520px; width: 160px; height: 160px; border: 6px solid var(--rose-deep); border-radius: 50%; }
+  .card { position:absolute; left: 34px; right: 34px; padding: 26px; border-radius: 36px; background: var(--paper); box-shadow: 0 16px 34px rgba(150,80,100,.12); display:flex; gap: 22px; align-items:center; }
+  .card .ico { width: 92px; height: 92px; border-radius: 28px; background: var(--rose-soft); display:grid; place-items:center; font-size: 46px; flex-shrink:0; }
+  .card b { display:block; font-size: 30px; }
+  .card span { font-size: 24px; color: var(--taupe); }
+  .wave { display:flex; gap: 6px; align-items:center; height: 40px; margin-top: 8px; }
+  .wave i { width: 8px; border-radius: 4px; background: var(--rose-deep); display:block; }
+
+  /* G — 18 anos */
+  #year { top: 420px; font-size: 300px; color: var(--rose-deep); }
+  #later { top: 740px; font-size: 90px; }
+  #letter { position:absolute; left: 110px; right: 110px; top: 900px; min-height: 620px; padding: 70px 64px; background: var(--paper); border-radius: 30px; box-shadow: 0 40px 80px rgba(150,80,100,.18); transform-origin: 50% 100%; }
+  #letter p { font-size: 62px; line-height: 1.25; color: var(--ink); }
+  #lock { position:absolute; left: 50%; top: 840px; width: 140px; height: 140px; margin-left: -70px; border-radius: 50%; background: var(--rose-deep); color: #fff; display:grid; place-items:center; font-size: 70px; box-shadow: 0 20px 40px rgba(217,122,146,.4); }
+
+  /* H — final */
+  #end-heart { position:absolute; left: 50%; top: 470px; width: 200px; margin-left: -100px; }
+  #end-word { top: 730px; font-size: 175px; color: var(--rose-deep); }
+  #end-cta { top: 1020px; font-size: 52px; font-weight: 700; }
+  #end-url { position:absolute; left: 50%; top: 1110px; transform: translateX(-50%); padding: 26px 56px; border-radius: 80px; background: var(--rose-deep); color:#fff; font-size: 60px; font-weight: 800; white-space: nowrap; box-shadow: 0 20px 40px rgba(217,122,146,.4); }
+  #end-small { top: 1290px; font-size: 38px; color: var(--taupe); font-weight: 600; }
+</style>
+<script src="engine.js"></script>
+</head>
+<body>
+<div class="grain"></div>
+
+<!-- A -->
+<section class="scene" id="A">
+  <div class="abs display" id="a1">Sua mãe tem</div>
+  <div class="abs display" id="a2">40.312</div>
+  <div class="abs display" id="a3">fotos no celular.</div>
+  <div class="abs" id="a4">Quantas o seu filho<br>vai ver um dia?</div>
+</section>
+
+<!-- B -->
+<section class="scene" id="B">
+  <div class="abs display" id="b-title">Tudo se perde pelo caminho</div>
+  <div class="lost" id="l1" style="left:90px;top:640px"><div class="ico">🎙️</div>A voz da vó<small>num grupo que ninguém acha</small></div>
+  <div class="lost" id="l2" style="left:570px;top:820px"><div class="ico">🎥</div>O primeiro passo<small>no celular que quebrou</small></div>
+  <div class="lost" id="l3" style="left:110px;top:1120px"><div class="ico">📸</div>Mil fotos<small>no meio de prints e memes</small></div>
+  <div class="lost dashed" id="l4" style="left:560px;top:1290px"><div class="ico">✉️</div>A carta<small>que você ia escrever…</small></div>
+</section>
+
+<!-- C -->
+<section class="scene" id="C">
+  <svg id="logo-heart" viewBox="0 0 48 44" fill="none"><path id="hpath" d="M24 40C14 33 5 26 4.5 16.5 4.2 10 8.8 5 14.6 5c4.3 0 7.4 2.6 9.4 6.2C26 7.6 29.1 5 33.4 5 39.2 5 43.8 10 43.5 16.5 43 26 34 33 24 40Z" stroke="#d97a92" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="140" stroke-dashoffset="140"/></svg>
+  <div class="abs display" id="logo-word">guardei pra você</div>
+  <div class="abs" id="logo-tag">o baú da família para a criança abrir quando crescer</div>
+</section>
+
+<!-- D/E/F — produto -->
+<section class="scene" id="P">
+  <div class="abs caption" id="cap1">1. Crie o baú em <b>1 minuto</b>. Grátis.</div>
+  <div class="abs caption" id="cap2">2. A família entra pelo <b>ursinho</b> ou QR. Sem senha.</div>
+  <div class="abs caption" id="cap3">3. Fotos, <b>vozes</b> e cartas. Só pra família.</div>
+  <div id="phone"><div id="screen">
+    <div class="notch"></div>
+    <div class="scr" id="s1">
+      <h4>Vamos criar o seu baú</h4>
+      <p class="sub">Grátis, em um minuto.</p>
+      <div class="field"><label>Nome da criança</label><div class="inp" id="t-name"></div></div>
+      <div class="field"><label>Data prevista</label><div class="inp" id="t-date"></div></div>
+      <div class="field"><label>Você é…</label><div class="inp">Mãe</div></div>
+      <div class="btn" id="s1btn">Criar meu baú grátis ♡</div>
+    </div>
+    <div class="scr" id="s2">
+      <h4>Baú da Alice</h4>
+      <p class="sub">quem já está guardando</p>
+      <div class="avatar" id="av1" style="left:40px;top:330px"><div class="c" style="background:#d97a92">L</div>Vó Lúcia</div>
+      <div class="avatar" id="av2" style="left:220px;top:330px"><div class="c" style="background:#a8c3b0">B</div>Tio Beto</div>
+      <div class="avatar" id="av3" style="left:400px;top:330px"><div class="c" style="background:#c9a27a">B</div>Dinda Bia</div>
+      <div class="avatar" id="av4" style="left:130px;top:560px"><div class="c" style="background:#8a6cc1">R</div>Papai</div>
+      <div class="avatar" id="av5" style="left:310px;top:560px"><div class="c" style="background:#4f86b8">N</div>Vô Nelson</div>
+      <div class="card" id="toast" style="top:860px"><div class="ico">🧸</div><div><b>Vó Lúcia entrou</b><span>encostou o celular no ursinho</span></div></div>
+    </div>
+    <div class="scr" id="s3">
+      <h4>Baú da Alice</h4>
+      <div class="card" id="m1" style="top:250px"><div class="ico">📸</div><div><b>Primeiro banho</b><span>Mamãe · hoje</span></div></div>
+      <div class="card" id="m2" style="top:440px"><div class="ico">🎙️</div><div style="flex:1"><b>Vó Lúcia cantando</b><div class="wave" id="wave"></div></div></div>
+      <div class="card" id="m3" style="top:650px"><div class="ico">🔒</div><div><b>Carta do papai</b><span>abre em 12/05/2044 · aos 18</span></div></div>
+      <div class="card" id="m4" style="top:840px"><div class="ico">🎂</div><div><b>Cápsula do 1º aniversário</b><span>abre sozinha em 2027</span></div></div>
+    </div>
+  </div></div>
+  <div id="bear">🧸</div>
+  <div class="ripple" id="rp1"></div><div class="ripple" id="rp2"></div>
+</section>
+
+<!-- G -->
+<section class="scene" id="G">
+  <div class="abs display" id="year">2026</div>
+  <div class="abs display" id="later">18 anos depois…</div>
+  <div id="lock">🔒</div>
+  <div id="letter"><p class="hand" id="letter-text"></p></div>
+</section>
+
+<!-- H -->
+<section class="scene" id="H">
+  <svg id="end-heart" viewBox="0 0 48 44" fill="none"><path d="M24 40C14 33 5 26 4.5 16.5 4.2 10 8.8 5 14.6 5c4.3 0 7.4 2.6 9.4 6.2C26 7.6 29.1 5 33.4 5 39.2 5 43.8 10 43.5 16.5 43 26 34 33 24 40Z" fill="#fbe8ec" stroke="#d97a92" stroke-width="2.6" stroke-linejoin="round"/></svg>
+  <div class="abs display" id="end-word">guardei pra você</div>
+  <div class="abs" id="end-cta">Crie o baú da sua família, grátis:</div>
+  <div id="end-url">guardeipravoce.com.br</div>
+  <div class="abs" id="end-small">privado · sem anúncios · da família, pra sempre</div>
+</section>
+
+<script>
+const DURATION = 52;
+const LETTER = "Alice, hoje você fez dois meses e segurou meu dedo a tarde inteira. Guardei pra você. — Vó Lúcia";
+// ondinha de áudio
+const wave = A.$("#wave");
+for (let i = 0; i < 26; i++) wave.appendChild(document.createElement("i"));
+
+function scene(id, t, a, b) {
+  const el = A.$(id);
+  const on = t >= a && t <= b;
+  el.style.display = on ? "block" : "none";
+  return on;
+}
+
+window.render = function (t) {
+  // A — gancho (0–6.2)
+  if (scene("#A", t, 0, 6.2)) {
+    const fade = 1 - A.p(t, 5.7, 6.2);
+    A.set("#a1", { o: A.out(A.p(t, 0.2, 0.8)) * fade, y: 40 * (1 - A.out(A.p(t, 0.2, 0.8))) });
+    A.set("#a2", { o: A.out(A.p(t, 0.7, 1.2)) * fade, s: 0.9 + 0.1 * A.back(A.p(t, 0.7, 1.4)) });
+    A.$("#a2").textContent = Math.round(40312 * A.out(A.p(t, 0.7, 2.6))).toLocaleString("pt-BR");
+    A.set("#a3", { o: A.out(A.p(t, 1.6, 2.2)) * fade, y: 40 * (1 - A.out(A.p(t, 1.6, 2.2))) });
+    A.set("#a4", { o: A.out(A.p(t, 3.2, 3.9)) * fade, y: 30 * (1 - A.out(A.p(t, 3.2, 3.9))) });
+  }
+  // B — tudo se perde (6.2–12.6)
+  if (scene("#B", t, 6.2, 12.6)) {
+    A.set("#b-title", { o: A.life(t, 6.3, 12.4, 0.5) });
+    ["#l1", "#l2", "#l3", "#l4"].forEach((id, i) => {
+      const inP = A.out(A.p(t, 6.8 + i * 0.6, 7.5 + i * 0.6));
+      const fall = A.inOut(A.p(t, 10.6 + i * 0.15, 12.3));
+      A.set(id, { o: inP * (1 - fall), y: 60 * (1 - inP) + 500 * fall, r: (i % 2 ? 4 : -4) + (i % 2 ? 25 : -25) * fall, s: 1 - 0.15 * fall });
+    });
+  }
+  // C — logo (12.6–17.4)
+  if (scene("#C", t, 12.6, 17.4)) {
+    const out = 1 - A.p(t, 17.0, 17.4);
+    A.$("#hpath").setAttribute("stroke-dashoffset", 140 * (1 - A.inOut(A.p(t, 12.8, 14.2))));
+    A.$("#hpath").setAttribute("fill", `rgba(251,232,236,${A.p(t, 13.9, 14.4)})`);
+    A.set("#logo-heart", { o: out, s: 1 + 0.06 * Math.sin(Math.max(0, t - 14.2) * 5) * (1 - A.p(t, 14.2, 15.4)) });
+    const w = A.$("#logo-word");
+    w.style.clipPath = `inset(0 ${100 - 100 * A.inOut(A.p(t, 13.6, 15.0))}% 0 0)`;
+    A.set(w, { o: out });
+    A.set("#logo-tag", { o: A.out(A.p(t, 15.0, 15.6)) * out, y: 20 * (1 - A.out(A.p(t, 15.0, 15.6))) });
+  }
+  // P — produto (17.4–38.2)
+  if (scene("#P", t, 17.4, 38.2)) {
+    const phoneIn = A.out(A.p(t, 17.4, 18.3));
+    const phoneOut = A.inOut(A.p(t, 37.6, 38.2));
+    A.set("#phone", { o: 1 - phoneOut, y: 900 * (1 - phoneIn) + 200 * phoneOut });
+    A.set("#cap1", { o: A.life(t, 17.8, 24.2, 0.4) });
+    A.set("#cap2", { o: A.life(t, 24.2, 31.2, 0.4) });
+    A.set("#cap3", { o: A.life(t, 31.2, 38.0, 0.4) });
+    // tela 1
+    const s1 = t < 24.2;
+    A.set("#s1", { o: s1 ? 1 : 0 });
+    A.type("#t-name", "Alice", A.p(t, 18.8, 19.8));
+    A.type("#t-date", "12/05/2026", A.p(t, 20.1, 21.3));
+    const press = A.p(t, 22.4, 22.7) - A.p(t, 22.7, 23.0);
+    A.set("#s1btn", { s: 1 - 0.06 * press + 0.03 * Math.sin(t * 6) * A.p(t, 21.5, 22.3) * (1 - A.p(t, 22.3, 22.4)) });
+    // tela 2
+    const s2 = t >= 24.2 && t < 31.2;
+    A.set("#s2", { o: s2 ? A.out(A.p(t, 24.2, 24.6)) : 0 });
+    ["#av1", "#av2", "#av3", "#av4", "#av5"].forEach((id, i) => {
+      const k = A.back(A.p(t, 25.2 + i * 0.7, 25.7 + i * 0.7));
+      A.set(id, { o: A.clamp(k * 2), s: Math.max(0.01, k) });
+    });
+    A.set("#toast", { o: A.life(t, 25.4, 30.9, 0.4), y: 40 * (1 - A.out(A.p(t, 25.4, 25.9))) });
+    const bearOn = A.life(t, 24.4, 31.0, 0.5);
+    A.set("#bear", { o: bearOn, x: 60 * A.inOut(A.p(t, 24.6, 25.2)), r: -8 + 8 * A.inOut(A.p(t, 24.6, 25.2)) });
+    [["#rp1", 0], ["#rp2", 0.6]].forEach(([id, off]) => {
+      const cyc = ((t - 25.0 - off) % 1.2 + 1.2) % 1.2 / 1.2;
+      A.set(id, { o: bearOn * (t > 25 ? 1 - cyc : 0), s: 0.4 + 1.2 * cyc });
+    });
+    // tela 3
+    const s3 = t >= 31.2;
+    A.set("#s3", { o: s3 ? A.out(A.p(t, 31.2, 31.6)) : 0 });
+    ["#m1", "#m2", "#m3", "#m4"].forEach((id, i) => {
+      const k = A.out(A.p(t, 31.6 + i * 0.9, 32.2 + i * 0.9));
+      A.set(id, { o: k, y: 120 * (1 - k) });
+    });
+    A.$$("#wave i").forEach((bar, i) => {
+      const playing = A.p(t, 33.2, 33.4);
+      bar.style.height = `${8 + playing * (16 + 14 * Math.sin(t * 9 + i * 0.7) + 10 * Math.sin(t * 4.3 + i * 1.9))}px`;
+    });
+  }
+  // G — 18 anos depois (38.2–45.8)
+  if (scene("#G", t, 38.2, 45.8)) {
+    const out = 1 - A.p(t, 45.3, 45.8);
+    const yp = A.inOut(A.p(t, 38.6, 40.4));
+    A.$("#year").textContent = String(Math.round(2026 + 18 * yp));
+    A.set("#year", { o: A.out(A.p(t, 38.3, 38.7)) * (1 - A.p(t, 41.0, 41.5)), s: 1 + 0.05 * yp });
+    A.set("#later", { o: A.life(t, 39.8, 41.6, 0.4) });
+    const unlock = A.p(t, 41.5, 42.3);
+    A.$("#lock").textContent = unlock > 0.5 ? "🔓" : "🔒";
+    A.set("#lock", { o: A.out(A.p(t, 41.2, 41.5)) * (1 - A.p(t, 42.4, 42.8)), s: 1 + 0.2 * Math.sin(unlock * Math.PI), r: unlock > 0.5 ? 0 : -10 * Math.sin(t * 30) * A.p(t, 41.5, 41.9) });
+    const lt = A.out(A.p(t, 42.3, 42.9));
+    A.set("#letter", { o: lt * out, y: 140 * (1 - lt), s: 0.92 + 0.08 * lt });
+    A.type("#letter-text", LETTER, A.p(t, 42.7, 45.0));
+  }
+  // H — final (45.8–52)
+  if (scene("#H", t, 45.8, 52)) {
+    const k = A.out(A.p(t, 45.8, 46.5));
+    A.set("#end-heart", { o: k, s: 0.8 + 0.2 * A.back(A.p(t, 45.8, 46.6)) + 0.04 * Math.sin(Math.max(0, t - 47) * 3) });
+    A.set("#end-word", { o: A.out(A.p(t, 46.1, 46.8)), y: 30 * (1 - A.out(A.p(t, 46.1, 46.8))) });
+    A.set("#end-cta", { o: A.out(A.p(t, 46.9, 47.4)) });
+    const u = A.back(A.p(t, 47.3, 47.9));
+    const el = A.$("#end-url");
+    el.style.opacity = A.clamp(u * 2);
+    el.style.visibility = u > 0 ? "visible" : "hidden";
+    el.style.transform = `translateX(-50%) scale(${Math.max(0.01, u)})`;
+    A.set("#end-small", { o: A.out(A.p(t, 48.2, 48.8)) });
+  }
+};
+window.DURATION = DURATION;
+</script>
+</body>
+</html>

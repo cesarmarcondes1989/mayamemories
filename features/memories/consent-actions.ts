@@ -8,7 +8,7 @@ import { POLICY_VERSION } from "@/lib/constants";
 
 const PURPOSES: Record<string, string> = {
   contribution_terms:
-    "Guardar e exibir minhas contribuições na plataforma Maya Memories, conforme as regras de visibilidade e após revisão dos pais.",
+    "Guardar e exibir minhas contribuições na plataforma Guardei pra você, conforme as regras de visibilidade e após revisão dos pais.",
   email_notifications: "Receber e-mails sobre minhas contribuições e cápsulas.",
   image_of_third_parties: "Declaro ter autorização das pessoas que aparecem nas fotos e vídeos que eu enviar.",
 };

@@ -14,7 +14,7 @@ import { purgeMemoryFiles } from "./purge";
 import { POLICY_VERSION } from "@/lib/constants";
 
 const CONTRIBUTION_PURPOSE =
-  "Guardar e exibir minhas contribuições na plataforma Maya Memories, conforme as regras de visibilidade e após revisão dos pais (aceito ao enviar).";
+  "Guardar e exibir minhas contribuições na plataforma Guardei pra você, conforme as regras de visibilidade e após revisão dos pais (aceito ao enviar).";
 
 const BUCKET = "memories";
 

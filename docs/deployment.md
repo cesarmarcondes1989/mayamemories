@@ -21,8 +21,8 @@ Tempo estimado: 30–40 min. Faça primeiro em um projeto de **desenvolvimento**
    - Site URL: `https://seu-dominio.com.br`
    - Redirect URLs: `https://seu-dominio.com.br/**` (e a URL de preview da Vercel, se quiser testar previews).
 5. **Authentication → Emails → Templates** — *obrigatório*. Cole o HTML de:
-   - `supabase/templates/magic_link.html` em **Magic Link** (assunto: “Seu link de acesso ao Maya Memories”)
-   - `supabase/templates/invite.html` em **Invite user** (assunto: “Você faz parte da história da Maya”)
+   - `supabase/templates/magic_link.html` em **Magic Link** (assunto: “Seu link de acesso ao Guardei pra você”)
+   - `supabase/templates/invite.html` em **Invite user** (assunto: “Você faz parte desta história ♡”)
    - `supabase/templates/email_change.html` em **Change Email Address** (assunto: “Confirme seu e-mail”)
 
    E em **Authentication → Sign In / Providers → Email**, desligue **“Secure email change”**: quem entrou

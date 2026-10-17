@@ -27,8 +27,8 @@ export type Brand = {
 };
 
 export const DEFAULT_BRAND: Brand = {
-  brand_name: "Baú de Memórias",
-  brand_slogan: "Memórias de família que esperam a hora certa de serem descobertas.",
+  brand_name: "Guardei pra você",
+  brand_slogan: "O baú da família para a criança abrir quando crescer.",
   contact_whatsapp: null,
   contact_email: null,
 };

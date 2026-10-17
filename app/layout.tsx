@@ -11,8 +11,8 @@ const body = Nunito({ subsets: ["latin"], weight: ["400", "500", "600", "700"], 
 const hand = Caveat({ subsets: ["latin"], weight: ["400", "500"], variable: "--font-hand", display: "swap" });
 
 export const metadata: Metadata = {
-  title: { default: "Maya Memories", template: "%s · Maya Memories" },
-  description: "Um legado familiar digital, construído por quem ama.",
+  title: { default: "Guardei pra você", template: "%s · Guardei pra você" },
+  description: "Guardei pra você: o baú da família para a criança abrir quando crescer.",
   robots: { index: false, follow: false, nocache: true, googleBot: { index: false, follow: false } },
   icons: { icon: "/icon.svg" },
   referrer: "no-referrer",

@@ -29,7 +29,7 @@ export async function getSettings(): Promise<VaultSettings> {
   const own = (v?.upload_limits ?? {}) as Partial<UploadLimits>;
   return {
     vault_id: v?.id ?? null,
-    title: v?.title ?? "Maya Memories",
+    title: v?.title ?? "Guardei pra você",
     subject_name: v?.subject_name ?? "Maya",
     expected_birth_date: v?.expected_birth_date ?? null,
     birth_date: v?.birth_date ?? null,
