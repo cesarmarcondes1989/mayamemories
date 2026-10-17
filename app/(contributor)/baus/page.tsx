@@ -22,7 +22,18 @@ export default async function VaultsPage() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-8">
-      <PageHeader eyebrow="Seus baús" title="Meus baús" description="Cada baú é um espaço separado, com as suas pessoas, memórias e cápsulas." />
+      <PageHeader
+        eyebrow="Seus baús"
+        title="Meus baús"
+        description="Cada baú é um espaço separado, com as suas pessoas, memórias e cápsulas."
+        actions={
+          viewer.isPlatformAdmin ? (
+            <Link href="/plataforma" className="inline-flex h-10 items-center rounded-full border border-rose/70 bg-paper px-4 text-sm font-semibold text-rose-deep">
+              Painel da plataforma →
+            </Link>
+          ) : undefined
+        }
+      />
       {viewer.vaults.length === 0 ? (
         <EmptyState title="Você ainda não participa de nenhum baú">Peça um convite a quem cuida do baú.</EmptyState>
       ) : (

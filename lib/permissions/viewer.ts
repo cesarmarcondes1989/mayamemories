@@ -123,3 +123,11 @@ export async function requireAdmin() {
   if (!viewer.isAdmin || !viewer.vault || !viewer.personId) redirect("/inicio");
   return viewer as Viewer & { vault: Vault; personId: string };
 }
+
+/** Dono da plataforma (vitrine, planos, interessados). Não vê conteúdo das famílias. */
+export async function requirePlatformAdmin() {
+  const viewer = await getViewer();
+  if (!viewer) redirect("/entrar?next=/plataforma");
+  if (!viewer.isPlatformAdmin) redirect("/inicio");
+  return viewer;
+}

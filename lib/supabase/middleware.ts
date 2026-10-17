@@ -3,7 +3,7 @@ import { createServerClient } from "@supabase/ssr";
 
 const PROTECTED_PREFIXES = [
   "/inicio", "/enviar", "/cartas", "/visitas", "/minhas-memorias", "/linha-do-tempo",
-  "/memoria", "/capsulas", "/perfil", "/boas-vindas", "/obrigado", "/admin", "/baus",
+  "/memoria", "/capsulas", "/perfil", "/boas-vindas", "/obrigado", "/admin", "/baus", "/plataforma",
 ];
 
 export async function updateSession(request: NextRequest) {

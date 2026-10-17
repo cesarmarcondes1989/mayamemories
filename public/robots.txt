@@ -1,2 +1,5 @@
 User-agent: *
+# Só a vitrine é pública; os baús das famílias nunca são indexados.
+Allow: /$
+Allow: /privacidade$
 Disallow: /
