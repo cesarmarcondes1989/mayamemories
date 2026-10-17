@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { Alert } from "@/components/ui/misc";
 import { EmailLinkForm } from "@/components/auth/email-form";
@@ -12,7 +13,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
   return (
     <div className="mx-auto mt-6 max-w-md">
       <h1 className="text-center text-6xl">Que bom ter você aqui</h1>
-      <p className="mt-3 text-center text-taupe">Entre com o e-mail que foi convidado para o baú.</p>
+      <p className="mt-3 text-center text-taupe">Entre com o seu e-mail. Mandamos um link de acesso.</p>
       <Card className="mt-8 p-6">
         {erro === "link" && (
           <div className="mb-4">
@@ -23,6 +24,10 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
         )}
         <EmailLinkForm action={requestLoginLink} hidden={{ next: safeNextPath(next) }} />
       </Card>
+      <p className="mt-6 text-center text-sm text-taupe">
+        Ainda não tem um baú?{" "}
+        <Link href="/comecar" className="font-semibold text-rose-deep underline-offset-4 hover:underline">Crie grátis</Link>
+      </p>
     </div>
   );
 }

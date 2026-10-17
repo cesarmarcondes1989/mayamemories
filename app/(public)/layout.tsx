@@ -31,9 +31,14 @@ export default async function PublicLayout({ children }: { children: React.React
               Meu baú →
             </Link>
           ) : (
-            <Link href="/entrar" className={buttonClasses("secondary", "sm", "px-4")}>
-              Entrar
-            </Link>
+            <>
+              <Link href="/entrar" className="rounded-full px-3 py-2 text-taupe hover:text-ink">
+                Entrar
+              </Link>
+              <Link href="/comecar" className={buttonClasses("primary", "sm", "px-4")}>
+                Criar conta
+              </Link>
+            </>
           )}
         </nav>
       </header>

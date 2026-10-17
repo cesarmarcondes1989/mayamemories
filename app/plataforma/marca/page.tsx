@@ -2,7 +2,8 @@ import { getBrand } from "@/features/plans/queries";
 import { updateBrand } from "@/features/plans/actions";
 import { Card } from "@/components/ui/card";
 import { Alert, PageHeader } from "@/components/ui/misc";
-import { Field, Input } from "@/components/ui/field";
+import { Checkbox, Field, Input } from "@/components/ui/field";
+import { createClient } from "@/lib/supabase/server";
 import { SubmitButton } from "@/components/ui/submit-button";
 
 export const metadata = { title: "Marca e contato" };
@@ -10,6 +11,7 @@ export const metadata = { title: "Marca e contato" };
 export default async function BrandPage({ searchParams }: { searchParams: Promise<{ erro?: string; salvo?: string }> }) {
   const sp = await searchParams;
   const brand = await getBrand();
+  const { data: cfg } = await (await createClient()).from("app_settings").select("*").maybeSingle();
   return (
     <div className="max-w-2xl space-y-6">
       <PageHeader
@@ -33,6 +35,18 @@ export default async function BrandPage({ searchParams }: { searchParams: Promis
           <Field label="E-mail de contato" htmlFor="contact_email" optional>
             <Input id="contact_email" name="contact_email" type="email" defaultValue={brand.contact_email ?? ""} />
           </Field>
+          <fieldset className="space-y-3 border-t border-line pt-4">
+            <legend className="text-sm font-semibold">Cadastro pelo site</legend>
+            <Checkbox
+              name="self_service_vaults"
+              defaultChecked={cfg?.self_service_vaults ?? true}
+              label="Qualquer pessoa pode criar a conta e o baú sozinha"
+              hint="Desligue para pausar novos cadastros (o formulário de interessados continua)."
+            />
+            <Field label="Baús por conta no autoatendimento" htmlFor="self_service_vault_limit" hint="O plano Grátis vem com 1.">
+              <Input id="self_service_vault_limit" name="self_service_vault_limit" type="number" min={0} max={50} defaultValue={cfg?.self_service_vault_limit ?? 1} className="w-28" />
+            </Field>
+          </fieldset>
           <div>
             <SubmitButton pendingText="Salvando…">Salvar</SubmitButton>
           </div>

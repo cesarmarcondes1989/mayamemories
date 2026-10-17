@@ -80,12 +80,12 @@ function PlanCard({ plan }: { plan: Plan }) {
         ))}
       </ul>
       <TrackedLink
-        href={`/?plano=${plan.key}#quero`}
+        href={plan.billing === "free" ? "/comecar" : plan.audience === "event" ? `/comecar?tipo=evento&plano=${plan.key}` : `/comecar?plano=${plan.key}`}
         event="plan_click"
         plan={plan.key}
         className={buttonClasses(plan.highlight ? "primary" : "secondary", "md", "mt-6 w-full")}
       >
-        {plan.billing === "free" ? "Começar grátis" : `Quero o ${plan.name}`}
+        {plan.billing === "free" ? "Começar grátis" : `Começar com o ${plan.name}`}
       </TrackedLink>
     </Card>
   );
@@ -110,8 +110,8 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
             para uma criança descobrir ao longo da vida, ou para uma festa nunca ser esquecida.
           </p>
           <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row lg:justify-start">
-            <TrackedLink href="#quero" event="cta_click" className={buttonClasses("primary", "lg", "px-9")}>
-              Quero o meu baú ♡
+            <TrackedLink href="/comecar" event="cta_click" className={buttonClasses("primary", "lg", "px-9")}>
+              Criar meu baú grátis ♡
             </TrackedLink>
             <ButtonLink href="#planos" size="lg" variant="secondary" className="px-9">
               Ver planos
@@ -284,9 +284,10 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
       <section id="quero" className="mx-auto max-w-2xl scroll-mt-8">
         <Card className="relative p-6 sm:p-10">
           <HeartDoodle className="absolute -top-5 -right-3 size-12 rotate-12 text-rose-deep/70" />
-          <h2 className="text-center text-5xl sm:text-6xl">Vamos montar o seu?</h2>
+          <h2 className="text-center text-5xl sm:text-6xl">Prefere ajuda para montar?</h2>
           <p className="mx-auto mt-2 mb-8 max-w-md text-center text-taupe">
-            Estamos abrindo para as primeiras famílias. Deixe seu contato e a gente prepara o baú junto com você.
+            Quer o ursinho, um plano pago ou montar para um evento grande? Deixe seu contato e a gente prepara tudo com você.
+            Ou <a href="/comecar" className="font-semibold text-rose-deep underline underline-offset-4">crie grátis agora</a>.
           </p>
           <LeadForm
             plans={plans.map(({ key, name, audience }) => ({ key, name, audience }))}

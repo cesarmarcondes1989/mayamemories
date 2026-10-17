@@ -5,7 +5,7 @@ import { parseUserAgent, sanitizePath } from "@/lib/analytics/ua";
 
 export const dynamic = "force-dynamic";
 
-const EVENTS = new Set(["page_view", "plans_view", "plan_click", "cta_click", "lead_form_start", "lead_submit", "login_view", "nfc_open"]);
+const EVENTS = new Set(["page_view", "plans_view", "plan_click", "cta_click", "lead_form_start", "lead_submit", "login_view", "nfc_open", "signup_start"]);
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 const str = (v: unknown, max = 120) => (typeof v === "string" && v.trim() ? v.trim().slice(0, max) : null);

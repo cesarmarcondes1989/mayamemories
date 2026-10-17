@@ -7,9 +7,10 @@ insert into auth.users (id, email) values
   ('00000000-0000-0000-0000-000000000c05', 'vovo5@example.com');    -- avó nos dois baús
 select public.bootstrap_first_admin('cesar5@example.com', 'Cesar', 'pai');
 
--- Criação self-service fechada por padrão
+-- Criação self-service pode ser fechada pela plataforma
+update public.app_settings set self_service_vaults = false;
 select tests.login('00000000-0000-0000-0000-000000000b05');
-select tests.expect_error($$ select public.create_vault('child', 'João', 'João', 'joao', 'Joana', 'mae') $$, 'self-service vault creation is off by default');
+select tests.expect_error($$ select public.create_vault('child', 'João', 'João', 'joao', 'Joana', 'mae') $$, 'self-service vault creation can be closed');
 reset role;
 update public.app_settings set self_service_vaults = true;
 -- Joana cria o próprio baú (self-service ligado)

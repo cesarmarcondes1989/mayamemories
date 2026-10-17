@@ -14,7 +14,8 @@ Tempo estimado: 30–40 min. Faça primeiro em um projeto de **desenvolvimento**
    ```
    Isso cria tabelas, RLS, funções, bucket privado `memories` e as cápsulas iniciais.
 3. **Authentication → Sign In / Providers**
-   - Email: habilitado. **“Allow new users to sign up”: DESLIGADO.** Contas só nascem por convite.
+   - Email: habilitado. **“Allow new users to sign up”: DESLIGADO.** Contas nascem pelo servidor: convite,
+     ursinho/mesa ou o cadastro aberto em `/comecar` (Admin API, com freios no banco).
    - Confirm email: pode ficar ligado.
 4. **Authentication → URL Configuration**
    - Site URL: `https://seu-dominio.com.br`
@@ -102,3 +103,12 @@ revogue explicitamente o que não deve ser público (veja o final de `..._workfl
 - Não guarda IP nem User-Agent completo; região vem dos cabeçalhos de geolocalização da Vercel.
 - Identificador de visitante só com o aceite de cookies (banner na vitrine).
 - Retenção: rode `select public.analytics_prune();` uma vez por mês (apaga eventos com mais de 13 meses).
+
+## Cadastro aberto (`/comecar`)
+
+- Cria conta + baú Grátis e já entra logado como dono. Liga/desliga e limite de baús por conta em
+  `/plataforma/marca`.
+- O e-mail nasce como não confirmado (`app_metadata.email_verified = false`). Enquanto isso a pessoa usa o
+  próprio baú, mas o e-mail não aceita convites de outros baús. Ao abrir qualquer link enviado ao e-mail,
+  a conta é confirmada.
+- Quem escolhe um plano pago no site começa no Grátis e aparece em `/plataforma/interessados`.

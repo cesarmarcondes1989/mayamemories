@@ -5,6 +5,9 @@ import { requireAdmin } from "@/lib/permissions/viewer";
 import { PageHeader, Stat } from "@/components/ui/misc";
 import { Card } from "@/components/ui/card";
 import { formatBytes, formatDate, formatDateTime } from "@/lib/format";
+import { VerifyEmailBanner } from "@/components/account/verify-email-banner";
+import { Alert } from "@/components/ui/misc";
+import { ButtonLink } from "@/components/ui/button";
 
 export const metadata: Metadata = { title: "Painel" };
 
@@ -25,13 +28,39 @@ type Stats = {
   recent_admin_activity: Array<{ action: string; resource_type: string; created_at: string; actor: string | null }>;
 };
 
-export default async function AdminDashboard() {
-  const { vault } = await requireAdmin();
+export default async function AdminDashboard({ searchParams }: { searchParams: Promise<{ novo?: string; email?: string }> }) {
+  const viewer = await requireAdmin();
+  const { vault } = viewer;
+  const sp = await searchParams;
   const supabase = await createClient();
   const { data } = await supabase.rpc("admin_dashboard_stats", { p_vault_id: vault.id });
   const s = data as Stats;
   return (
     <>
+      {!viewer.emailVerified && <VerifyEmailBanner email={viewer.email} />}
+      {sp.email === "confirmado" && viewer.emailVerified && (
+        <div className="mb-4"><Alert tone="success">E-mail confirmado ♡</Alert></div>
+      )}
+      {(sp.novo || (s.people <= 1 && s.photos_videos === 0)) && (
+        <Card className="mb-8 border-rose-deep/40 bg-rose-soft/50 p-6">
+          <p className="text-xs font-bold tracking-[0.16em] text-taupe uppercase">{sp.novo ? "Seu baú está pronto 🎉" : "Primeiros passos"}</p>
+          <h2 className="mt-1 text-4xl">{vault.title}</h2>
+          <ol className="mt-4 grid gap-3 sm:grid-cols-3">
+            {[
+              ["📸", "Guarde a primeira memória", "Uma foto, um áudio, uma carta.", "/enviar/foto"],
+              ["👵", "Chame a família", "Cadastre as pessoas e gere o QR ou ursinho de cada uma.", "/admin/pessoas/nova"],
+              ["🎉", "Tem festa vindo?", "Crie um evento com token de mesa para os convidados.", "/admin/eventos"],
+            ].map(([icon, title, text, href], i) => (
+              <li key={href} className="rounded-3xl bg-paper p-4 shadow-[var(--shadow-soft)]">
+                <p className="text-2xl" aria-hidden="true">{icon}</p>
+                <p className="mt-1 font-semibold">{i + 1}. {title}</p>
+                <p className="text-sm text-taupe">{text}</p>
+                <ButtonLink href={href} size="sm" variant={i === 0 ? "primary" : "secondary"} className="mt-3">Fazer agora</ButtonLink>
+              </li>
+            ))}
+          </ol>
+        </Card>
+      )}
       <PageHeader eyebrow="Visão geral" title="Painel" description="Acessos ao portal não são visitas: cada indicador é contado separadamente." />
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
         <Stat label="Aguardando aprovação" value={s.pending_review + s.pending_comments} hint={`${s.pending_comments} comentários`} href="/admin/aprovacao" />

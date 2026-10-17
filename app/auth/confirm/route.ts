@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import type { EmailOtpType } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
+import { markEmailVerifiedIfPending } from "@/lib/auth/mark-verified";
 import { safeNextPath } from "@/lib/validation/schemas";
 
 /**
@@ -15,6 +16,7 @@ export async function GET(request: NextRequest) {
   if (tokenHash) {
     const supabase = await createClient();
     const { error } = await supabase.auth.verifyOtp({ token_hash: tokenHash, type });
+    if (!error) await markEmailVerifiedIfPending(supabase);
     if (!error) return NextResponse.redirect(new URL(next, url.origin));
   }
   return NextResponse.redirect(new URL("/entrar?erro=link", url.origin));

@@ -44,6 +44,8 @@ export type Viewer = {
   hasRealEmail: boolean;
   /** e-mail novo aguardando confirmação */
   pendingEmail: string | null;
+  /** false para conta do cadastro aberto que ainda não clicou no link do e-mail */
+  emailVerified: boolean;
   profileId: string | null;
   displayName: string;
   /** Baú em uso agora (null se a pessoa ainda não participa de nenhum). */
@@ -94,6 +96,7 @@ export const getViewer = cache(async (): Promise<Viewer | null> => {
     email: auth.user.email ?? null,
     hasRealEmail: !isPlaceholderEmail(auth.user.email),
     pendingEmail: auth.user.new_email ?? null,
+    emailVerified: auth.user.app_metadata?.email_verified !== false,
     profileId: profile?.id ?? null,
     displayName: profile?.display_name ?? "",
     vault,

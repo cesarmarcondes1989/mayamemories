@@ -4,7 +4,7 @@
 // anônimas (sem identificador). Com consentimento: visitante + sessão, para
 // medir o funil e a volta das pessoas.
 
-export type TrackEvent = "page_view" | "plans_view" | "plan_click" | "cta_click" | "lead_form_start" | "lead_submit" | "login_view" | "nfc_open";
+export type TrackEvent = "page_view" | "plans_view" | "plan_click" | "cta_click" | "lead_form_start" | "lead_submit" | "login_view" | "nfc_open" | "signup_start";
 
 const CONSENT_KEY = "mm_consent";
 const VID_KEY = "mm_vid";

@@ -124,6 +124,8 @@ export async function updateBrand(formData: FormData) {
       brand_slogan: get("brand_slogan").slice(0, 160),
       contact_whatsapp: whatsapp ? (whatsapp.length <= 11 ? `55${whatsapp}` : whatsapp) : null,
       contact_email: get("contact_email") || null,
+      self_service_vaults: formData.get("self_service_vaults") === "on",
+      self_service_vault_limit: Math.min(50, Math.max(0, Number.parseInt(get("self_service_vault_limit"), 10) || 1)),
     })
     .eq("id", true);
   if (error) fail("/plataforma/marca", error);
