@@ -40,6 +40,7 @@ export async function GET() {
           "014_brand_guardei": await probe("app_settings", "brand_name"),
           "015_demo_vault": await probe("vaults", "is_demo"),
           "016_story_texts": await probe("story_selections", "kind"),
+          "017_story_films": await probe("story_films", "source"),
         };
         if (migrations["015_demo_vault"]) {
           const { data } = await admin.rpc("demo_vault_id");

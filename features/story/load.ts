@@ -6,6 +6,10 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getStory, type Story } from "./build";
 import { refreshStoryTexts, resolveStoryTexts } from "./texts";
+import { aiConfigured } from "./ai";
+import { periodLabel } from "./build";
+import { directFilm, sanitizeScript, scriptKey, type FilmScript } from "./film-script";
+import { refreshFilmScript } from "./film-ai";
 import { applyRules, filterStory, pickItems, refreshSelection, selectionKey, type StoryKind, type StoryRules } from "./curate";
 
 const EMPTY: StoryRules = { exclude: [], prioritize: [], notes: "" };
@@ -44,14 +48,29 @@ export async function loadStory(periodo: string, kind: StoryKind) {
   const { texts, stale } = await resolveStoryTexts(vault.id, book.story);
   if (stale.length && book.story.chapters.length) after(() => refreshStoryTexts(vault, book.story, stale));
 
+  // Filme: o roteiro em motion (diretor IA em segundo plano; diretor automático na hora)
+  let film: FilmScript | null = null;
+  let filmWorking = false;
+  if (kind === "film" && current.story.chapters.length) {
+    const fallback = directFilm(current.story, texts, periodLabel(periodo));
+    const useAI = vault.ai_enabled !== false && aiConfigured();
+    const fkey = `${scriptKey(current.story, texts)}-${useAI ? "ai" : "auto"}`;
+    const { data: row, error } = await admin.from("story_films").select("script, source_key, updated_at").eq("vault_id", vault.id).eq("period", periodo).maybeSingle();
+    film = row?.source_key === fkey ? sanitizeScript(row.script as FilmScript, current.story, fallback) : fallback;
+    const pending = row?.source_key === `pending-${fkey}` && Date.now() - new Date(row.updated_at).getTime() < 5 * 60_000;
+    if (!error && row?.source_key !== fkey && !pending) after(() => refreshFilmScript(vault, current.story, texts, fallback, fkey));
+    filmWorking = useAI && row?.source_key !== fkey;
+  }
+
   const totalAll = full.chapters.reduce((a, c) => a + c.items.length, 0);
   return {
+    film,
     viewer,
     vault,
     story: current.story,
     texts,
     rationale: current.rationale,
     totalAll,
-    working: stale.length > 0 || current.rationale === null,
+    working: stale.length > 0 || current.rationale === null || filmWorking,
   };
 }
