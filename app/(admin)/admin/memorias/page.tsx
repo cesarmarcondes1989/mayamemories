@@ -1,3 +1,4 @@
+import { requireAdmin } from "@/lib/permissions/viewer";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
@@ -10,9 +11,10 @@ import { cn } from "@/components/ui/cn";
 export const metadata: Metadata = { title: "Memórias" };
 
 export default async function AdminMemoriesPage({ searchParams }: { searchParams: Promise<{ status?: string }> }) {
+  const V = (await requireAdmin()).vault.id;
   const { status = "approved" } = await searchParams;
   const supabase = await createClient();
-  let q = supabase.from("memories").select(MEMORY_SELECT).order("created_at", { ascending: false }).limit(120);
+  let q = supabase.from("memories").select(MEMORY_SELECT).eq("vault_id", V).order("created_at", { ascending: false }).limit(120);
   if (status !== "all" && status in MODERATION_LABELS) q = q.eq("moderation_status", status);
   const { data } = await q;
   const memories = await attachMediaUrls((data ?? []) as unknown as MemoryRow[], { firstOnly: true });

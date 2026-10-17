@@ -1,3 +1,4 @@
+import { requireAdmin } from "@/lib/permissions/viewer";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
@@ -17,10 +18,11 @@ const STATUS: Record<string, { label: string; tone: "ok" | "pending" | "neutral"
 };
 
 export default async function VisitsPage() {
+  const V = (await requireAdmin()).vault.id;
   const supabase = await createClient();
   const { data } = await supabase
     .from("visits")
-    .select("id, occurred_at, registered_at, visit_type, message, companions, status, memory_id, person:people(id, display_name)")
+    .select("id, occurred_at, registered_at, visit_type, message, companions, status, memory_id, person:people(id, display_name)").eq("vault_id", V)
     .order("occurred_at", { ascending: false })
     .limit(200);
   const visits = (data ?? []) as unknown as Array<{

@@ -1,3 +1,4 @@
+import { requireAdmin } from "@/lib/permissions/viewer";
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { PageHeader } from "@/components/ui/misc";
@@ -15,10 +16,11 @@ const LABELS: Record<string, string> = {
 };
 
 export default async function ConsentsPage() {
+  const V = (await requireAdmin()).vault.id;
   const supabase = await createClient();
   const [{ data: people }, { data: consents }] = await Promise.all([
-    supabase.from("people").select("id, display_name, profile_id").not("profile_id", "is", null).order("display_name"),
-    supabase.from("consents").select("person_id, consent_type, status, policy_version, created_at").order("created_at", { ascending: false }),
+    supabase.from("people").select("id, display_name, profile_id").eq("vault_id", V).not("profile_id", "is", null).order("display_name"),
+    supabase.from("consents").select("person_id, consent_type, status, policy_version, created_at").eq("vault_id", V).order("created_at", { ascending: false }),
   ]);
   const latest = new Map<string, { status: string; policy_version: string; created_at: string }>();
   for (const c of consents ?? []) {

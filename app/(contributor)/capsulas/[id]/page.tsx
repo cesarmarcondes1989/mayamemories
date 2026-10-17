@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { subjectWords } from "@/lib/subject";
 import { notFound } from "next/navigation";
 import { requireMember } from "@/lib/permissions/viewer";
 import { createClient } from "@/lib/supabase/server";
@@ -11,7 +12,8 @@ import { capsuleDisplayState, CAPSULE_STATE_LABELS } from "@/lib/permissions/cap
 export const metadata: Metadata = { title: "Cápsula" };
 
 export default async function CapsulePage({ params }: { params: Promise<{ id: string }> }) {
-  await requireMember();
+  const viewer = await requireMember();
+  const sw = subjectWords(viewer.vault);
   const { id } = await params;
   if (!/^[0-9a-f-]{36}$/.test(id)) notFound();
   const supabase = await createClient();
@@ -20,7 +22,7 @@ export default async function CapsulePage({ params }: { params: Promise<{ id: st
     supabase.rpc("capsule_viewable", { p_capsule_id: id }),
   ]);
   if (!capsule) notFound();
-  const memories = isOpen ? await listTimeline({ capsule: id }) : [];
+  const memories = isOpen ? await listTimeline(capsule.vault_id, { capsule: id }) : [];
   const state = capsuleDisplayState(capsule);
 
   return (
@@ -44,7 +46,7 @@ export default async function CapsulePage({ params }: { params: Promise<{ id: st
           </p>
           <p className="mt-4 text-lg">Esta cápsula está guardada.</p>
           <p className="mt-2 text-taupe">
-            {capsule.opens_at ? `Ela poderá ser aberta a partir de ${formatDate(capsule.opens_at)}.` : "Os pais da Maya decidirão o momento certo de abri-la."}
+            {capsule.opens_at ? `Ela poderá ser aberta a partir de ${formatDate(capsule.opens_at)}.` : `${sw.keepers[0].toUpperCase()}${sw.keepers.slice(1)} decidirão o momento certo de abri-la.`}
           </p>
         </div>
       )}

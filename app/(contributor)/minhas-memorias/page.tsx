@@ -18,11 +18,11 @@ export default async function MyMemoriesPage({ searchParams }: { searchParams: P
   const [{ data }, { data: visits }] = await Promise.all([
     supabase
       .from("memories")
-      .select(MEMORY_SELECT)
+      .select(MEMORY_SELECT).eq("vault_id", viewer.vault.id)
       .eq("created_by_profile_id", viewer.profileId!)
       .is("deleted_at", null)
       .order("created_at", { ascending: false }),
-    supabase.from("visits").select("id, occurred_at, visit_type, status").eq("person_id", viewer.personId!).order("occurred_at", { ascending: false }),
+    supabase.from("visits").select("id, occurred_at, visit_type, status").eq("vault_id", viewer.vault.id).eq("person_id", viewer.personId!).order("occurred_at", { ascending: false }),
   ]);
   const memories = await attachMediaUrls((data ?? []) as unknown as MemoryRow[], { firstOnly: true });
   const drafts = memories.filter((m) => ["draft", "uploading"].includes(m.moderation_status));

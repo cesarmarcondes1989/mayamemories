@@ -1,3 +1,4 @@
+import { requireAdmin } from "@/lib/permissions/viewer";
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { resendInvitation, revokeInvitation } from "@/features/admin/actions";
@@ -11,13 +12,14 @@ import { formatDate } from "@/lib/format";
 export const metadata: Metadata = { title: "Convites" };
 
 export default async function InvitationsPage({ searchParams }: { searchParams: Promise<{ pessoa?: string; erro?: string; reenviado?: string }> }) {
+  const V = (await requireAdmin()).vault.id;
   const sp = await searchParams;
   const supabase = await createClient();
   const [{ data: people }, { data: invites }] = await Promise.all([
-    supabase.from("people").select("id, display_name").in("status", ["invited", "active"]).order("display_name"),
+    supabase.from("people").select("id, display_name").eq("vault_id", V).in("status", ["invited", "active"]).order("display_name"),
     supabase
       .from("invitations")
-      .select("id, email, expires_at, accepted_at, revoked_at, last_sent_at, created_at, person:people(display_name)")
+      .select("id, email, expires_at, accepted_at, revoked_at, last_sent_at, created_at, person:people(display_name)").eq("vault_id", V)
       .order("created_at", { ascending: false })
       .limit(100),
   ]);

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { subjectWords } from "@/lib/subject";
 import { notFound } from "next/navigation";
 import { requireMember } from "@/lib/permissions/viewer";
 import { getMemory } from "@/features/memories/queries";
@@ -45,10 +46,10 @@ export default async function MyMemoryPage({
         </p>
       </div>
       {sp.salvo && <Alert tone="success">Alterações salvas. {memory.moderation_status === "pending_review" && "Elas passarão por uma nova revisão."}</Alert>}
-      {sp.pedido && <Alert tone="success">Pedido de exclusão enviado aos pais da Maya.</Alert>}
+      {sp.pedido && <Alert tone="success">Pedido de exclusão enviado a {subjectWords(viewer.vault).keepers}.</Alert>}
       {sp.erro && <Alert tone="error">{sp.erro}</Alert>}
       {memory.moderation_note && ["changes_requested", "rejected"].includes(memory.moderation_status) && (
-        <Alert tone="warn" title="Recado dos pais da Maya">
+        <Alert tone="warn" title="Recado de quem cuida do baú">
           {memory.moderation_note}
         </Alert>
       )}
@@ -85,7 +86,7 @@ export default async function MyMemoryPage({
           title={memory.moderation_status === "approved" ? "Pedir a exclusão desta memória?" : "Retirar esta memória?"}
           description={
             memory.moderation_status === "approved"
-              ? "Os pais da Maya receberão o seu pedido e farão a exclusão dos arquivos."
+              ? "Quem cuida do baú receberá o seu pedido e fará a exclusão dos arquivos."
               : "Ela ainda não foi publicada e será removida com os arquivos."
           }
           confirmLabel="Confirmar"

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { subjectWords } from "@/lib/subject";
 import { requireMember } from "@/lib/permissions/viewer";
 import { createClient } from "@/lib/supabase/server";
 import { CapsuleCard } from "@/components/capsules/capsule-card";
@@ -7,11 +8,12 @@ import { EmptyState, PageHeader } from "@/components/ui/misc";
 export const metadata: Metadata = { title: "Cápsulas" };
 
 export default async function CapsulesPage() {
-  await requireMember();
+  const viewer = await requireMember();
+  const sw = subjectWords(viewer.vault);
   const supabase = await createClient();
   const { data } = await supabase
     .from("capsules")
-    .select("id, title, description, theme, capsule_type, opens_at, opening_rule, status, opened_at")
+    .select("id, title, description, theme, capsule_type, opens_at, opening_rule, status, opened_at").eq("vault_id", viewer.vault.id)
     .neq("status", "draft")
     .order("opens_at", { ascending: true, nullsFirst: true });
   const capsules = data ?? [];
@@ -29,7 +31,7 @@ export default async function CapsulesPage() {
           ))}
         </div>
       ) : (
-        <EmptyState title="Nenhuma cápsula por enquanto">Os pais da Maya ainda estão preparando as cápsulas.</EmptyState>
+        <EmptyState title="Nenhuma cápsula por enquanto">{`${sw.keepers[0].toUpperCase()}${sw.keepers.slice(1)} ainda estão preparando as cápsulas.`}</EmptyState>
       )}
     </>
   );

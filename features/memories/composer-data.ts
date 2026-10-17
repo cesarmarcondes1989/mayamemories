@@ -10,10 +10,11 @@ export async function getComposerData() {
   const { data: capsules } = await supabase
     .from("capsules")
     .select("id, title, status")
+    .eq("vault_id", settings.vault_id ?? "")
     .in("status", ["scheduled", "sealed"])
     .order("opens_at", { ascending: true, nullsFirst: false });
   const today = todayISO();
-  const birth = settings.birth_date ?? settings.expected_birth_date;
+  const birth = settings.kind === "child" ? (settings.birth_date ?? settings.expected_birth_date) : null;
   const letterMilestones = birth
     ? [1, 5, 10, 15, 18]
         .map((y) => ({ label: `Quando ${settings.subject_name} fizer ${y} ${y === 1 ? "ano" : "anos"}`, date: dateAtAge(birth, y) }))

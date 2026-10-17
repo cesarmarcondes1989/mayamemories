@@ -23,6 +23,37 @@
   --danger-soft: #fbe7ea;
 }
 
+/* Temas por baú: só trocam as variáveis; os componentes usam os mesmos nomes */
+[data-theme="azul"] {
+  --cream: #f1f6fb; --warm-white: #fafcff; --rose: #c9ddf0; --rose-deep: #4f86b8; --rose-soft: #e3eef8;
+  --line: #dce7f1; --ink: #33404c; --taupe: #6f7d8a;
+}
+[data-theme="salvia"] {
+  --cream: #f4f6f0; --warm-white: #fbfcf8; --rose: #cfdac6; --rose-deep: #6f8a63; --rose-soft: #e8eee2;
+  --line: #e1e7da; --ink: #3a4136; --taupe: #747c6d;
+}
+[data-theme="marronzinho"] {
+  --cream: #f8f2ec; --warm-white: #fdf9f5; --rose: #e6cdb6; --rose-deep: #a8683f; --rose-soft: #f3e6da;
+  --line: #ecdfd3; --ink: #45362c; --taupe: #85705f;
+}
+[data-theme="lavanda"] {
+  --cream: #f6f3fb; --warm-white: #fcfaff; --rose: #dccff0; --rose-deep: #8a6cc1; --rose-soft: #eee7f8;
+  --line: #e7e0f2; --ink: #3f3850; --taupe: #7c7290;
+}
+[data-theme="vermelho"] {
+  --cream: #fcf3f2; --warm-white: #fffafa; --rose: #f2c4c2; --rose-deep: #c1403f; --rose-soft: #fae4e3;
+  --line: #f1dedd; --ink: #4a3332; --taupe: #8a6c6b;
+}
+[data-theme="amarelo"] {
+  --cream: #fcf8ec; --warm-white: #fffdf6; --rose: #f2e0a6; --rose-deep: #b8892a; --rose-soft: #f8efcf;
+  --line: #efe6cc; --ink: #4a4130; --taupe: #85795f;
+}
+[data-theme="noite"] {
+  --cream: #1f2738; --warm-white: #283146; --rose: #4a5570; --rose-deep: #d8b46a; --rose-soft: #323c55;
+  --line: #3a4560; --ink: #f2ede3; --taupe: #b9b2a5;
+  --sage-soft: #2e3a4c; --amber-soft: #3a3628; --danger-soft: #4a2c31;
+}
+
 @theme inline {
   --color-cream: var(--cream);
   --color-paper: var(--warm-white);

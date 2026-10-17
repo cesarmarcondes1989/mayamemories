@@ -12,7 +12,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
   return (
     <div className="mx-auto mt-6 max-w-md">
       <h1 className="text-center text-6xl">Que bom ter você aqui</h1>
-      <p className="mt-3 text-center text-taupe">Entre com o e-mail que os pais da Maya cadastraram.</p>
+      <p className="mt-3 text-center text-taupe">Entre com o e-mail que foi convidado para o baú.</p>
       <Card className="mt-8 p-6">
         {erro === "link" && (
           <div className="mb-4">

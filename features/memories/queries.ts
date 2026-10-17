@@ -59,7 +59,7 @@ export type TimelineFilters = { year?: string; type?: string; person?: string; c
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-export async function listTimeline(raw: TimelineFilters, opts: { includeCapsuleOnly?: boolean } = {}) {
+export async function listTimeline(vaultId: string, raw: TimelineFilters, opts: { includeCapsuleOnly?: boolean } = {}) {
   const filters: TimelineFilters = {
     ...raw,
     person: raw.person && UUID.test(raw.person) ? raw.person : undefined,
@@ -73,6 +73,7 @@ export async function listTimeline(raw: TimelineFilters, opts: { includeCapsuleO
   let query = supabase
     .from("memories")
     .select(select)
+    .eq("vault_id", vaultId)
     .eq("moderation_status", "approved")
     .is("deleted_at", null);
   if (filters.capsule) query = query.eq("capsule_items.capsule_id", filters.capsule);

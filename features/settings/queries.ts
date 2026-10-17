@@ -1,29 +1,43 @@
 import "server-only";
 import { createClient } from "@/lib/supabase/server";
+import { getViewer } from "@/lib/permissions/viewer";
 import { normalizeLimits, type UploadLimits } from "@/lib/storage/limits";
 
-export type AppSettings = {
-  project_title: string;
+export type VaultSettings = {
+  vault_id: string | null;
+  title: string;
   subject_name: string;
   expected_birth_date: string | null;
   birth_date: string | null;
-  require_comment_moderation: boolean;
-  public_landing_enabled: boolean;
+  event_date: string | null;
+  kind: "child" | "event";
+  theme: string;
+  welcome_message: string | null;
   nudges_enabled: boolean;
   limits: UploadLimits;
 };
 
-export async function getSettings(): Promise<AppSettings> {
+/** Configurações do baú em uso; limites = padrão da plataforma + ajustes do baú. */
+export async function getSettings(): Promise<VaultSettings> {
   const supabase = await createClient();
-  const { data } = await supabase.from("app_settings").select("*").maybeSingle();
+  const [viewer, { data: platform }] = await Promise.all([
+    getViewer(),
+    supabase.from("app_settings").select("upload_limits").maybeSingle(),
+  ]);
+  const v = viewer?.vault;
+  const base = normalizeLimits(platform?.upload_limits);
+  const own = (v?.upload_limits ?? {}) as Partial<UploadLimits>;
   return {
-    project_title: data?.project_title ?? "Maya Memories",
-    subject_name: data?.subject_name ?? "Maya",
-    expected_birth_date: data?.expected_birth_date ?? null,
-    birth_date: data?.birth_date ?? null,
-    require_comment_moderation: data?.require_comment_moderation ?? true,
-    public_landing_enabled: data?.public_landing_enabled ?? true,
-    nudges_enabled: data?.nudges_enabled ?? true,
-    limits: normalizeLimits(data?.upload_limits),
+    vault_id: v?.id ?? null,
+    title: v?.title ?? "Maya Memories",
+    subject_name: v?.subject_name ?? "Maya",
+    expected_birth_date: v?.expected_birth_date ?? null,
+    birth_date: v?.birth_date ?? null,
+    event_date: v?.event_date ?? null,
+    kind: v?.kind ?? "child",
+    theme: v?.theme ?? "rosa",
+    welcome_message: v?.welcome_message ?? null,
+    nudges_enabled: v?.nudges_enabled ?? true,
+    limits: normalizeLimits({ ...base, ...own }),
   };
 }

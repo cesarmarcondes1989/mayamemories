@@ -8,12 +8,14 @@ import { Logo } from "@/components/ui/misc";
 export const dynamic = "force-dynamic";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  await requireAdmin();
+  const { vault } = await requireAdmin();
+  const V = vault.id;
+  const vaultTitle = vault.title;
   const supabase = await createClient();
   const [{ count: pendingMemories }, { count: pendingComments }, { count: pendingDeletions }] = await Promise.all([
-    supabase.from("memories").select("id", { count: "exact", head: true }).eq("moderation_status", "pending_review").is("deleted_at", null),
-    supabase.from("memory_comments").select("id", { count: "exact", head: true }).eq("status", "pending_review").is("deleted_at", null),
-    supabase.from("data_deletion_requests").select("id", { count: "exact", head: true }).eq("status", "pending"),
+    supabase.from("memories").select("id", { count: "exact", head: true }).eq("vault_id", V).eq("moderation_status", "pending_review").is("deleted_at", null),
+    supabase.from("memory_comments").select("id", { count: "exact", head: true }).eq("vault_id", V).eq("status", "pending_review").is("deleted_at", null),
+    supabase.from("data_deletion_requests").select("id", { count: "exact", head: true }).eq("vault_id", V).eq("status", "pending"),
   ]);
   const pending = (pendingMemories ?? 0) + (pendingComments ?? 0) + (pendingDeletions ?? 0);
   const links = [
@@ -30,6 +32,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     { href: "/admin/auditoria", label: "Auditoria" },
     { href: "/admin/exportacao", label: "Exportação" },
     { href: "/admin/configuracoes", label: "Configurações" },
+    { href: "/baus", label: "Meus baús" },
   ];
   return (
     <div className="min-h-dvh lg:grid lg:grid-cols-[240px_1fr]">
@@ -37,7 +40,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         <div className="flex h-16 items-center justify-between gap-2 px-4">
           <Link href="/admin" className="flex items-center gap-2">
             <Logo className="size-8" />
-            <span className="font-display text-2xl text-rose-deep">Administração</span>
+            <span className="flex flex-col leading-none"><span className="font-display text-2xl text-rose-deep">Administração</span><span className="max-w-[40vw] truncate text-xs font-semibold text-taupe">{vaultTitle}</span></span>
           </Link>
           <div className="lg:hidden">
             <MobileMenu

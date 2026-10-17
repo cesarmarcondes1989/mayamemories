@@ -13,15 +13,15 @@ export default function PrivacyPage() {
           adolescente.
         </p>
         <ul className="list-disc space-y-2 pl-5">
-          <li>Nada é publicado automaticamente: toda contribuição é revisada pelos pais da Maya.</li>
+          <li>Nada é publicado automaticamente: toda contribuição é revisada por quem cuida do baú.</li>
           <li>Fotos, vídeos e áudios ficam em armazenamento privado e são exibidos por links temporários.</li>
           <li>As páginas não são indexadas por mecanismos de busca e não há compartilhamento em redes sociais.</li>
           <li>Não há publicidade, rastreamento comportamental nem coleta de dados sem finalidade definida.</li>
           <li>Você pode consultar, corrigir e pedir a exclusão do que enviou, e retirar consentimentos a qualquer momento.</li>
           <li>Acessos administrativos relevantes são registrados em log de auditoria.</li>
-          <li>À medida que crescer, a própria Maya ganhará autonomia sobre a sua história.</li>
+          <li>À medida que crescer, a própria criança ganhará autonomia sobre a sua história.</li>
         </ul>
-        <p>Dúvidas ou pedidos: fale diretamente com os pais da Maya.</p>
+        <p>Dúvidas ou pedidos: fale diretamente com quem cuida do baú.</p>
       </div>
     </article>
   );

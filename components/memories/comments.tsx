@@ -8,7 +8,7 @@ import { Alert } from "@/components/ui/misc";
 export function CommentForm({ memoryId }: { memoryId: string }) {
   const [state, action] = useActionState<CommentState, FormData>(addComment, { status: "idle" });
   if (state.status === "sent") {
-    return <Alert tone="success" title="Comentário recebido ♡">Ele aparecerá aqui depois que os pais da Maya revisarem.</Alert>;
+    return <Alert tone="success" title="Comentário recebido ♡">Ele aparecerá aqui depois da revisão de quem cuida do baú.</Alert>;
   }
   return (
     <form action={action} className="space-y-3">

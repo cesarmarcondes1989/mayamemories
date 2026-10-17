@@ -96,9 +96,10 @@ export async function requestInviteLink(_prev: LoginState, formData: FormData): 
 export async function acceptInviteNow(formData: FormData) {
   const secret = String(formData.get("secret") ?? "");
   const supabase = await createClient();
-  const { error } = await supabase.rpc("accept_invitation", { p_secret: secret });
+  const { data: personId, error } = await supabase.rpc("accept_invitation", { p_secret: secret });
   if (error) redirect(`/acesso-indisponivel?motivo=${encodeURIComponent(friendlyError(error))}`);
-  redirect("/inicio");
+  const { data: person } = await supabase.from("people").select("vault_id").eq("id", personId as string).maybeSingle();
+  redirect(person?.vault_id ? `/baus/${person.vault_id}` : "/inicio");
 }
 
 export async function signOut() {

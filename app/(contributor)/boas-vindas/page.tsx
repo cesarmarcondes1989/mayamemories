@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { subjectWords } from "@/lib/subject";
 import { redirect } from "next/navigation";
 import { requireMember } from "@/lib/permissions/viewer";
 import { Card } from "@/components/ui/card";
@@ -18,7 +19,7 @@ export default async function WelcomePage({ searchParams }: { searchParams: Prom
       <p className="text-xs font-medium tracking-[0.2em] text-rose-deep uppercase">Boas-vindas</p>
       <h1 className="mt-2 text-5xl leading-tight">Que bom ter você aqui, {viewer.displayName.split(" ")[0]}.</h1>
       <p className="mt-4 text-taupe">
-        Antes de começar, um combinado rápido. Tudo o que você enviar fica privado até ser revisado pelos pais da Maya,
+        Antes de começar, um combinado rápido. Tudo o que você enviar fica privado até ser revisado por {subjectWords(viewer.vault).keepers},
         e você pode pedir correção ou exclusão quando quiser.
       </p>
       <Card className="mt-8 p-6">

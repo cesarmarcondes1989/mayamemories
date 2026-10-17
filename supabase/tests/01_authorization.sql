@@ -27,13 +27,13 @@ select tests.expect_error($$ select public.bootstrap_first_admin('ana@example.co
 -- Admin cria pessoas e convites
 -- ---------------------------------------------------------------------
 select tests.login('00000000-0000-0000-0000-00000000000a');
-select tests.expect_true(public.is_admin(), 'cesar is admin');
+select tests.expect_true(public.is_vault_admin(tests.vault()), 'cesar is admin');
 
-insert into public.people (id, display_name, relationship_type) values
-  ('10000000-0000-0000-0000-00000000000b', 'Ana', 'mae'),
-  ('10000000-0000-0000-0000-00000000000c', 'Vovó Lúcia', 'avo'),
-  ('10000000-0000-0000-0000-00000000000d', 'Tia Bia', 'tio'),
-  ('10000000-0000-0000-0000-00000000000e', 'Amigo Leo', 'amigo');
+insert into public.people (vault_id, id, display_name, relationship_type) values
+  (tests.vault(), '10000000-0000-0000-0000-00000000000b', 'Ana', 'mae'),
+  (tests.vault(), '10000000-0000-0000-0000-00000000000c', 'Vovó Lúcia', 'avo'),
+  (tests.vault(), '10000000-0000-0000-0000-00000000000d', 'Tia Bia', 'tio'),
+  (tests.vault(), '10000000-0000-0000-0000-00000000000e', 'Amigo Leo', 'amigo');
 
 insert into tests.kv select 'inv_ana', secret from public.admin_create_invitation('10000000-0000-0000-0000-00000000000b', 'ana@example.com', 30, true);
 insert into tests.kv select 'inv_vovo', secret from public.admin_create_invitation('10000000-0000-0000-0000-00000000000c', 'VOVO@example.com', 30, true);
@@ -75,12 +75,12 @@ select tests.expect_error($$ select public.accept_invitation((select v from test
 reset role;
 select tests.login('00000000-0000-0000-0000-00000000000e');
 select tests.expect_ok($$ select public.accept_invitation((select v from tests.kv where k = 'inv_amigo')) $$, 'amigo accepts secret link');
-select tests.expect_true(public.can_contribute() and not public.is_in_family(), 'amigo contributes but is outside the family group');
+select tests.expect_true(public.can_contribute_in(tests.vault()) and not public.in_vault_family(tests.vault()), 'amigo contributes but is outside the family group');
 reset role;
 
 -- Ana vira admin somente por ação de um admin
 select tests.login('00000000-0000-0000-0000-00000000000b');
-select tests.expect_true(not public.is_admin(), 'ana is not admin before being granted');
+select tests.expect_true(not public.is_vault_admin(tests.vault()), 'ana is not admin before being granted');
 select tests.expect_error($$ select public.admin_set_role('10000000-0000-0000-0000-00000000000b', 'admin', true) $$, 'ana cannot promote herself');
 reset role;
 select tests.login('00000000-0000-0000-0000-00000000000a');
@@ -89,7 +89,7 @@ select tests.expect_error($$ select public.admin_set_role((select id from public
   'admin cannot remove own admin role');
 reset role;
 select tests.login('00000000-0000-0000-0000-00000000000b');
-select tests.expect_true(public.is_admin(), 'ana is admin after grant');
+select tests.expect_true(public.is_vault_admin(tests.vault()), 'ana is admin after grant');
 reset role;
 
 -- ---------------------------------------------------------------------
@@ -105,7 +105,7 @@ select tests.expect_error($$ update public.profiles set status = 'active', auth_
   'contributor cannot alter protected profile fields');
 select tests.expect_ok($$ update public.profiles set display_name = 'Vó Lúcia' where auth_user_id = auth.uid() $$,
   'contributor can rename own display name');
-update public.people set relationship_type = 'mae' where id = public.current_person_id(); -- sem política: 0 linhas
+update public.people set relationship_type = 'mae' where id = public.vault_person_id(tests.vault()); -- sem política: 0 linhas
 reset role;
 select tests.expect_count($$ select 1 from public.people where display_name = 'Vovó Lúcia' and relationship_type = 'avo' $$, 1,
   'people row untouched by contributor');
@@ -120,11 +120,11 @@ reset role;
 -- Memórias: envio, aprovação e visibilidade
 -- ---------------------------------------------------------------------
 select tests.login('00000000-0000-0000-0000-00000000000c');
-select tests.expect_error($$ insert into public.memories (memory_type, author_person_id, created_by_profile_id, moderation_status, description)
-  values ('text', public.current_person_id(), public.current_profile_id(), 'approved', 'oi') $$,
+select tests.expect_error($$ insert into public.memories (vault_id, memory_type, author_person_id, created_by_profile_id, moderation_status, description)
+  values (tests.vault(), 'text', public.vault_person_id(tests.vault()), public.current_profile_id(), 'approved', 'oi') $$,
   'contributor cannot create an already-approved memory');
-insert into public.memories (id, memory_type, author_person_id, created_by_profile_id, title, description, visibility)
-values ('20000000-0000-0000-0000-000000000001', 'text', public.current_person_id(), public.current_profile_id(),
+insert into public.memories (vault_id, id, memory_type, author_person_id, created_by_profile_id, title, description, visibility)
+values (tests.vault(), '20000000-0000-0000-0000-000000000001', 'text', public.vault_person_id(tests.vault()), public.current_profile_id(),
         'Quando soubemos', 'Chorei de alegria.', 'family');
 select tests.expect_error($$ update public.memories set moderation_status = 'approved' where id = '20000000-0000-0000-0000-000000000001' $$,
   'contributor cannot approve own memory by altering request');
@@ -169,8 +169,8 @@ reset role;
 
 -- Seleção explícita via access_grants
 select tests.login('00000000-0000-0000-0000-00000000000a');
-insert into public.access_grants (grantee_profile_id, resource_type, resource_id)
-select profile_id, 'memory', '20000000-0000-0000-0000-000000000001' from public.people where id = '10000000-0000-0000-0000-00000000000e';
+insert into public.access_grants (vault_id, grantee_profile_id, resource_type, resource_id)
+select tests.vault(), profile_id, 'memory', '20000000-0000-0000-0000-000000000001' from public.people where id = '10000000-0000-0000-0000-00000000000e';
 reset role;
 select tests.login('00000000-0000-0000-0000-00000000000e');
 select tests.expect_count($$ select 1 from public.memories where id = '20000000-0000-0000-0000-000000000001' $$, 1,
@@ -192,32 +192,32 @@ reset role;
 -- Arquivos e Storage
 -- ---------------------------------------------------------------------
 select tests.login('00000000-0000-0000-0000-00000000000c');
-insert into public.memories (id, memory_type, author_person_id, created_by_profile_id, title, visibility)
-values ('20000000-0000-0000-0000-000000000002', 'photo', public.current_person_id(), public.current_profile_id(), 'Ultrassom', 'family');
+insert into public.memories (vault_id, id, memory_type, author_person_id, created_by_profile_id, title, visibility)
+values (tests.vault(), '20000000-0000-0000-0000-000000000002', 'photo', public.vault_person_id(tests.vault()), public.current_profile_id(), 'Ultrassom', 'family');
 select tests.expect_error($$ insert into public.media_assets (memory_id, media_type, storage_path, mime_type, processing_status, created_by_profile_id)
-  values ('20000000-0000-0000-0000-000000000002', 'image', '20000000-0000-0000-0000-000000000002/a.jpg', 'image/jpeg', 'ready', public.current_profile_id()) $$,
+  values ('20000000-0000-0000-0000-000000000002', 'image', tests.vault()::text || '/20000000-0000-0000-0000-000000000002/a.jpg', 'image/jpeg', 'ready', public.current_profile_id()) $$,
   'contributor cannot mark own file as ready');
 select tests.expect_error($$ insert into public.media_assets (memory_id, media_type, storage_path, mime_type, created_by_profile_id)
   values ('20000000-0000-0000-0000-000000000002', 'image', 'other-folder/a.jpg', 'image/jpeg', public.current_profile_id()) $$,
   'asset path must live under memory folder');
 insert into public.media_assets (id, memory_id, media_type, storage_path, mime_type, created_by_profile_id)
 values ('30000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-000000000002', 'image',
-        '20000000-0000-0000-0000-000000000002/30000000-0000-0000-0000-000000000001.jpg', 'image/jpeg', public.current_profile_id());
+        tests.vault()::text || '/20000000-0000-0000-0000-000000000002/30000000-0000-0000-0000-000000000001.jpg', 'image/jpeg', public.current_profile_id());
 select tests.expect_error($$ select public.submit_memory('20000000-0000-0000-0000-000000000002') $$, 'cannot submit while upload pending');
 reset role;
 
 select tests.login('00000000-0000-0000-0000-00000000000e');
 select tests.expect_error($$ insert into public.media_assets (memory_id, media_type, storage_path, mime_type, created_by_profile_id)
-  values ('20000000-0000-0000-0000-000000000002', 'image', '20000000-0000-0000-0000-000000000002/x.jpg', 'image/jpeg', public.current_profile_id()) $$,
+  values ('20000000-0000-0000-0000-000000000002', 'image', tests.vault()::text || '/20000000-0000-0000-0000-000000000002/x.jpg', 'image/jpeg', public.current_profile_id()) $$,
   'cannot attach files to memory of another person');
-select tests.expect_error($$ insert into storage.objects (bucket_id, name) values ('memories', '20000000-0000-0000-0000-000000000002/30000000-0000-0000-0000-000000000001.jpg') $$,
+select tests.expect_error($$ insert into storage.objects (bucket_id, name) values ('memories', tests.vault()::text || '/20000000-0000-0000-0000-000000000002/30000000-0000-0000-0000-000000000001.jpg') $$,
   'cannot upload into a path registered by someone else');
 select tests.expect_error($$ insert into storage.objects (bucket_id, name) values ('memories', 'random/path.jpg') $$,
   'cannot upload to unregistered path');
 reset role;
 
 select tests.login('00000000-0000-0000-0000-00000000000c');
-select tests.expect_ok($$ insert into storage.objects (bucket_id, name) values ('memories', '20000000-0000-0000-0000-000000000002/30000000-0000-0000-0000-000000000001.jpg') $$,
+select tests.expect_ok($$ insert into storage.objects (bucket_id, name) values ('memories', tests.vault()::text || '/20000000-0000-0000-0000-000000000002/30000000-0000-0000-0000-000000000001.jpg') $$,
   'author uploads to registered path');
 reset role;
 
@@ -255,16 +255,16 @@ reset role;
 select tests.login('00000000-0000-0000-0000-00000000000f');
 select tests.expect_count($$ select 1 from storage.objects $$, 0, 'stranger reads no files');
 select tests.expect_count($$ select 1 from public.memories $$, 0, 'stranger reads no memories');
-select tests.expect_error($$ insert into public.memories (memory_type, author_person_id, created_by_profile_id, description)
-  values ('text', '10000000-0000-0000-0000-00000000000c', public.current_profile_id(), 'spam') $$, 'stranger cannot contribute');
+select tests.expect_error($$ insert into public.memories (vault_id, memory_type, author_person_id, created_by_profile_id, description)
+  values (tests.vault(), 'text', '10000000-0000-0000-0000-00000000000c', public.current_profile_id(), 'spam') $$, 'stranger cannot contribute');
 reset role;
 
 -- ---------------------------------------------------------------------
 -- Cartas para o futuro: bloqueio real por data
 -- ---------------------------------------------------------------------
 select tests.login('00000000-0000-0000-0000-00000000000c');
-insert into public.memories (id, memory_type, author_person_id, created_by_profile_id, title, description, visibility, unlock_at, recipient)
-values ('20000000-0000-0000-0000-000000000003', 'letter', public.current_person_id(), public.current_profile_id(),
+insert into public.memories (vault_id, id, memory_type, author_person_id, created_by_profile_id, title, description, visibility, unlock_at, recipient)
+values (tests.vault(), '20000000-0000-0000-0000-000000000003', 'letter', public.vault_person_id(tests.vault()), public.current_profile_id(),
         'Para os seus 15 anos', 'Querida Maya...', 'family', '2042-06-01', 'Maya');
 select public.submit_memory('20000000-0000-0000-0000-000000000003');
 reset role;
@@ -286,14 +286,14 @@ reset role;
 -- Cápsulas: não abrem antes da condição, nem por chamada direta
 -- ---------------------------------------------------------------------
 select tests.login('00000000-0000-0000-0000-00000000000a');
-insert into public.capsules (id, title, opens_at, opening_rule, status)
-values ('40000000-0000-0000-0000-000000000001', '1 ano', now() + interval '1 year', 'date', 'scheduled'),
-       ('40000000-0000-0000-0000-000000000002', 'Surpresa', now() - interval '1 day', 'date_and_manual', 'scheduled'),
-       ('40000000-0000-0000-0000-000000000003', 'Rascunho', now() - interval '1 day', 'date', 'draft');
-insert into public.memories (id, memory_type, author_person_id, created_by_profile_id, title, description, visibility)
-values ('20000000-0000-0000-0000-000000000004', 'text', public.current_person_id(), public.current_profile_id(),
+insert into public.capsules (vault_id, id, title, opens_at, opening_rule, status)
+values (tests.vault(), '40000000-0000-0000-0000-000000000001', '1 ano', now() + interval '1 year', 'date', 'scheduled'),
+       (tests.vault(), '40000000-0000-0000-0000-000000000002', 'Surpresa', now() - interval '1 day', 'date_and_manual', 'scheduled'),
+       (tests.vault(), '40000000-0000-0000-0000-000000000003', 'Rascunho', now() - interval '1 day', 'date', 'draft');
+insert into public.memories (vault_id, id, memory_type, author_person_id, created_by_profile_id, title, description, visibility)
+values (tests.vault(), '20000000-0000-0000-0000-000000000004', 'text', public.vault_person_id(tests.vault()), public.current_profile_id(),
         'Segredo do primeiro ano', 'Guardado.', 'capsule'),
-       ('20000000-0000-0000-0000-000000000005', 'text', public.current_person_id(), public.current_profile_id(),
+       (tests.vault(), '20000000-0000-0000-0000-000000000005', 'text', public.vault_person_id(tests.vault()), public.current_profile_id(),
         'Segredo surpresa', 'Guardado.', 'capsule');
 select public.moderate_memory('20000000-0000-0000-0000-000000000004', 'approve');
 select public.moderate_memory('20000000-0000-0000-0000-000000000005', 'approve');
@@ -343,7 +343,7 @@ reset role;
 -- NFC: porta de entrada, nunca chave mestra
 -- ---------------------------------------------------------------------
 select tests.login('00000000-0000-0000-0000-00000000000a');
-insert into tests.kv select 'nfc1', (public.admin_create_nfc_token('10000000-0000-0000-0000-00000000000c', 'Ursinho da Vovó')).public_id;
+insert into tests.kv select 'nfc1', (public.admin_create_nfc_token(tests.vault(), '10000000-0000-0000-0000-00000000000c', 'Ursinho da Vovó')).public_id;
 reset role;
 
 select tests.login_anon();
@@ -374,9 +374,9 @@ select tests.expect_count($$ select 1 from public.nfc_tokens where person_id = '
 -- Visitas
 -- ---------------------------------------------------------------------
 select tests.login('00000000-0000-0000-0000-00000000000d');
-insert into public.visits (person_id, occurred_at, visit_type, status, created_by)
-values ('10000000-0000-0000-0000-00000000000c', current_date, 'home', 'approved', public.current_profile_id());
-select tests.expect_count($$ select 1 from public.visits where status = 'pending_review' and person_id = public.current_person_id() $$, 1,
+insert into public.visits (vault_id, person_id, occurred_at, visit_type, status, created_by)
+values (tests.vault(), '10000000-0000-0000-0000-00000000000c', current_date, 'home', 'approved', public.current_profile_id());
+select tests.expect_count($$ select 1 from public.visits where status = 'pending_review' and person_id = public.vault_person_id(tests.vault()) $$, 1,
   'visit forced to pending and to the caller person');
 reset role;
 select tests.login('00000000-0000-0000-0000-00000000000e');
@@ -388,12 +388,12 @@ reset role;
 -- ---------------------------------------------------------------------
 select tests.login('00000000-0000-0000-0000-00000000000e');
 select tests.expect_error($$ insert into public.memory_comments (memory_id, author_person_id, created_by_profile_id, body)
-  values ('20000000-0000-0000-0000-000000000002', public.current_person_id(), public.current_profile_id(), 'oi') $$,
+  values ('20000000-0000-0000-0000-000000000002', public.vault_person_id(tests.vault()), public.current_profile_id(), 'oi') $$,
   'cannot comment on memory without access');
 reset role;
 select tests.login('00000000-0000-0000-0000-00000000000d');
 insert into public.memory_comments (id, memory_id, author_person_id, created_by_profile_id, body, status)
-values ('50000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-000000000002', public.current_person_id(), public.current_profile_id(), 'Que lindo!', 'approved');
+values ('50000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-000000000002', public.vault_person_id(tests.vault()), public.current_profile_id(), 'Que lindo!', 'approved');
 select tests.expect_count($$ select 1 from public.memory_comments where status = 'pending_review' $$, 1, 'comment forced to pending');
 reset role;
 select tests.login('00000000-0000-0000-0000-00000000000c');
@@ -424,8 +424,8 @@ select tests.expect_error($$ delete from public.audit_events $$, 'even the owner
 -- Retirada pelo autor
 -- ---------------------------------------------------------------------
 select tests.login('00000000-0000-0000-0000-00000000000c');
-insert into public.memories (id, memory_type, author_person_id, created_by_profile_id, description)
-values ('20000000-0000-0000-0000-000000000006', 'text', public.current_person_id(), public.current_profile_id(), 'Ops');
+insert into public.memories (vault_id, id, memory_type, author_person_id, created_by_profile_id, description)
+values (tests.vault(), '20000000-0000-0000-0000-000000000006', 'text', public.vault_person_id(tests.vault()), public.current_profile_id(), 'Ops');
 select public.submit_memory('20000000-0000-0000-0000-000000000006');
 select tests.expect_true(public.request_memory_removal('20000000-0000-0000-0000-000000000006') = 'removed', 'author withdraws pending content');
 select tests.expect_true(public.request_memory_removal('20000000-0000-0000-0000-000000000002') = 'requested', 'published content needs admin decision');

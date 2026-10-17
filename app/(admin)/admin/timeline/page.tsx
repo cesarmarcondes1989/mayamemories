@@ -1,3 +1,4 @@
+import { requireAdmin } from "@/lib/permissions/viewer";
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { listTimeline, type TimelineFilters } from "@/features/memories/queries";
@@ -8,12 +9,13 @@ import { EmptyState, PageHeader } from "@/components/ui/misc";
 export const metadata: Metadata = { title: "Linha do tempo" };
 
 export default async function AdminTimelinePage({ searchParams }: { searchParams: Promise<TimelineFilters> }) {
+  const V = (await requireAdmin()).vault.id;
   const filters = await searchParams;
   const supabase = await createClient();
   const [memories, { data: people }, { data: capsules }] = await Promise.all([
-    listTimeline(filters, { includeCapsuleOnly: true }),
-    supabase.from("people").select("id, display_name").order("display_name"),
-    supabase.from("capsules").select("id, title").order("title"),
+    listTimeline(V, filters, { includeCapsuleOnly: true }),
+    supabase.from("people").select("id, display_name").eq("vault_id", V).order("display_name"),
+    supabase.from("capsules").select("id, title").eq("vault_id", V).order("title"),
   ]);
   return (
     <>

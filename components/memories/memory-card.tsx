@@ -41,7 +41,7 @@ export function MemoryCard({
           <p className={`mt-1 line-clamp-4 text-[15px] text-ink/80 ${isLetter ? "letter-body text-lg" : ""}`}>{memory.description}</p>
         )}
         {memory.memory_type === "visit" && !memory.description && (
-          <p className="mt-1 text-[15px] text-ink/80">Esteve com a Maya.</p>
+          <p className="mt-1 text-[15px] text-ink/80">Registrou uma visita.</p>
         )}
         <div className="mt-3 flex items-center justify-between gap-2">
           {memory.author && (

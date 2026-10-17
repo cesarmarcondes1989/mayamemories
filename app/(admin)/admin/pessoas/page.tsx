@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { requireAdmin } from "@/lib/permissions/viewer";
 import { Avatar, PageHeader } from "@/components/ui/misc";
 import { ButtonLink } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -25,9 +26,10 @@ type Row = {
 };
 
 export default async function PeoplePage() {
+  const { vault } = await requireAdmin();
   const supabase = await createClient();
   const [{ data }, { data: rel }] = await Promise.all([
-    supabase.rpc("admin_people_overview"),
+    supabase.rpc("admin_people_overview", { p_vault_id: vault.id }),
     supabase.from("relationship_types").select("key, label"),
   ]);
   const labels = new Map((rel ?? []).map((r) => [r.key, r.label]));

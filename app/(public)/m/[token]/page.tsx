@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { subjectWords } from "@/lib/subject";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getViewer } from "@/lib/permissions/viewer";
@@ -13,7 +14,7 @@ import { requestLoginLink } from "@/features/auth/actions";
 import { UnavailableMessage } from "@/components/auth/unavailable";
 import { HomeActions, HomeHero } from "@/components/contributor/home-actions";
 
-export const metadata: Metadata = { title: "Maya" };
+export const metadata: Metadata = { title: "Ursinho" };
 export const dynamic = "force-dynamic";
 
 /**
@@ -37,11 +38,14 @@ export default async function NfcEntryPage({
   }
 
   if (resolved.is_my_token) {
-    const [viewer, , stats] = await Promise.all([getViewer(), supabase.rpc("touch_last_seen"), getMyStats()]);
+    const viewer = await getViewer();
+    // O ursinho abre SEMPRE no baú dele: se o baú em uso é outro, troca.
+    if (viewer?.vault?.id !== resolved.vault_id) redirect(`/m/${encodeURIComponent(token)}/entrar`);
+    const [, stats] = await Promise.all([supabase.rpc("touch_last_seen"), getMyStats(resolved.vault_id)]);
     return (
       <div className="mx-auto max-w-3xl pt-2 pb-24 md:pb-0">
         <BottomTabs />
-        <HomeHero name={resolved.greeting_name ?? viewer?.displayName.split(" ")[0]} />
+        <HomeHero name={resolved.greeting_name ?? viewer?.displayName.split(" ")[0]} subject={subjectWords(viewer?.vault).of} pronoun={subjectWords(viewer?.vault).pronoun} />
         <NudgeCard stats={stats} />
         <HomeActions />
         {viewer?.isAdmin && (
@@ -62,7 +66,7 @@ export default async function NfcEntryPage({
   const viewer = await getViewer();
   return (
     <div className="mx-auto max-w-md pt-4 text-center">
-      <p className="font-display text-8xl">Maya</p>
+      <p className="font-display text-7xl">♡</p>
       <h1 className="mt-2 text-4xl">Você faz parte da história dela</h1>
       <Card className="mt-8 p-6 text-left">
         {sp.admin ? (
@@ -79,7 +83,7 @@ export default async function NfcEntryPage({
           <div className="mb-4">
             <Alert tone="warn">
               {sp.falha === "sem-pessoa"
-                ? "Este ursinho ainda não está ligado a uma pessoa. Peça aos pais da Maya para vinculá-lo."
+                ? "Este ursinho ainda não está ligado a uma pessoa. Peça a quem cuida do baú para vinculá-lo."
                 : "Não conseguimos abrir o acesso direto agora. Você pode entrar com seu e-mail."}
               <span className="mt-1 block text-xs opacity-70">Código: {sp.falha}</span>
             </Alert>

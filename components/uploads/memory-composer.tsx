@@ -10,6 +10,7 @@ import { AudioRecorder } from "./audio-recorder";
 import { readMediaDuration, uploadToSignedUrl } from "./upload-engine";
 import { checkFileAgainstLimits, type UploadLimits } from "@/lib/storage/limits";
 import { formatBytes } from "@/lib/format";
+import type { SubjectWords } from "@/lib/subject";
 import { VISIBILITY_OPTIONS, VISIT_TYPES } from "@/lib/constants";
 import {
   createMemoryDraft,
@@ -32,7 +33,9 @@ export function MemoryComposer({
   today,
   letterMilestones = [],
   capsules = [],
+  subject,
 }: {
+  subject: SubjectWords;
   kind: ComposerKind;
   limits: UploadLimits;
   today: string;
@@ -45,7 +48,7 @@ export function MemoryComposer({
   const [description, setDescription] = useState("");
   const [occurredAt, setOccurredAt] = useState(kind === "letter" ? "" : today);
   const [visibility, setVisibility] = useState(kind === "letter" ? "family" : "family");
-  const [recipient, setRecipient] = useState("Maya");
+  const [recipient, setRecipient] = useState(subject.name);
   const [unlockChoice, setUnlockChoice] = useState(letterMilestones.at(-1)?.date ?? "custom");
   const [unlockCustom, setUnlockCustom] = useState("");
   const [capsuleId, setCapsuleId] = useState("");
@@ -400,7 +403,7 @@ export function MemoryComposer({
           maxLength={20000}
           required={kind === "letter" || (kind === "text" && files.length === 0)}
           className={kind === "letter" ? "letter-body min-h-72" : ""}
-          placeholder={kind === "letter" ? "Querida Maya," : ""}
+          placeholder={kind === "letter" ? `Querid${subject.pronoun === "ele" ? "o" : "a"} ${subject.name},` : ""}
         />
       </Field>
 
@@ -450,7 +453,7 @@ export function MemoryComposer({
               </Select>
             </Field>
           )}
-          <p className="pt-1 text-sm text-taupe">Os pais da Maya revisam tudo antes de qualquer pessoa ver.</p>
+          <p className="pt-1 text-sm text-taupe">{subject.keepers[0].toUpperCase() + subject.keepers.slice(1)} revisam tudo antes de qualquer pessoa ver.</p>
         </div>
       </details>
 
@@ -458,7 +461,7 @@ export function MemoryComposer({
 
       <p className="text-xs leading-relaxed text-taupe">
         Ao enviar, você concorda que esta lembrança seja guardada e mostrada conforme a visibilidade escolhida, depois da
-        revisão dos pais da Maya. Você pode pedir correção ou exclusão quando quiser.{" "}
+        revisão de {subject.keepers}. Você pode pedir correção ou exclusão quando quiser.{" "}
         <a href="/privacidade" className="underline">Privacidade</a>
       </p>
 

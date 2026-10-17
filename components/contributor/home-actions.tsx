@@ -2,7 +2,7 @@ import { HeartDivider, HeartDoodle, SparkleDoodle } from "@/components/ui/doodle
 import Link from "next/link";
 
 const ACTIONS = [
-  { href: "/visitas/nova", icon: "🏡", title: "Registrar minha visita", text: "Conte que esteve com a Maya." },
+  { href: "/visitas/nova", icon: "🏡", title: "Registrar minha visita", text: "Conte que você esteve lá." },
   { href: "/enviar/foto", icon: "📷", title: "Enviar uma foto ou vídeo", text: "Um momento que merece ficar guardado." },
   { href: "/enviar/audio", icon: "🎙️", title: "Gravar uma mensagem", text: "Sua voz, para ela ouvir quando crescer." },
   { href: "/cartas/nova", icon: "✉️", title: "Escrever uma carta para o futuro", text: "Ela será aberta na data que você escolher." },
@@ -36,16 +36,16 @@ export function HomeActions() {
   );
 }
 
-export function HomeHero({ name }: { name?: string | null }) {
+export function HomeHero({ name, subject, pronoun = "ela" }: { name?: string | null; subject?: string | null; pronoun?: string }) {
   return (
     <div className="relative mb-8 text-center">
       <SparkleDoodle className="absolute -top-4 left-2 size-8 text-rose-deep/60" />
       <HeartDoodle className="absolute top-0 right-2 size-10 rotate-12 text-rose-deep/60" />
       {name && <p className="mb-1 text-lg font-semibold text-taupe">Olá, {name} ♡</p>}
-      <h1 className="text-5xl sm:text-6xl">Você faz parte da história da Maya</h1>
+      <h1 className="text-5xl sm:text-6xl">Você faz parte da história {subject ?? "desta família"}</h1>
       <HeartDivider className="mx-auto mt-4 max-w-xs" />
       <p className="mx-auto mt-4 max-w-md text-[15px] leading-relaxed text-ink/80">
-        Um cantinho para guardar <strong className="text-rose-deep">momentos, palavras e lembranças</strong> que ela vai
+        Um cantinho para guardar <strong className="text-rose-deep">momentos, palavras e lembranças</strong> que {pronoun === "vocês" ? "vocês vão" : `${pronoun} vai`}
         descobrir ao longo da vida.
       </p>
     </div>

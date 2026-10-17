@@ -1,3 +1,4 @@
+import { requireAdmin } from "@/lib/permissions/viewer";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -20,19 +21,20 @@ export default async function PersonPage({
   params: Promise<{ id: string }>;
   searchParams: Promise<{ salvo?: string; erro?: string; criada?: string }>;
 }) {
+  const V = (await requireAdmin()).vault.id;
   const { id } = await params;
   const sp = await searchParams;
   if (!/^[0-9a-f-]{36}$/.test(id)) notFound();
   const supabase = await createClient();
-  const { data: person } = await supabase.from("people").select("*").eq("id", id).maybeSingle();
+  const { data: person } = await supabase.from("people").select("*").eq("vault_id", V).eq("id", id).maybeSingle();
   if (!person) notFound();
   const [{ data: rel }, { data: overview }, { data: invites }, { data: tokens }, { data: visits }, { data: consents }] = await Promise.all([
     supabase.from("relationship_types").select("key, label").order("sort_order"),
-    supabase.rpc("admin_people_overview"),
-    supabase.from("invitations").select("id, email, expires_at, accepted_at, revoked_at, created_at").eq("person_id", id).order("created_at", { ascending: false }),
-    supabase.from("nfc_tokens").select("id, public_id, status, label, created_at").eq("person_id", id).order("created_at", { ascending: false }),
-    supabase.from("visits").select("id, occurred_at, visit_type, status").eq("person_id", id).order("occurred_at", { ascending: false }),
-    supabase.from("consents").select("consent_type, status, policy_version, created_at").eq("person_id", id).order("created_at", { ascending: false }),
+    supabase.rpc("admin_people_overview", { p_vault_id: V }),
+    supabase.from("invitations").select("id, email, expires_at, accepted_at, revoked_at, created_at").eq("vault_id", V).eq("person_id", id).order("created_at", { ascending: false }),
+    supabase.from("nfc_tokens").select("id, public_id, status, label, created_at").eq("vault_id", V).eq("person_id", id).order("created_at", { ascending: false }),
+    supabase.from("visits").select("id, occurred_at, visit_type, status").eq("vault_id", V).eq("person_id", id).order("occurred_at", { ascending: false }),
+    supabase.from("consents").select("consent_type, status, policy_version, created_at").eq("vault_id", V).eq("person_id", id).order("created_at", { ascending: false }),
   ]);
   const ov = ((overview ?? []) as Array<{ person_id: string; roles: string[]; in_family: boolean; last_portal_access: string | null; last_contribution: string | null; last_confirmed_visit: string | null; last_interaction: string | null }>).find(
     (o) => o.person_id === id,

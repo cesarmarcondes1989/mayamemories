@@ -77,6 +77,13 @@ npm run bootstrap:admin -- cesar@email.com "Cesar" pai
 - [ ] Backup + **teste de restauração** feitos (docs/backup.md)
 - [ ] Ponto de recuperação (PITR) ou backups diários habilitados no Supabase (plano Pro)
 
+## Atualização para multi-cliente (migração 009)
+
+A migração `20261017000009_multi_vault.sql` transforma os dados atuais no baú `maya` e o primeiro
+administrador em dono da plataforma. Ela é testada contra uma cópia do formato antigo
+(`scripts/test-db.sh`, teste "upgrade"), mas **faça um backup antes**:
+Supabase → Database → Backups (ou `npm run backup`), e só então `npx supabase db push`.
+
 ## Atualizações futuras do banco
 
 Nunca altere migrações já aplicadas. Crie um novo arquivo em `supabase/migrations/` e rode `npx supabase db push`.

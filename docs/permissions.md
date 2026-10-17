@@ -2,7 +2,13 @@
 
 Toda autorização é avaliada **no banco** (RLS + funções). A interface só esconde o que o banco já nega.
 
-## Papéis (`person_roles`, escopo `global`)
+## Papéis por baú (`person_roles.vault_id`)
+
+Todo papel vale para um baú. Ser admin do baú da Maya não dá acesso ao baú do João.
+O **dono da plataforma** (`platform_admins`) vê contas e baús (metadados), mas não vê memórias,
+pessoas, arquivos nem auditoria de nenhuma família.
+
+## Papéis
 
 | Papel | Quem | Como recebe |
 | --- | --- | --- |

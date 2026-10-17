@@ -15,9 +15,10 @@ const PURPOSES: Record<string, string> = {
 
 async function record(type: string, status: "granted" | "withdrawn") {
   const viewer = await getViewer();
-  if (!viewer?.personId) redirect("/entrar");
+  if (!viewer?.personId || !viewer.vault) redirect("/entrar");
   const supabase = await createClient();
   await supabase.from("consents").insert({
+    vault_id: viewer.vault.id,
     person_id: viewer.personId,
     consent_type: type,
     purpose: PURPOSES[type],

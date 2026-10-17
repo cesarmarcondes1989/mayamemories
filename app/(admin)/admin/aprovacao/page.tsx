@@ -1,3 +1,4 @@
+import { requireAdmin } from "@/lib/permissions/viewer";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
@@ -76,9 +77,10 @@ export default async function ApprovalPage({
 type Sb = Awaited<ReturnType<typeof createClient>>;
 
 async function MemoryQueue({ supabase, types, returnTo }: { supabase: Sb; types: string[] | null; returnTo: string }) {
+  const V = (await requireAdmin()).vault.id;
   let q = supabase
     .from("memories")
-    .select(MEMORY_SELECT + ", requested_capsule:capsules!memories_requested_capsule_fk(title), visits(occurred_at, visit_type, companions)")
+    .select(MEMORY_SELECT + ", requested_capsule:capsules!memories_requested_capsule_fk(title), visits(occurred_at, visit_type, companions)").eq("vault_id", V)
     .eq("moderation_status", "pending_review")
     .is("deleted_at", null)
     .order("submitted_at", { ascending: true })
@@ -195,9 +197,10 @@ async function MemoryQueue({ supabase, types, returnTo }: { supabase: Sb; types:
 }
 
 async function CommentsQueue({ supabase }: { supabase: Sb }) {
+  const V = (await requireAdmin()).vault.id;
   const { data } = await supabase
     .from("memory_comments")
-    .select("id, body, created_at, memory_id, author:people!memory_comments_author_person_id_fkey(display_name), memory:memories(title)")
+    .select("id, body, created_at, memory_id, author:people!memory_comments_author_person_id_fkey(display_name), memory:memories(title)").eq("vault_id", V)
     .eq("status", "pending_review")
     .is("deleted_at", null)
     .order("created_at");
@@ -243,9 +246,10 @@ async function CommentsQueue({ supabase }: { supabase: Sb }) {
 }
 
 async function DeletionQueue({ supabase }: { supabase: Sb }) {
+  const V = (await requireAdmin()).vault.id;
   const { data } = await supabase
     .from("data_deletion_requests")
-    .select("id, reason, created_at, memory_id, requester:profiles!data_deletion_requests_requested_by_fkey(display_name), memory:memories(title)")
+    .select("id, reason, created_at, memory_id, requester:profiles!data_deletion_requests_requested_by_fkey(display_name), memory:memories(title)").eq("vault_id", V)
     .eq("status", "pending")
     .order("created_at");
   const rows = (data ?? []) as unknown as Array<{

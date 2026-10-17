@@ -8,10 +8,10 @@ insert into auth.users (id, email) values
 select public.bootstrap_first_admin('admin2@example.com', 'Admin', 'pai');
 
 select tests.login('00000000-0000-0000-0000-0000000000a2');
-insert into public.people (id, display_name, relationship_type) values ('10000000-0000-0000-0000-0000000000b2', 'Vovó Nina', 'avo');
-insert into tests.kv select 'tok', (public.admin_create_nfc_token('10000000-0000-0000-0000-0000000000b2', 'Ursinho da Vovó')).public_id;
-insert into tests.kv select 'admintok', (public.admin_create_nfc_token((select id from public.people where display_name = 'Admin'), 'Ursinho do admin')).public_id;
-insert into tests.kv select 'campaign', (public.admin_create_nfc_token(null, 'Campanha')).public_id;
+insert into public.people (vault_id, id, display_name, relationship_type) values (tests.vault(), '10000000-0000-0000-0000-0000000000b2', 'Vovó Nina', 'avo');
+insert into tests.kv select 'tok', (public.admin_create_nfc_token(tests.vault(), '10000000-0000-0000-0000-0000000000b2', 'Ursinho da Vovó')).public_id;
+insert into tests.kv select 'admintok', (public.admin_create_nfc_token(tests.vault(), (select id from public.people where display_name = 'Admin'), 'Ursinho do admin')).public_id;
+insert into tests.kv select 'campaign', (public.admin_create_nfc_token(tests.vault(), null, 'Campanha')).public_id;
 reset role;
 
 -- Clientes (anon/autenticado) não podem usar as funções do backend
@@ -38,8 +38,8 @@ select tests.expect_error($$ select public.nfc_link_person((select v from tests.
 reset role;
 
 select tests.login('00000000-0000-0000-0000-0000000000b2');
-select tests.expect_true(public.can_contribute() and not public.is_admin(), 'token person is a contributor, never admin');
-select tests.expect_true(public.is_in_family(), 'token person joins the family group');
+select tests.expect_true(public.can_contribute_in(tests.vault()) and not public.is_vault_admin(tests.vault()), 'token person is a contributor, never admin');
+select tests.expect_true(public.in_vault_family(tests.vault()), 'token person joins the family group');
 select tests.expect_true((select is_my_token from public.resolve_nfc_token((select v from tests.kv where k = 'tok'))), 'page recognises its owner');
 reset role;
 

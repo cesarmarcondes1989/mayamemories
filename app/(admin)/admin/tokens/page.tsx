@@ -1,3 +1,4 @@
+import { requireAdmin } from "@/lib/permissions/viewer";
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { createNfcToken, linkNfcToPerson, replaceNfcToken, setNfcStatus } from "@/features/admin/actions";
@@ -16,14 +17,15 @@ import { formatDate, formatDateTime } from "@/lib/format";
 export const metadata: Metadata = { title: "Tokens NFC" };
 
 export default async function TokensPage({ searchParams }: { searchParams: Promise<{ erro?: string; criado?: string; substituido?: string; vinculado?: string }> }) {
+  const V = (await requireAdmin()).vault.id;
   const sp = await searchParams;
   const supabase = await createClient();
   const [{ data: tokens }, { data: people }] = await Promise.all([
     supabase
       .from("nfc_tokens")
-      .select("id, public_id, label, status, notes, created_at, activated_at, revoked_at, last_scanned_at, replaced_by_token_id, person:people(display_name)")
+      .select("id, public_id, label, status, notes, created_at, activated_at, revoked_at, last_scanned_at, replaced_by_token_id, person:people(display_name)").eq("vault_id", V)
       .order("created_at", { ascending: false }),
-    supabase.from("people").select("id, display_name").neq("status", "archived").order("display_name"),
+    supabase.from("people").select("id, display_name").eq("vault_id", V).neq("status", "archived").order("display_name"),
   ]);
   const site = publicEnv.siteUrl();
   type Token = { id: string; public_id: string; label: string | null; status: string; notes: string | null; created_at: string; activated_at: string | null; revoked_at: string | null; last_scanned_at: string | null; person: { display_name: string } | null };

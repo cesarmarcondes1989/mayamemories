@@ -130,9 +130,9 @@ export function ProgressBar({ value, label }: { value: number; label?: string })
 export function Logo({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 64 64" className={className} aria-hidden="true">
-      <circle cx="20" cy="18" r="7" fill="#E7A9B8" />
-      <circle cx="44" cy="18" r="7" fill="#E7A9B8" />
-      <circle cx="32" cy="32" r="17" fill="#E7A9B8" />
+      <circle cx="20" cy="18" r="7" fill="var(--rose-deep)" fillOpacity="0.55" />
+      <circle cx="44" cy="18" r="7" fill="var(--rose-deep)" fillOpacity="0.55" />
+      <circle cx="32" cy="32" r="17" fill="var(--rose-deep)" fillOpacity="0.55" />
       <path
         d="M32 47c-6-4.4-10-8-10-12a5 5 0 0 1 10-1.2A5 5 0 0 1 42 35c0 4-4 7.6-10 12z"
         fill="#FFFAFA"

@@ -1,3 +1,4 @@
+import { requireAdmin } from "@/lib/permissions/viewer";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
@@ -9,12 +10,13 @@ export const metadata: Metadata = { title: "Auditoria" };
 const PAGE = 50;
 
 export default async function AuditPage({ searchParams }: { searchParams: Promise<{ p?: string; tipo?: string }> }) {
+  const V = (await requireAdmin()).vault.id;
   const sp = await searchParams;
   const page = Math.max(0, Number(sp.p ?? 0) || 0);
   const supabase = await createClient();
   let q = supabase
     .from("audit_events")
-    .select("id, action, resource_type, resource_id, metadata, created_at, actor:profiles(display_name)")
+    .select("id, action, resource_type, resource_id, metadata, created_at, actor:profiles(display_name)").eq("vault_id", V)
     .order("created_at", { ascending: false })
     .range(page * PAGE, page * PAGE + PAGE - 1);
   if (sp.tipo && /^[a-z_]+$/.test(sp.tipo)) q = q.eq("resource_type", sp.tipo);

@@ -1,3 +1,4 @@
+import { requireAdmin } from "@/lib/permissions/viewer";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
@@ -22,6 +23,7 @@ export default async function AdminMemoryPage({
   params: Promise<{ id: string }>;
   searchParams: Promise<{ salvo?: string; erro?: string }>;
 }) {
+  const V = (await requireAdmin()).vault.id;
   const { id } = await params;
   const sp = await searchParams;
   if (!/^[0-9a-f-]{36}$/.test(id)) notFound();
@@ -29,9 +31,9 @@ export default async function AdminMemoryPage({
   if (!memory) notFound();
   const supabase = await createClient();
   const [{ data: capsules }, { data: grants }, { data: people }, comments] = await Promise.all([
-    supabase.from("capsules").select("id, title, status").neq("status", "archived").order("opens_at", { nullsFirst: true }),
-    supabase.from("access_grants").select("id, grantee_profile_id, created_at").eq("resource_type", "memory").eq("resource_id", id).is("revoked_at", null),
-    supabase.from("people").select("id, display_name, profile_id").not("profile_id", "is", null).order("display_name"),
+    supabase.from("capsules").select("id, title, status").eq("vault_id", V).neq("status", "archived").order("opens_at", { nullsFirst: true }),
+    supabase.from("access_grants").select("id, grantee_profile_id, created_at").eq("vault_id", V).eq("resource_type", "memory").eq("resource_id", id).is("revoked_at", null),
+    supabase.from("people").select("id, display_name, profile_id").eq("vault_id", V).not("profile_id", "is", null).order("display_name"),
     listComments(id),
   ]);
   const inCapsules = new Set(memory.capsule_items.map((c) => c.capsule_id));

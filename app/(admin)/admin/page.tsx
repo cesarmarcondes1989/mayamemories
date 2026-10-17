@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { requireAdmin } from "@/lib/permissions/viewer";
 import { PageHeader, Stat } from "@/components/ui/misc";
 import { Card } from "@/components/ui/card";
 import { formatBytes, formatDate, formatDateTime } from "@/lib/format";
@@ -25,8 +26,9 @@ type Stats = {
 };
 
 export default async function AdminDashboard() {
+  const { vault } = await requireAdmin();
   const supabase = await createClient();
-  const { data } = await supabase.rpc("admin_dashboard_stats");
+  const { data } = await supabase.rpc("admin_dashboard_stats", { p_vault_id: vault.id });
   const s = data as Stats;
   return (
     <>

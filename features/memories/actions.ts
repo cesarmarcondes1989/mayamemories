@@ -23,11 +23,14 @@ export type DraftResult = { memoryId: string; uploads: UploadTicket[]; submitted
 
 async function contributorOrError() {
   const viewer = await getViewer();
-  if (!viewer?.canContribute || !viewer.profileId) return { viewer: null, error: "Você não tem permissão para contribuir." };
+  if (!viewer?.canContribute || !viewer.profileId || !viewer.vault) {
+    return { viewer: null, error: viewer?.vault?.status === "read_only" ? "Este baú está em modo só leitura." : "Você não tem permissão para contribuir." };
+  }
   if (!viewer.hasConsent && !viewer.isAdmin) {
     // Consentimento pelo ato de enviar: o termo é exibido junto ao botão.
     const supabase = await createClient();
     const { error } = await supabase.from("consents").insert({
+      vault_id: viewer.vault!.id,
       person_id: viewer.personId!,
       consent_type: "contribution_terms",
       purpose: CONTRIBUTION_PURPOSE,
@@ -83,6 +86,7 @@ export async function createMemoryDraft(raw: CreateMemoryInput): Promise<ActionR
       .from("media_assets")
       .select("size_bytes, memories!inner(created_by_profile_id)")
       .eq("memories.created_by_profile_id", viewer.profileId!)
+      .eq("vault_id", viewer.vault!.id)
       .neq("processing_status", "deleted");
     const total = (used ?? []).reduce((acc, r) => acc + (r.size_bytes ?? 0), 0) + files.reduce((a, f) => a + f.file.size, 0);
     if (total > limits.max_bytes_per_person) {
@@ -94,6 +98,7 @@ export async function createMemoryDraft(raw: CreateMemoryInput): Promise<ActionR
   const memoryType = resolveMemoryType(input.kind, files.map((f) => f.kind));
   const { error: memError } = await supabase.from("memories").insert({
     id: memoryId,
+    vault_id: viewer.vault!.id,
     memory_type: memoryType,
     title: input.title ?? (input.kind === "visit" ? "Visita" : null),
     description: input.description,
@@ -114,6 +119,7 @@ export async function createMemoryDraft(raw: CreateMemoryInput): Promise<ActionR
 
   if (input.kind === "visit" && input.visit) {
     const { error } = await supabase.from("visits").insert({
+      vault_id: viewer.vault!.id,
       person_id: viewer.personId!,
       occurred_at: input.visit.occurredAt,
       visit_type: input.visit.visitType,
@@ -131,7 +137,7 @@ export async function createMemoryDraft(raw: CreateMemoryInput): Promise<ActionR
   const uploads: UploadTicket[] = [];
   for (const [i, f] of files.entries()) {
     const assetId = crypto.randomUUID();
-    const path = `${memoryId}/${assetId}.${MIME_EXTENSION[f.mime] ?? "bin"}`;
+    const path = `${viewer.vault!.id}/${memoryId}/${assetId}.${MIME_EXTENSION[f.mime] ?? "bin"}`;
     const { error } = await supabase.from("media_assets").insert({
       id: assetId,
       memory_id: memoryId,
@@ -209,7 +215,9 @@ export async function finalizeAsset(assetId: string): Promise<ActionResult<{ sta
     return { ok: false as const, error: reason };
   };
 
-  const [folder, filename] = asset.storage_path.split("/");
+  const cut = asset.storage_path.lastIndexOf("/");
+  const folder = asset.storage_path.slice(0, cut);
+  const filename = asset.storage_path.slice(cut + 1);
   const { data: listing } = await admin.storage.from(BUCKET).list(folder, { search: filename, limit: 1 });
   const object = listing?.find((o) => o.name === filename);
   if (!object) return { ok: false, error: "O arquivo ainda não chegou. Tente novamente." };

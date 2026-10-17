@@ -17,10 +17,8 @@ export function bootstrapEmails(): string[] {
 export async function adminExists(): Promise<boolean> {
   const admin = createAdminClient();
   const { count, error } = await admin
-    .from("person_roles")
-    .select("id", { count: "exact", head: true })
-    .eq("role", "admin")
-    .is("revoked_at", null);
+    .from("platform_admins")
+    .select("profile_id", { count: "exact", head: true });
   if (error) throw new Error(`admin check failed: ${error.message}`);
   return (count ?? 0) > 0;
 }

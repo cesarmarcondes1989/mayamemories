@@ -1,3 +1,4 @@
+import { requireAdmin } from "@/lib/permissions/viewer";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -23,28 +24,29 @@ export default async function AdminCapsulePage({
   params: Promise<{ id: string }>;
   searchParams: Promise<{ salvo?: string; erro?: string }>;
 }) {
+  const V = (await requireAdmin()).vault.id;
   const { id } = await params;
   const sp = await searchParams;
   if (!/^[0-9a-f-]{36}$/.test(id)) notFound();
   const supabase = await createClient();
-  const { data: capsule } = await supabase.from("capsules").select("*").eq("id", id).maybeSingle();
+  const { data: capsule } = await supabase.from("capsules").select("*").eq("vault_id", V).eq("id", id).maybeSingle();
   if (!capsule) notFound();
   const [{ data: items }, { data: candidates }, { data: grants }, { data: people }, { data: history }] = await Promise.all([
     supabase
       .from("capsule_items")
-      .select("memory_id, position, memory:memories(id, title, memory_type, occurred_at, moderation_status)")
+      .select("memory_id, position, memory:memories(id, title, memory_type, occurred_at, moderation_status)").eq("vault_id", V)
       .eq("capsule_id", id)
       .order("position"),
     supabase
       .from("memories")
-      .select("id, title, memory_type, occurred_at, author:people!memories_author_person_id_fkey(display_name)")
+      .select("id, title, memory_type, occurred_at, author:people!memories_author_person_id_fkey(display_name)").eq("vault_id", V)
       .eq("moderation_status", "approved")
       .is("deleted_at", null)
       .order("created_at", { ascending: false })
       .limit(80),
-    supabase.from("access_grants").select("id, grantee_profile_id").eq("resource_type", "capsule").eq("resource_id", id).is("revoked_at", null),
-    supabase.from("people").select("id, display_name, profile_id").not("profile_id", "is", null).order("display_name"),
-    supabase.from("audit_events").select("action, created_at, metadata").eq("resource_type", "capsules").eq("resource_id", id).order("created_at", { ascending: false }).limit(15),
+    supabase.from("access_grants").select("id, grantee_profile_id").eq("vault_id", V).eq("resource_type", "capsule").eq("resource_id", id).is("revoked_at", null),
+    supabase.from("people").select("id, display_name, profile_id").eq("vault_id", V).not("profile_id", "is", null).order("display_name"),
+    supabase.from("audit_events").select("action, created_at, metadata").eq("vault_id", V).eq("resource_type", "capsules").eq("resource_id", id).order("created_at", { ascending: false }).limit(15),
   ]);
   const state = capsuleDisplayState(capsule);
   const already = new Set((items ?? []).map((i) => i.memory_id));

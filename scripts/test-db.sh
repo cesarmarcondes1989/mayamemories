@@ -30,5 +30,29 @@ for t in "$ROOT"/supabase/tests/*.sql; do
     status=1
   fi
 done
+# Upgrade: banco no formato antigo + dados reais -> aplica as migrações novas
+UP="maya_upgrade_$$"
+createdb "$UP"
+trap 'dropdb --if-exists "$DB" >/dev/null 2>&1 || true; dropdb --if-exists "$UP" >/dev/null 2>&1 || true' EXIT
+upgrade_ok=1
+psql -X -q -v ON_ERROR_STOP=1 -d "$UP" -f "$ROOT/supabase/tests/shim/00_supabase_shim.sql" >/dev/null || upgrade_ok=0
+for f in "$ROOT"/supabase/migrations/*.sql; do
+  case "$(basename "$f")" in 20261017000009_*) break ;; esac
+  psql -X -q -v ON_ERROR_STOP=1 -d "$UP" -f "$f" >/dev/null || upgrade_ok=0
+done
+psql -X -q -v ON_ERROR_STOP=1 -d "$UP" -f "$ROOT/supabase/tests/upgrade/legacy_seed.sql" >/dev/null 2>/tmp/maya_test_out_$$ || upgrade_ok=0
+for f in "$ROOT"/supabase/migrations/*.sql; do
+  [[ "$(basename "$f")" < "20261017000009" ]] && continue
+  psql -X -q -v ON_ERROR_STOP=1 -d "$UP" -f "$f" >/dev/null 2>>/tmp/maya_test_out_$$ || upgrade_ok=0
+done
+psql -X -q -v ON_ERROR_STOP=1 -d "$UP" -f "$ROOT/supabase/tests/shim/01_test_helpers.sql" >/dev/null || upgrade_ok=0
+if [[ $upgrade_ok == 1 ]] && psql -X -q -v ON_ERROR_STOP=1 -d "$UP" -f "$ROOT/supabase/tests/upgrade/check.sql" >>/tmp/maya_test_out_$$ 2>&1; then
+  echo "PASS     upgrade (legacy data -> current schema)"
+else
+  echo "FAIL     upgrade (legacy data -> current schema)"
+  cat /tmp/maya_test_out_$$
+  status=1
+fi
+
 rm -f /tmp/maya_test_out_$$
 exit $status

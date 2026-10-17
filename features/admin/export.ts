@@ -6,11 +6,13 @@ import type { SupabaseClient } from "@supabase/supabase-js";
  * Executa com o cliente do administrador: o RLS continua valendo.
  * Não inclui segredos (hashes de convite) nem e-mails de autenticação.
  */
-export async function buildExportManifest(supabase: SupabaseClient) {
+export async function buildExportManifest(supabase: SupabaseClient, vaultId: string) {
   const all = async (table: string, columns = "*") => {
     const rows: unknown[] = [];
     for (let from = 0; ; from += 1000) {
-      const { data, error } = await supabase.from(table).select(columns).range(from, from + 999);
+      let q = supabase.from(table).select(columns);
+      if (!["app_settings", "relationship_types", "access_group_members"].includes(table)) q = q.eq("vault_id", vaultId);
+      const { data, error } = await q.range(from, from + 999);
       if (error) throw new Error(`${table}: ${error.message}`);
       rows.push(...(data ?? []));
       if (!data || data.length < 1000) break;
@@ -20,7 +22,7 @@ export async function buildExportManifest(supabase: SupabaseClient) {
 
   const [settings, people, relationshipTypes, visits, memories, media, comments, capsules, capsuleItems, consents, groups, groupMembers, grants] =
     await Promise.all([
-      all("app_settings", "project_title, subject_name, expected_birth_date, birth_date"),
+      supabase.from("vaults").select("slug, kind, title, subject_name, gender, birth_date, expected_birth_date, event_date, theme").eq("id", vaultId).then((r) => (r.data ?? []) as unknown[]),
       all("people", "id, display_name, relationship_type, status, created_at"),
       all("relationship_types", "key, label"),
       all("visits", "id, person_id, occurred_at, registered_at, visit_type, message, companions, status, memory_id"),
@@ -31,7 +33,11 @@ export async function buildExportManifest(supabase: SupabaseClient) {
       all("capsule_items", "capsule_id, memory_id, position, created_at"),
       all("consents", "person_id, consent_type, purpose, status, policy_version, granted_at, withdrawn_at, created_at"),
       all("access_groups", "id, name, is_default_family"),
-      all("access_group_members", "group_id, person_id, created_at"),
+      supabase
+        .from("access_group_members")
+        .select("group_id, person_id, created_at, access_groups!inner(vault_id)")
+        .eq("access_groups.vault_id", vaultId)
+        .then((r) => ((r.data ?? []) as Array<Record<string, unknown>>).map(({ access_groups: _g, ...rest }) => (void _g, rest))),
       all("access_grants", "resource_type, resource_id, permission, grantee_profile_id, grantee_group_id, expires_at, revoked_at, created_at"),
     ]);
 
@@ -41,7 +47,7 @@ export async function buildExportManifest(supabase: SupabaseClient) {
     exported_at: new Date().toISOString(),
     readme:
       "Cada memória referencia seus arquivos em media[].storage_path. O script scripts/export-media.mjs baixa os arquivos para media/<storage_path>. Datas de acontecimento (occurred_at) são distintas das datas de registro (created_at).",
-    settings: settings[0] ?? null,
+    vault: settings[0] ?? null,
     relationship_types: relationshipTypes,
     people,
     visits,

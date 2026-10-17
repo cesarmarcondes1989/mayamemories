@@ -2,10 +2,11 @@ import { NextResponse, type NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { publicEnv } from "@/lib/env";
+import { CURRENT_VAULT_COOKIE } from "@/lib/permissions/vault-cookie";
 
 export const dynamic = "force-dynamic";
 
-type Target = { person_id: string; display_name: string; auth_email: string | null; invitation_email: string | null; is_admin: boolean };
+type Target = { person_id: string; display_name: string; auth_email: string | null; invitation_email: string | null; is_admin: boolean; vault_id: string };
 
 /**
  * Acesso direto pelo ursinho: o token É a identidade da pessoa.
@@ -15,7 +16,13 @@ type Target = { person_id: string; display_name: string; auth_email: string | nu
 export async function GET(request: NextRequest, { params }: { params: Promise<{ token: string }> }) {
   const { token } = await params;
   const origin = request.nextUrl.origin;
-  const back = (query = "") => NextResponse.redirect(new URL(`/m/${encodeURIComponent(token)}${query}`, origin));
+  const back = (query = "", vaultId?: string) => {
+    const res = NextResponse.redirect(new URL(`/m/${encodeURIComponent(token)}${query}`, origin));
+    if (vaultId) {
+      res.cookies.set(CURRENT_VAULT_COOKIE, vaultId, { httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production", path: "/", maxAge: 60 * 60 * 24 * 365 });
+    }
+    return res;
+  };
   if (!/^[A-Za-z0-9_-]{16,64}$/.test(token)) return back("?falha=1");
 
   let step = "rpc";
@@ -25,6 +32,12 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     if (error) throw error;
     const target = (data as Target[] | null)?.[0];
     if (!target) return back("?falha=sem-pessoa");
+
+    // Já é a pessoa do ursinho neste celular: só troca para o baú dele.
+    const current = await createClient();
+    const { data: mine } = await current.rpc("resolve_nfc_token", { p_public_id: token });
+    const me = Array.isArray(mine) ? mine[0] : null;
+    if (me?.is_my_token) return back("", target.vault_id);
 
     const host = new URL(publicEnv.siteUrl()).hostname;
     const email = target.auth_email ?? target.invitation_email ?? `nfc-${target.person_id}@${host}`;
@@ -58,7 +71,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       await supabase.auth.signOut();
       throw linkPersonError;
     }
-    return back();
+    return back("", target.vault_id);
   } catch (e) {
     const message = e && typeof e === "object" && "message" in e ? String(e.message) : String(e);
     console.error("[nfc] direct access", step, message);

@@ -15,7 +15,7 @@ export default async function HomePage() {
         <SparkleDoodle className="absolute -top-6 -left-2 size-9 text-rose-deep/70" />
         <HeartDoodle className="absolute -top-2 -right-2 size-12 rotate-12 text-rose-deep/70" />
         <h1 className="text-6xl sm:text-8xl">
-          Um dia, Maya vai descobrir quem estava lá
+          Um dia, quem você ama vai descobrir quem estava lá
         </h1>
         <HeartDivider className="mx-auto mt-6 max-w-sm" />
         <p className="mx-auto mt-6 max-w-md text-lg leading-relaxed text-ink/80">
@@ -35,7 +35,7 @@ export default async function HomePage() {
         <ButtonLink href="/entrar" size="lg" className="mt-8 px-10">
           Entrar <span aria-hidden="true">→</span>
         </ButtonLink>
-        <p className="mt-5 text-sm text-taupe">Acesso por convite dos pais da Maya · 2026 — 2042</p>
+        <p className="mt-5 text-sm text-taupe">Acesso somente por convite</p>
       </div>
     </section>
   );

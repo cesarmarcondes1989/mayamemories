@@ -1,3 +1,4 @@
+import { requireAdmin } from "@/lib/permissions/viewer";
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { CapsuleCard } from "@/components/capsules/capsule-card";
@@ -9,11 +10,12 @@ import { generateGrowthCapsules } from "@/features/admin/actions";
 export const metadata: Metadata = { title: "Cápsulas" };
 
 export default async function AdminCapsulesPage({ searchParams }: { searchParams: Promise<{ geradas?: string; erro?: string }> }) {
+  const V = (await requireAdmin()).vault.id;
   const sp = await searchParams;
   const supabase = await createClient();
   const { data } = await supabase
     .from("capsules")
-    .select("id, title, description, theme, capsule_type, opens_at, opening_rule, status, opened_at, capsule_items(count)")
+    .select("id, title, description, theme, capsule_type, opens_at, opening_rule, status, opened_at, capsule_items(count)").eq("vault_id", V)
     .order("opens_at", { ascending: true, nullsFirst: true });
   const capsules = (data ?? []) as unknown as Array<
     Parameters<typeof CapsuleCard>[0]["capsule"] & { capsule_items: Array<{ count: number }> }

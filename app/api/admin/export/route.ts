@@ -1,17 +1,20 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { buildExportManifest, toCsv } from "@/features/admin/export";
+import { getViewer } from "@/lib/permissions/viewer";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
   const supabase = await createClient();
-  const { data: isAdmin } = await supabase.rpc("is_admin");
-  if (!isAdmin) return NextResponse.json({ error: "forbidden" }, { status: 403 });
+  const viewer = await getViewer();
+  if (!viewer?.isAdmin || !viewer.vault) return NextResponse.json({ error: "forbidden" }, { status: 403 });
+  const vaultId = viewer.vault.id;
 
   const format = request.nextUrl.searchParams.get("format") ?? "json";
-  const manifest = await buildExportManifest(supabase);
+  const manifest = await buildExportManifest(supabase, vaultId);
   await supabase.rpc("log_admin_event", {
+    p_vault: vaultId,
     p_action: `export.${format}`,
     p_resource_type: "export",
     p_resource_id: null,
@@ -22,7 +25,7 @@ export async function GET(request: NextRequest) {
 
   if (format === "json") {
     return new NextResponse(JSON.stringify(manifest, null, 2), {
-      headers: { ...headers, "Content-Type": "application/json; charset=utf-8", "Content-Disposition": `attachment; filename="maya-memories-${stamp}.json"` },
+      headers: { ...headers, "Content-Type": "application/json; charset=utf-8", "Content-Disposition": `attachment; filename="${viewer.vault.slug}-${stamp}.json"` },
     });
   }
   const tables: Record<string, Array<Record<string, unknown>>> = {
@@ -35,6 +38,6 @@ export async function GET(request: NextRequest) {
   const rows = tables[format];
   if (!rows) return NextResponse.json({ error: "unknown format" }, { status: 400 });
   return new NextResponse(toCsv(rows), {
-    headers: { ...headers, "Content-Type": "text/csv; charset=utf-8", "Content-Disposition": `attachment; filename="maya-${format}-${stamp}.csv"` },
+    headers: { ...headers, "Content-Type": "text/csv; charset=utf-8", "Content-Disposition": `attachment; filename="${viewer.vault.slug}-${format}-${stamp}.csv"` },
   });
 }

@@ -54,3 +54,8 @@ begin
 end $$;
 
 grant execute on all functions in schema tests to anon, authenticated, service_role;
+
+-- id de um baú pelo endereço (ignora RLS, só para testes)
+create or replace function tests.vault(p_slug text default 'maya') returns uuid
+language sql stable security definer as $$ select id from public.vaults where slug = p_slug $$;
+grant execute on function tests.vault(text) to anon, authenticated, service_role;

@@ -18,6 +18,24 @@ O **service role** é usado só em pontos estreitos do servidor (`lib/supabase/a
 verificar arquivos enviados, enviar convites pelo Admin API, limpar arquivos de memórias removidas,
 fila de automação e scripts de backup.
 
+## Multi-cliente (Fase 0)
+
+O **baú** (`vaults`) é a unidade de tudo. Toda tabela de conteúdo tem `vault_id`, e as regras de acesso
+avaliam o baú **da própria linha** (`is_vault_admin(vault_id)`, `memory_viewable(id)` usa o baú da memória).
+Não há cabeçalho nem cookie na autorização: o cookie `mm_vault` só escolhe qual dos seus baús o app mostra.
+
+```
+accounts (quem paga) ─┬─ vaults (baú: criança ou evento, tema, datas, status)
+                      │     └─ people, person_roles, memories, media, capsules, tokens NFC, …
+platform_admins ──────┘  (dono da plataforma: vê baús e contas, NÃO vê conteúdo)
+```
+
+- Uma pessoa (um login) participa de vários baús, com uma `people` por baú (`my_vaults()`).
+- `vault_id` é imutável; filhos herdam o baú do pai por trigger; referências cruzadas entre baús são recusadas.
+- Baú `read_only`: todos leem e exportam, ninguém envia (inadimplência ou evento encerrado).
+- Criar baú: só o dono da plataforma, até `app_settings.self_service_vaults` ser ligado (Fase 1, com checkout).
+- Arquivos novos: `<vault>/<memória>/<arquivo>`; caminhos antigos continuam válidos.
+
 ## Fluxos principais
 
 ### Entrada por NFC (`/m/[token]`)
@@ -60,6 +78,7 @@ Vídeos ficam `ready` após verificação; miniaturas/transcodificação ficam p
 6. **Comentários sempre moderados no MVP.**
 7. **Localização de visitas não é coletada** no MVP (minimização de dados). O campo pode ser adicionado com consentimento específico.
 8. **Futuro acesso da Maya**: papel `future_subject` já existe; ela vê o que um membro da família vê (via grupo) e as concessões explícitas. A experiência dedicada vem depois, sem reestruturar o banco.
+11. **Baú como unidade, autorização pela linha (Fase 0).** Evita depender de contexto de requisição (cabeçalho/cookie) para segurança; o mesmo login atravessa vários baús sem vazar nada entre eles. Testado em `05_vault_isolation.sql` e no teste de upgrade.
 10. **Ursinho = identidade (decisão do produto).** O token NFC ativo abre sessão direta como a pessoa vinculada (`/m/[token]/entrar`, Admin API + `nfc_link_person`). Nunca para administradores. O termo de contribuição é exibido junto ao botão de envio e registrado no primeiro envio.
 9. **Notificações por outbox** (`notification_jobs` com `dedupe_key`): idempotentes e auditáveis; o n8n apenas consome.
 

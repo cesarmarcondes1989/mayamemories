@@ -138,6 +138,7 @@ export async function grantAccess(formData: FormData) {
   const { data: person } = await supabase.from("people").select("profile_id").eq("id", personId).maybeSingle();
   if (!person?.profile_id) fail(to, "Esta pessoa ainda não ativou a conta.");
   const { error } = await supabase.from("access_grants").insert({
+    vault_id: viewer.vault.id,
     grantee_profile_id: person.profile_id,
     resource_type: resourceType,
     resource_id: resourceId,
@@ -170,6 +171,7 @@ export async function createPerson(formData: FormData) {
   const { data, error } = await supabase
     .from("people")
     .insert({
+      vault_id: viewer.vault.id,
       display_name: parsed.data.displayName,
       relationship_type: parsed.data.relationshipType,
       notes: parsed.data.notes,
@@ -225,7 +227,12 @@ export async function setFamilyMembership(formData: FormData) {
   const viewer = await requireAdmin();
   const personId = id(formData);
   const supabase = await createClient();
-  const { data: family } = await supabase.from("access_groups").select("id").eq("is_default_family", true).single();
+  const { data: family } = await supabase
+    .from("access_groups")
+    .select("id")
+    .eq("vault_id", viewer.vault.id)
+    .eq("is_default_family", true)
+    .single();
   if (formData.get("enabled") === "1") {
     await supabase.from("access_group_members").upsert({ group_id: family!.id, person_id: personId, added_by: viewer.profileId });
   } else {
@@ -238,7 +245,7 @@ export async function setFamilyMembership(formData: FormData) {
 export type InviteResult = { status: "idle" | "created" | "error"; link?: string; emailed?: boolean; message?: string };
 
 export async function createInvitation(_prev: InviteResult, formData: FormData): Promise<InviteResult> {
-  await requireAdmin();
+  const viewer = await requireAdmin();
   const parsed = invitationSchema.safeParse({
     personId: formData.get("personId"),
     email: formData.get("email") ?? "",
@@ -264,6 +271,7 @@ export async function createInvitation(_prev: InviteResult, formData: FormData):
 
   if (formData.get("nfc") === "on") {
     await supabase.rpc("admin_create_nfc_token", {
+      p_vault_id: viewer.vault.id,
       p_person_id: parsed.data.personId,
       p_label: String(formData.get("nfcLabel") ?? "") || null,
       p_invitation_id: invitation_id,
@@ -310,10 +318,11 @@ export async function revokeInvitation(formData: FormData) {
 
 // -------------------------------------------------------------------- NFC
 export async function createNfcToken(formData: FormData) {
-  await requireAdmin();
+  const viewer = await requireAdmin();
   const personId = String(formData.get("personId") ?? "");
   const supabase = await createClient();
   const { error } = await supabase.rpc("admin_create_nfc_token", {
+    p_vault_id: viewer.vault.id,
     p_person_id: UUID.test(personId) ? personId : null,
     p_label: String(formData.get("label") ?? "").slice(0, 120) || null,
     p_invitation_id: null,
@@ -388,6 +397,7 @@ export async function createCapsule(formData: FormData) {
   const { data, error } = await supabase
     .from("capsules")
     .insert({
+      vault_id: viewer.vault.id,
       title: c.title,
       description: c.description,
       theme: c.theme,
@@ -466,16 +476,18 @@ export async function addCapsuleItems(formData: FormData) {
 }
 
 export async function generateGrowthCapsules() {
-  await requireAdmin();
+  const viewer = await requireAdmin();
   const supabase = await createClient();
-  const { data, error } = await supabase.rpc("admin_generate_growth_capsules");
+  const { data, error } = await supabase.rpc("admin_generate_growth_capsules", { p_vault_id: viewer.vault.id });
   if (error) fail("/admin/capsulas", error);
   redirect(`/admin/capsulas?geradas=${data ?? 0}`);
 }
 
 // ----------------------------------------------------------- configurações
+const THEMES = ["rosa", "azul", "salvia", "marronzinho", "lavanda", "vermelho", "amarelo", "noite"];
+
 export async function updateSettings(formData: FormData) {
-  await requireAdmin();
+  const viewer = await requireAdmin();
   const date = (k: string) => {
     const v = String(formData.get(k) ?? "");
     return /^\d{4}-\d{2}-\d{2}$/.test(v) ? v : null;
@@ -485,8 +497,11 @@ export async function updateSettings(formData: FormData) {
     return Number.isFinite(n) && n > 0 && n <= 5000 ? Math.round(n * 1024 * 1024) : fallback;
   };
   const supabase = await createClient();
-  const { data: current } = await supabase.from("app_settings").select("upload_limits").single();
-  const limits = normalizeLimits(current?.upload_limits);
+  const [{ data: current }, { data: platform }] = await Promise.all([
+    supabase.from("vaults").select("upload_limits").eq("id", viewer.vault.id).single(),
+    supabase.from("app_settings").select("upload_limits").maybeSingle(),
+  ]);
+  const limits = normalizeLimits({ ...normalizeLimits(platform?.upload_limits), ...((current?.upload_limits ?? {}) as object) });
   limits.image.max_bytes = mb("imageMb", limits.image.max_bytes);
   limits.video.max_bytes = mb("videoMb", limits.video.max_bytes);
   limits.audio.max_bytes = mb("audioMb", limits.audio.max_bytes);
@@ -501,21 +516,26 @@ export async function updateSettings(formData: FormData) {
   if (Number.isInteger(files) && files >= 1 && files <= 50) limits.max_files_per_memory = files;
   const quota = Number(formData.get("quotaGb"));
   if (Number.isFinite(quota) && quota > 0 && quota <= 1000) limits.max_bytes_per_person = Math.round(quota * 1024 ** 3);
+  const theme = String(formData.get("theme") ?? "");
+  const gender = String(formData.get("gender") ?? "");
 
   const { error } = await supabase
-    .from("app_settings")
+    .from("vaults")
     .update({
-      project_title: String(formData.get("projectTitle") ?? "").trim().slice(0, 120) || "Maya Memories",
-      subject_name: String(formData.get("subjectName") ?? "").trim().slice(0, 60) || "Maya",
+      title: String(formData.get("title") ?? "").trim().slice(0, 120) || viewer.vault.title,
+      subject_name: String(formData.get("subjectName") ?? "").trim().slice(0, 80) || viewer.vault.subject_name,
+      gender: ["girl", "boy", "unspecified"].includes(gender) ? gender : null,
       expected_birth_date: date("expectedBirthDate"),
       birth_date: date("birthDate"),
-      require_comment_moderation: true, // MVP: moderação de comentários é obrigatória
+      event_date: date("eventDate"),
+      theme: THEMES.includes(theme) ? theme : viewer.vault.theme,
+      welcome_message: String(formData.get("welcome") ?? "").trim().slice(0, 400) || null,
       nudges_enabled: formData.get("nudgesEnabled") === "on",
       upload_limits: limits,
-      updated_at: new Date().toISOString(),
     })
-    .eq("id", true);
+    .eq("id", viewer.vault.id);
   if (error) fail("/admin/configuracoes", error);
+  revalidatePath("/", "layout");
   redirect("/admin/configuracoes?salvo=1");
 }
 

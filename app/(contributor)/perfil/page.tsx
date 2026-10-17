@@ -25,7 +25,7 @@ export default async function ProfilePage({ searchParams }: { searchParams: Prom
   const supabase = await createClient();
   const [{ data: prefs }, { data: consents }] = await Promise.all([
     supabase.from("notification_preferences").select("*").eq("profile_id", viewer.profileId!).maybeSingle(),
-    supabase.from("consents").select("consent_type, status, policy_version, created_at").eq("person_id", viewer.personId!).order("created_at", { ascending: false }),
+    supabase.from("consents").select("consent_type, status, policy_version, created_at").eq("vault_id", viewer.vault.id).eq("person_id", viewer.personId!).order("created_at", { ascending: false }),
   ]);
   const latest = new Map<string, { status: string; created_at: string; policy_version: string }>();
   for (const c of consents ?? []) if (!latest.has(c.consent_type)) latest.set(c.consent_type, c);

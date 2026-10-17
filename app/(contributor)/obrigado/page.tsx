@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { subjectWords } from "@/lib/subject";
 import { requireMember } from "@/lib/permissions/viewer";
 import { createClient } from "@/lib/supabase/server";
 import { ButtonLink } from "@/components/ui/button";
@@ -10,7 +11,7 @@ import { formatDateTime } from "@/lib/format";
 export const metadata: Metadata = { title: "Memória recebida" };
 
 export default async function ThanksPage({ searchParams }: { searchParams: Promise<{ m?: string; tipo?: string }> }) {
-  await requireMember();
+  const viewer = await requireMember();
   const { m } = await searchParams;
   const supabase = await createClient();
   const { data: memory } = m
@@ -23,7 +24,7 @@ export default async function ThanksPage({ searchParams }: { searchParams: Promi
         ♡
       </div>
       <h1 className="text-5xl">Memória recebida com carinho.</h1>
-      <p className="mt-4 text-taupe">Ela ficará guardada com cuidado enquanto os pais da Maya revisam sua publicação.</p>
+      <p className="mt-4 text-taupe">Ela ficará guardada com cuidado enquanto {subjectWords(viewer.vault).keepers} revisam sua publicação.</p>
       {memory && (
         <Card className="mt-8 p-5 text-left">
           <dl className="grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 text-[15px]">

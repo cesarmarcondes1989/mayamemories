@@ -11,15 +11,16 @@ const LINKS = [
   { href: "/perfil", label: "Perfil" },
 ];
 
-export function ContributorNav({ isAdmin }: { isAdmin: boolean }) {
-  const links = isAdmin ? [...LINKS, { href: "/admin", label: "Administração" }] : LINKS;
+export function ContributorNav({ isAdmin, vaultTitle, showVaults }: { isAdmin: boolean; vaultTitle?: string | null; showVaults?: boolean }) {
+  const base = showVaults ? [...LINKS, { href: "/baus", label: "Meus baús" }] : LINKS;
+  const links = isAdmin ? [...base, { href: "/admin", label: "Administração" }] : base;
   return (
     <>
       <header className="sticky top-0 z-20 border-b border-line bg-cream/90 backdrop-blur">
         <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-3">
           <Link href="/inicio" className="flex shrink-0 items-center gap-2" aria-label="Maya Memories — início">
             <Logo className="size-8" />
-            <span className="font-display text-2xl text-rose-deep">Maya Memories</span>
+            <span className="max-w-[46vw] truncate font-display text-2xl text-rose-deep">{vaultTitle ?? "Maya Memories"}</span>
           </Link>
           {/* Computador: menu completo no topo */}
           <div className="hidden min-w-0 flex-1 md:block">
@@ -30,6 +31,11 @@ export function ContributorNav({ isAdmin }: { isAdmin: boolean }) {
             {isAdmin && (
               <Link href="/admin" className="inline-flex h-9 items-center rounded-full bg-rose-deep px-3 text-sm font-semibold text-white">
                 ⚙︎ Admin
+              </Link>
+            )}
+            {showVaults && (
+              <Link href="/baus" aria-label="Meus baús" className="grid size-9 place-items-center rounded-full border border-rose/70 bg-paper text-lg">
+                🧸
               </Link>
             )}
             <Link href="/perfil" aria-label="Perfil" className="grid size-9 place-items-center rounded-full border border-rose/70 bg-paper text-lg">
