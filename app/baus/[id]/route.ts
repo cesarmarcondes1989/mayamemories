@@ -12,7 +12,11 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   const { data } = await supabase.rpc("my_vaults");
   const mine = ((data ?? []) as Array<{ vault_id: string; roles: string[] }>).find((v) => v.vault_id === id);
   if (!mine) return NextResponse.redirect(new URL("/baus", origin));
-  const next = request.nextUrl.searchParams.get("para") === "admin" && mine.roles.includes("admin") ? "/admin" : "/inicio";
+  const para = request.nextUrl.searchParams.get("para") ?? "";
+  const next =
+    para === "admin" && mine.roles.includes("admin") ? "/admin"
+    : /^\/m\/[A-Za-z0-9_-]{16,64}$/.test(para) ? para // volta para a página do token (ex.: mesa do evento)
+    : "/inicio";
   const res = NextResponse.redirect(new URL(next, origin));
   res.cookies.set(CURRENT_VAULT_COOKIE, id, {
     httpOnly: true,

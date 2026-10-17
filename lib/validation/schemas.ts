@@ -37,6 +37,7 @@ export const createMemorySchema = z
     recipient: optionalText(120),
     unlockAt: isoDate.optional().nullable(),
     requestedCapsuleId: z.string().uuid().optional().nullable(),
+    eventId: z.string().uuid().optional().nullable(),
     files: z.array(fileDescriptorSchema).max(20).default([]),
     visit: z
       .object({

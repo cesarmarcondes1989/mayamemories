@@ -55,7 +55,7 @@ export async function attachMediaUrls(memories: MemoryRow[], opts: { firstOnly?:
   return memories;
 }
 
-export type TimelineFilters = { year?: string; type?: string; person?: string; capsule?: string; highlight?: string };
+export type TimelineFilters = { year?: string; type?: string; person?: string; capsule?: string; highlight?: string; evento?: string };
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -64,6 +64,7 @@ export async function listTimeline(vaultId: string, raw: TimelineFilters, opts: 
     ...raw,
     person: raw.person && UUID.test(raw.person) ? raw.person : undefined,
     capsule: raw.capsule && UUID.test(raw.capsule) ? raw.capsule : undefined,
+    evento: raw.evento && UUID.test(raw.evento) ? raw.evento : undefined,
     type: raw.type && /^[a-z_]{2,20}$/.test(raw.type) ? raw.type : undefined,
   };
   const supabase = await createClient();
@@ -80,6 +81,7 @@ export async function listTimeline(vaultId: string, raw: TimelineFilters, opts: 
   else if (!opts.includeCapsuleOnly) query = query.neq("visibility", "capsule");
   if (filters.type) query = query.eq("memory_type", filters.type);
   if (filters.person) query = query.eq("author_person_id", filters.person);
+  if (filters.evento) query = query.eq("event_id", filters.evento);
   if (filters.highlight === "1") query = query.eq("is_highlight", true);
   if (filters.year && /^\d{4}$/.test(filters.year)) {
     query = query.gte("occurred_at", `${filters.year}-01-01`).lte("occurred_at", `${filters.year}-12-31`);

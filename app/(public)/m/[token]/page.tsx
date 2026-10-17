@@ -13,6 +13,37 @@ import { EmailLinkForm } from "@/components/auth/email-form";
 import { requestLoginLink } from "@/features/auth/actions";
 import { UnavailableMessage } from "@/components/auth/unavailable";
 import { HomeActions, HomeHero } from "@/components/contributor/home-actions";
+import { GuestJoinForm } from "@/components/events/guest-join-form";
+import { EmailOptIn } from "@/components/account/email-opt-in";
+import { shouldPromptEmail } from "@/features/account/email-prompt";
+import { HeartDoodle } from "@/components/ui/doodles";
+
+type Resolved = {
+  state: "active" | "closed" | "unavailable";
+  is_my_token: boolean;
+  greeting_name: string | null;
+  vault_id: string | null;
+  token_kind?: "person" | "guest" | "campaign" | null;
+  event_id?: string | null;
+  event_name?: string | null;
+  vault_title?: string | null;
+};
+
+function EventActions({ eventId, eventName }: { eventId: string; eventName: string }) {
+  const q = `?evento=${eventId}`;
+  return (
+    <Card className="mb-6 p-6 text-center">
+      <p className="text-xs font-bold tracking-[0.16em] text-taupe uppercase">Você está no</p>
+      <h2 className="mt-1 text-5xl text-rose-deep">🎉 {eventName}</h2>
+      <div className="mt-5 grid gap-2 sm:grid-cols-3">
+        <ButtonLink href={`/enviar/foto${q}`} size="lg">📸 Foto ou vídeo</ButtonLink>
+        <ButtonLink href={`/enviar/mensagem${q}`} size="lg" variant="secondary">💌 Recado</ButtonLink>
+        <ButtonLink href={`/enviar/audio${q}`} size="lg" variant="secondary">🎙️ Áudio</ButtonLink>
+      </div>
+      <ButtonLink href={`/linha-do-tempo${q}`} variant="ghost" className="mt-3">Ver o álbum da festa →</ButtonLink>
+    </Card>
+  );
+}
 
 export const metadata: Metadata = { title: "Ursinho" };
 export const dynamic = "force-dynamic";
@@ -32,20 +63,38 @@ export default async function NfcEntryPage({
   const sp = await searchParams;
   const supabase = await createClient();
   const { data } = await supabase.rpc("resolve_nfc_token", { p_public_id: token });
-  const resolved = Array.isArray(data) ? data[0] : null;
+  const resolved = (Array.isArray(data) ? data[0] : null) as Resolved | null;
+  if (resolved?.state === "closed") {
+    return (
+      <UnavailableMessage reason={`${resolved.event_name ?? "Este evento"} já foi encerrado. Obrigado por ter feito parte ♡`} />
+    );
+  }
   if (!resolved || resolved.state !== "active") {
     return <UnavailableMessage reason="Este chaveiro foi desativado ou substituído." />;
   }
+  const isGuestToken = resolved.token_kind === "guest";
 
-  if (resolved.is_my_token) {
+  if (resolved.is_my_token && resolved.vault_id) {
     const viewer = await getViewer();
-    // O ursinho abre SEMPRE no baú dele: se o baú em uso é outro, troca.
-    if (viewer?.vault?.id !== resolved.vault_id) redirect(`/m/${encodeURIComponent(token)}/entrar`);
-    const [, stats] = await Promise.all([supabase.rpc("touch_last_seen"), getMyStats(resolved.vault_id)]);
+    // O token abre SEMPRE no baú dele: se o baú em uso é outro, troca.
+    if (viewer?.vault?.id !== resolved.vault_id) {
+      redirect(
+        isGuestToken
+          ? `/baus/${resolved.vault_id}?para=/m/${encodeURIComponent(token)}`
+          : `/m/${encodeURIComponent(token)}/entrar`,
+      );
+    }
+    const [, stats, promptEmail] = await Promise.all([
+      supabase.rpc("touch_last_seen"),
+      getMyStats(resolved.vault_id),
+      shouldPromptEmail(viewer),
+    ]);
     return (
       <div className="mx-auto max-w-3xl pt-2 pb-24 md:pb-0">
         <BottomTabs />
         <HomeHero name={resolved.greeting_name ?? viewer?.displayName.split(" ")[0]} subject={subjectWords(viewer?.vault).of} pronoun={subjectWords(viewer?.vault).pronoun} />
+        {isGuestToken && resolved.event_id && <EventActions eventId={resolved.event_id} eventName={resolved.event_name ?? "evento"} />}
+        {promptEmail && <EmailOptIn pendingEmail={viewer?.pendingEmail} className="mb-6" />}
         <NudgeCard stats={stats} />
         <HomeActions />
         {viewer?.isAdmin && (
@@ -55,6 +104,24 @@ export default async function NfcEntryPage({
             </ButtonLink>
           </div>
         )}
+      </div>
+    );
+  }
+
+  // Mesa do evento: quem chega diz o nome e entra como convidado.
+  if (isGuestToken) {
+    const viewer = await getViewer();
+    return (
+      <div className="mx-auto max-w-md pt-4 text-center">
+        <HeartDoodle className="mx-auto size-14 text-rose-deep" />
+        <p className="mt-3 text-sm font-semibold tracking-wide text-taupe uppercase">{resolved.vault_title}</p>
+        <h1 className="mt-1 text-6xl">{resolved.event_name} 🎉</h1>
+        <p className="mt-3 text-[15px] text-taupe">
+          Que bom ter você aqui! Deixe fotos, vídeos e recados deste dia. Tudo fica guardado num baú privado da família — só quem estava aqui vê o álbum.
+        </p>
+        <Card className="mt-8 p-6 text-left">
+          <GuestJoinForm token={token} defaultName={viewer?.displayName || undefined} />
+        </Card>
       </div>
     );
   }

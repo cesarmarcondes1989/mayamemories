@@ -14,6 +14,12 @@ const KNOWN: Array<[RegExp, string]> = [
   [/at least one administrator/i, "É preciso manter pelo menos um administrador."],
   [/own admin role|suspend yourself/i, "Você não pode remover o seu próprio acesso administrativo."],
   [/birth date/i, "Defina a data de nascimento (ou prevista) nas configurações."],
+  [/precisa de um evento/i, "Token impessoal (de mesa) precisa de um evento."],
+  [/Dê um nome ao evento|event name required/i, "Dê um nome ao evento."],
+  [/event closed/i, "Este evento já foi encerrado."],
+  [/event is full/i, "Este evento atingiu o limite de convidados."],
+  [/too many requests/i, "Muita gente entrando ao mesmo tempo. Tente de novo em um minutinho."],
+  [/name required/i, "Diga como podemos te chamar."],
   [/forbidden|row-level security|permission denied|not editable/i, "Você não tem permissão para esta ação."],
   [/duplicate key/i, "Este item já existe."],
 ];

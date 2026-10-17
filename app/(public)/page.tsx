@@ -40,6 +40,7 @@ const FAQ = [
   ["Como funciona o ursinho NFC?", "Cada ursinho tem uma etiqueta que é a identidade de uma pessoa. Encostou o celular, ela entra direto no baú — sem senha. Perdeu? Você desativa na hora e manda outro."],
   ["Precisa instalar aplicativo?", "Não. Funciona no navegador do celular e do computador, iPhone ou Android."],
   ["E as cartas trancadas, abrem mesmo só na data?", "Sim. A trava fica no banco de dados, não só na tela. Nem quem escreveu consegue espiar antes."],
+  ["Dá para criar eventos dentro do baú?", "Dá! Chá bar, 1 ano, batizado: você dá o nome, cria um token de mesa e os convidados encostam o celular, dizem o nome e mandam fotos e recados. Eles veem só o álbum daquele evento — o resto do baú continua da família."],
   ["Serve para casamento ou chá de bebê?", "Serve! No plano Evento, os convidados mandam fotos e recados pelo QR ou NFC da mesa, e no final vocês recebem o filme e o álbum da festa."],
   ["Se eu parar de pagar, perco tudo?", "Não. O baú fica guardado em modo leitura e você pode exportar tudo a qualquer momento."],
   ["Como eu pago?", "Pix, cartão ou boleto, pelo Mercado Pago. Enquanto estamos com as primeiras famílias, a gente fecha tudo com você pelo WhatsApp."],
@@ -186,7 +187,7 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
           <h2 className="mt-2 text-5xl">Para uma criança</h2>
           <p className="mt-2 text-[15px] leading-relaxed text-taupe">
             Da gestação aos 18 anos. Avós, tios, padrinhos e amigos guardando memórias que ela vai descobrir aos poucos —
-            no primeiro aniversário, aos 15, aos 18. Aos 18, o baú passa a ser dela.
+            no primeiro aniversário, aos 15, aos 18. E dá para abrir eventos dentro do baú — o chá bar, o 1 ano — com token de mesa para os convidados.
           </p>
           <p className="mt-4 text-sm font-semibold text-rose-deep">Grátis · Ninho · Família · Legado</p>
         </Card>

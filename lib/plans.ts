@@ -43,13 +43,13 @@ const plan = (p: Omit<Plan, "price_monthly_cents" | "price_yearly_cents" | "pric
 
 export const DEFAULT_PLANS: Plan[] = [
   plan({ key: "gratis", name: "Grátis", tagline: "Para conhecer sem compromisso", audience: "any", billing: "free", highlight: false, sort_order: 10,
-    features: ["1 baú", "Até 5 convidados", "Fotos, áudios e cartas", "1 cápsula do tempo"] }),
+    features: ["1 baú", "Até 5 convidados", "Fotos, áudios e cartas", "1 cápsula do tempo", "1 evento (ex.: chá de bebê)"] }),
   plan({ price_monthly_cents: 1990, price_yearly_cents: 19900, key: "ninho", name: "Ninho", tagline: "O essencial para guardar a história de uma criança", audience: "child", billing: "subscription", highlight: false, sort_order: 20,
-    features: ["1 baú", "Até 30 convidados", "Linha do tempo e cápsulas ilimitadas", "Cartas para o futuro com bloqueio real", "Todos os temas de cor"] }),
+    features: ["1 baú", "Até 30 convidados", "Linha do tempo e cápsulas ilimitadas", "Cartas para o futuro com bloqueio real", "Todos os temas de cor", "Até 3 eventos por ano (1 ano, chá bar, batizado…)"] }),
   plan({ price_monthly_cents: 3490, price_yearly_cents: 34900, key: "familia", name: "Família", tagline: "Para famílias grandes e mais de um filho", audience: "child", billing: "subscription", highlight: true, sort_order: 30,
-    features: ["Até 3 baús (um por filho)", "Convidados ilimitados", "Vídeos mais longos", "1 ursinho NFC incluso", "Foto de capa e boas-vindas personalizadas"] }),
+    features: ["Até 3 baús (um por filho)", "Convidados ilimitados", "Vídeos mais longos", "1 ursinho NFC incluso", "Foto de capa e boas-vindas personalizadas", "Eventos ilimitados com tokens de mesa"] }),
   plan({ price_once_cents: 149000, key: "legado", name: "Legado", tagline: "A história inteira, do primeiro ultrassom aos 18 anos", audience: "child", billing: "one_time", highlight: false, sort_order: 40,
-    features: ["Tudo do Família", "Filme do ano montado com as memórias", "Livro impresso anual", "2 ursinhos NFC inclusos", "Pendrive com tudo aos 15 e aos 18 anos", "O baú passa para a criança aos 18"] }),
+    features: ["Tudo do Família", "Filme do ano montado com as memórias", "Livro impresso anual", "2 ursinhos NFC inclusos", "Pendrive com tudo aos 15 e aos 18 anos", "O baú passa para a criança aos 18", "Eventos ilimitados com tokens de mesa"] }),
   plan({ price_once_cents: 39000, key: "evento", name: "Evento", tagline: "Casamento, chá de bebê, 15 anos", audience: "event", billing: "one_time", highlight: false, sort_order: 50,
     features: ["Convidados entram pelo QR ou NFC da mesa, sem cadastro", "Fotos, vídeos e áudios da festa num só lugar", "Filme e álbum do evento ao final", "Acesso para sempre depois da festa"] }),
 ];

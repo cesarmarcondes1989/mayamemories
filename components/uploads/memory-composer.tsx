@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Field, Input, Select, Textarea } from "@/components/ui/field";
 import { Alert, ProgressBar } from "@/components/ui/misc";
@@ -33,6 +33,8 @@ export function MemoryComposer({
   today,
   letterMilestones = [],
   capsules = [],
+  events = [],
+  guestEventId = null,
   subject,
 }: {
   subject: SubjectWords;
@@ -41,8 +43,12 @@ export function MemoryComposer({
   today: string;
   letterMilestones?: Array<{ label: string; date: string }>;
   capsules?: Array<{ id: string; title: string }>;
+  events?: Array<{ id: string; name: string }>;
+  guestEventId?: string | null;
 }) {
   const router = useRouter();
+  const wantedEvent = useSearchParams().get("evento");
+  const [eventId, setEventId] = useState(events.some((e) => e.id === wantedEvent) ? wantedEvent! : (guestEventId ?? ""));
   const [files, setFiles] = useState<Picked[]>([]);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -180,6 +186,7 @@ export function MemoryComposer({
       recipient: kind === "letter" ? recipient : undefined,
       unlockAt: unlockAt || null,
       requestedCapsuleId: capsuleId || null,
+      eventId: eventId || null,
       files: files.map((f) => ({ name: f.file.name, size: f.file.size, type: f.file.type, durationSeconds: f.duration })),
       visit: kind === "visit" ? { occurredAt, visitType: visitType as "home", companions: companions || undefined } : undefined,
     });
@@ -427,6 +434,19 @@ export function MemoryComposer({
             <Input id="occurred" type="date" max={today} value={occurredAt} onChange={(e) => setOccurredAt(e.target.value)} />
           </Field>
         )
+      )}
+
+      {events.length > 0 && (
+        <Field label="É de algum evento?" htmlFor="event" optional hint={eventId ? "Vai para o álbum do evento." : undefined}>
+          <Select id="event" value={eventId} onChange={(e) => setEventId(e.target.value)}>
+            {!guestEventId && <option value="">Não, é do dia a dia</option>}
+            {events.map((e) => (
+              <option key={e.id} value={e.id}>
+                🎉 {e.name}
+              </option>
+            ))}
+          </Select>
+        </Field>
       )}
 
       <details className="rounded-2xl border border-line bg-paper p-4">

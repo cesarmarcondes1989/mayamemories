@@ -107,6 +107,7 @@ export async function createMemoryDraft(raw: CreateMemoryInput): Promise<ActionR
     recipient: input.kind === "letter" ? (input.recipient ?? "Maya") : null,
     unlock_at: input.kind === "letter" && input.unlockAt ? `${input.unlockAt}T09:00:00-03:00` : null,
     requested_capsule_id: input.requestedCapsuleId ?? null,
+    ...(input.eventId ? { event_id: input.eventId } : {}),
     author_person_id: viewer.personId!,
     created_by_profile_id: viewer.profileId!,
     moderation_status: files.length ? "uploading" : "draft",

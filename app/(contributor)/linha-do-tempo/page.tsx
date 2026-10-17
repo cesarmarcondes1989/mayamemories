@@ -6,17 +6,23 @@ import { Timeline } from "@/components/timeline/timeline";
 import { TimelineFiltersForm } from "@/components/timeline/filters";
 import { EmptyState, PageHeader } from "@/components/ui/misc";
 import { ButtonLink } from "@/components/ui/button";
+import { getVisibleEvents } from "@/features/events/queries";
 
 export const metadata: Metadata = { title: "Linha do tempo" };
 
 export default async function TimelinePage({ searchParams }: { searchParams: Promise<TimelineFilters> }) {
   const viewer = await requireMember();
   const filters = await searchParams;
-  const memories = await listTimeline(viewer.vault.id, filters);
+  const [memories, events] = await Promise.all([listTimeline(viewer.vault.id, filters), getVisibleEvents(viewer.vault.id)]);
+  const event = events.find((e) => e.id === filters.evento);
   return (
     <>
-      <PageHeader eyebrow={`A história ${subjectWords(viewer.vault).of}`} title="Linha do tempo" description="Memórias aprovadas que você pode ver, na ordem em que aconteceram." />
-      <TimelineFiltersForm filters={filters} basePath="/linha-do-tempo" />
+      {event ? (
+        <PageHeader eyebrow="Álbum do evento" title={event.name} description={event.description ?? "Tudo o que a família e os convidados guardaram deste dia."} />
+      ) : (
+        <PageHeader eyebrow={`A história ${subjectWords(viewer.vault).of}`} title="Linha do tempo" description="Memórias aprovadas que você pode ver, na ordem em que aconteceram." />
+      )}
+      <TimelineFiltersForm filters={filters} basePath="/linha-do-tempo" events={events} />
       {memories.length ? (
         <Timeline memories={memories} hrefFor={(m) => `/memoria/${m.id}`} />
       ) : (

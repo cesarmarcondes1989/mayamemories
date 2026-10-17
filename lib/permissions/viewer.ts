@@ -2,6 +2,7 @@ import "server-only";
 import { cache } from "react";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { isPlaceholderEmail } from "@/lib/email-identity";
 import { createClient } from "@/lib/supabase/server";
 import { POLICY_VERSION } from "@/lib/constants";
 import { CURRENT_VAULT_COOKIE } from "./vault-cookie";
@@ -39,6 +40,10 @@ export type Vault = {
 export type Viewer = {
   userId: string;
   email: string | null;
+  /** false enquanto a pessoa só tem o e-mail interno do ursinho/mesa */
+  hasRealEmail: boolean;
+  /** e-mail novo aguardando confirmação */
+  pendingEmail: string | null;
   profileId: string | null;
   displayName: string;
   /** Baú em uso agora (null se a pessoa ainda não participa de nenhum). */
@@ -87,6 +92,8 @@ export const getViewer = cache(async (): Promise<Viewer | null> => {
   return {
     userId: auth.user.id,
     email: auth.user.email ?? null,
+    hasRealEmail: !isPlaceholderEmail(auth.user.email),
+    pendingEmail: auth.user.new_email ?? null,
     profileId: profile?.id ?? null,
     displayName: profile?.display_name ?? "",
     vault,

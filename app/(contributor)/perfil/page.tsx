@@ -10,6 +10,7 @@ import { Alert, PageHeader } from "@/components/ui/misc";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { formatDateTime } from "@/lib/format";
+import { EmailOptIn } from "@/components/account/email-opt-in";
 
 export const metadata: Metadata = { title: "Perfil" };
 
@@ -32,7 +33,8 @@ export default async function ProfilePage({ searchParams }: { searchParams: Prom
 
   return (
     <div className="mx-auto max-w-2xl space-y-8">
-      <PageHeader title="Seu perfil" description={viewer.email ?? undefined} />
+      <PageHeader title="Seu perfil" description={viewer.hasRealEmail ? (viewer.email ?? undefined) : "Você entra pelo ursinho."} />
+      {!viewer.hasRealEmail && <EmailOptIn pendingEmail={viewer.pendingEmail} dismissible={false} />}
       {salvo && <Alert tone="success">Preferências salvas.</Alert>}
       <Card className="p-6">
         <form action={updateProfile} className="space-y-4">

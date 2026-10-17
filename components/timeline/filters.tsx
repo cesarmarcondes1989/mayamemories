@@ -6,11 +6,13 @@ export function TimelineFiltersForm({
   basePath,
   people = [],
   capsules = [],
+  events = [],
 }: {
   filters: TimelineFilters;
   basePath: string;
   people?: Array<{ id: string; display_name: string }>;
   capsules?: Array<{ id: string; title: string }>;
+  events?: Array<{ id: string; name: string }>;
 }) {
   const years = Array.from({ length: 2042 - 2026 + 1 }, (_, i) => 2026 + i);
   const cls = "h-10 rounded-full border border-line bg-paper px-3 text-sm";
@@ -32,6 +34,16 @@ export function TimelineFiltersForm({
           </option>
         ))}
       </select>
+      {events.length > 0 && (
+        <select name="evento" defaultValue={filters.evento ?? ""} className={cls} aria-label="Evento">
+          <option value="">Todos os momentos</option>
+          {events.map((e) => (
+            <option key={e.id} value={e.id}>
+              🎉 {e.name}
+            </option>
+          ))}
+        </select>
+      )}
       {people.length > 0 && (
         <select name="person" defaultValue={filters.person ?? ""} className={cls} aria-label="Pessoa">
           <option value="">Todas as pessoas</option>

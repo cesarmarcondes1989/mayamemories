@@ -71,6 +71,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       await supabase.auth.signOut();
       throw linkPersonError;
     }
+    // Ursinho ligado a um evento: a pessoa também vê o álbum dele (ignora banco sem a migration 011)
+    await admin.rpc("nfc_link_event", { p_public_id: token, p_person_id: target.person_id });
     return back("", target.vault_id);
   } catch (e) {
     const message = e && typeof e === "object" && "message" in e ? String(e.message) : String(e);

@@ -320,6 +320,9 @@ export async function revokeInvitation(formData: FormData) {
 export async function createNfcToken(formData: FormData) {
   const viewer = await requireAdmin();
   const personId = String(formData.get("personId") ?? "");
+  const eventId = String(formData.get("eventId") ?? "");
+  // Impessoal (mesa) = sem pessoa + com evento
+  if (personId === "guest" && !UUID.test(eventId)) fail("/admin/tokens", "Token impessoal precisa de um evento.");
   const supabase = await createClient();
   const { error } = await supabase.rpc("admin_create_nfc_token", {
     p_vault_id: viewer.vault.id,
@@ -327,6 +330,8 @@ export async function createNfcToken(formData: FormData) {
     p_label: String(formData.get("label") ?? "").slice(0, 120) || null,
     p_invitation_id: null,
     p_activate: formData.get("activate") === "on",
+    // Só manda o evento quando existe (compatível com bancos sem a migration 011)
+    ...(UUID.test(eventId) && personId !== "campaign" ? { p_event_id: eventId } : {}),
   });
   if (error) fail("/admin/tokens", error);
   revalidatePath("/admin/tokens");
