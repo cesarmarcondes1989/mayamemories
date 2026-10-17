@@ -112,3 +112,13 @@ revogue explicitamente o que não deve ser público (veja o final de `..._workfl
   próprio baú, mas o e-mail não aceita convites de outros baús. Ao abrir qualquer link enviado ao e-mail,
   a conta é confirmada.
 - Quem escolhe um plano pago no site começa no Grátis e aparece em `/plataforma/interessados`.
+
+## Demonstração (Baú da Alice)
+
+1. Aplique a migration 015 (e as anteriores).
+2. Em `/plataforma/demo`, clique em **Criar a demonstração**. O servidor monta o baú com pessoas, ~24 memórias,
+   cápsulas, cartas trancadas, eventos e tokens, usando as mídias de `public/demo/` (ilustrações, sem fotos reais).
+3. Qualquer pessoa entra em `/demo` como família ou como administradora. O banco recusa qualquer alteração
+   num baú `is_demo` (trigger `guard_demo_vault`), inclusive via RPC. Só o service role e o dono da plataforma mudam.
+4. Tutoriais em vídeo: `node marketing/tutorials/record.mjs https://SEU-DOMINIO` grava cada guia navegando na demo,
+   salva em `public/tutoriais/` e atualiza `lib/tutorials-videos.json`. Depois é só fazer commit.

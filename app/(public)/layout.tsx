@@ -50,6 +50,12 @@ export default async function PublicLayout({ children }: { children: React.React
           <Link href="/#quero" className="underline-offset-4 hover:underline">
             Quero o meu
           </Link>
+          <Link href="/demo" className="underline-offset-4 hover:underline">
+            Demonstração
+          </Link>
+          <Link href="/tutoriais" className="underline-offset-4 hover:underline">
+            Tutoriais
+          </Link>
           <Link href="/privacidade" className="underline-offset-4 hover:underline">
             Privacidade
           </Link>

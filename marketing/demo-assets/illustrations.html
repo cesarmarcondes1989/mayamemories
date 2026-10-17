@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@700&family=Caveat:wght@600&family=Nunito:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; box-sizing: border-box; }
+  html, body { width: 1080px; height: 1350px; overflow: hidden; background: #fff; }
+  svg { display: block; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+// Ilustrações da demo (sem fotos reais de criança). Cada uma vira um JPG 1080x1350.
+const SKIN = { baby: "#f6d3bd", mom: "#f2c7a5", dad: "#e2b08d", vo: "#e8b896", tio: "#c98f6b" };
+
+const babyHead = (x, y, r = 120, { awake = false, smile = false } = {}) => `
+  <g transform="translate(${x} ${y})">
+    <circle r="${r}" fill="${SKIN.baby}"/>
+    <path d="M${-r * .15} ${-r * .95} Q0 ${-r * 1.18} ${r * .14} ${-r * .92} Q${r * .05} ${-r * 1.02} ${-r * .02} ${-r * .82}Z" fill="#7a5442"/>
+    ${awake
+      ? `<circle cx="${-r * .35}" cy="${-r * .05}" r="${r * .08}" fill="#4a3b40"/><circle cx="${r * .35}" cy="${-r * .05}" r="${r * .08}" fill="#4a3b40"/>`
+      : `<path d="M${-r * .5} 0 Q${-r * .35} ${-r * .12} ${-r * .2} 0" stroke="#4a3b40" stroke-width="${r * .05}" fill="none" stroke-linecap="round"/><path d="M${r * .2} 0 Q${r * .35} ${-r * .12} ${r * .5} 0" stroke="#4a3b40" stroke-width="${r * .05}" fill="none" stroke-linecap="round"/>`}
+    <circle cx="${-r * .55}" cy="${r * .3}" r="${r * .15}" fill="#f4a5b5" opacity=".6"/><circle cx="${r * .55}" cy="${r * .3}" r="${r * .15}" fill="#f4a5b5" opacity=".6"/>
+    ${smile
+      ? `<path d="M${-r * .25} ${r * .35} Q0 ${r * .65} ${r * .25} ${r * .35}Z" fill="#c9667f"/>`
+      : `<path d="M${-r * .12} ${r * .42} Q0 ${r * .52} ${r * .12} ${r * .42}" stroke="#4a3b40" stroke-width="${r * .045}" fill="none" stroke-linecap="round"/>`}
+  </g>`;
+
+const adult = (x, y, s, { skin, hair, shirt, style = "short", glasses = false, beard = false, closed = false }) => {
+  const hairs = {
+    short: `<path d="M-62 -10 Q-60 -78 0 -78 Q60 -78 62 -10 Q46 -50 0 -46 Q-46 -50 -62 -10Z" fill="${hair}"/>`,
+    pony: `<path d="M-66 0 Q-66 -82 0 -82 Q66 -82 66 0 Q52 -52 0 -50 Q-52 -52 -66 0Z" fill="${hair}"/><path d="M58 -40 Q100 -20 84 50 Q72 20 56 0Z" fill="${hair}"/>`,
+    long: `<path d="M-70 90 Q-84 -84 0 -84 Q84 -84 70 90 Q60 20 56 -20 Q30 -50 0 -48 Q-30 -50 -56 -20 Q-60 20 -70 90Z" fill="${hair}"/>`,
+    bun: `<circle cx="0" cy="-92" r="26" fill="${hair}"/><path d="M-64 -4 Q-64 -76 0 -76 Q64 -76 64 -4 Q46 -46 0 -44 Q-46 -46 -64 -4Z" fill="${hair}"/>`,
+  };
+  const eye = closed
+    ? `<path d="M-30 0 Q-22 -7 -14 0" stroke="#4a3b40" stroke-width="4" fill="none"/><path d="M14 0 Q22 -7 30 0" stroke="#4a3b40" stroke-width="4" fill="none"/>`
+    : `<circle cx="-22" cy="-2" r="6" fill="#4a3b40"/><circle cx="22" cy="-2" r="6" fill="#4a3b40"/>`;
+  return `<g transform="translate(${x} ${y}) scale(${s})">
+    <path d="M-110 300 Q-104 110 0 104 Q104 110 110 300Z" fill="${shirt}"/>
+    <circle r="64" fill="${skin}"/>
+    ${hairs[style]}
+    ${eye}
+    <circle cx="-36" cy="20" r="10" fill="#f4a5b5" opacity=".55"/><circle cx="36" cy="20" r="10" fill="#f4a5b5" opacity=".55"/>
+    <path d="M-16 24 Q0 38 16 24" stroke="#4a3b40" stroke-width="5" fill="none" stroke-linecap="round"/>
+    ${glasses ? `<circle cx="-22" cy="-2" r="17" fill="none" stroke="#4a3b40" stroke-width="4"/><circle cx="22" cy="-2" r="17" fill="none" stroke="#4a3b40" stroke-width="4"/><path d="M-5 -2h10" stroke="#4a3b40" stroke-width="4"/>` : ""}
+    ${beard ? `<path d="M-60 10 Q-56 70 0 74 Q56 70 60 10 Q44 50 0 50 Q-44 50 -60 10Z" fill="${hair}"/>` : ""}
+  </g>`;
+};
+const MOM = { skin: SKIN.mom, hair: "#6b4532", shirt: "#d97a92", style: "pony" };
+const DAD = { skin: SKIN.dad, hair: "#3b2a22", shirt: "#4f86b8", style: "short" };
+const VO = { skin: SKIN.vo, hair: "#bdb6b8", shirt: "#8fb39b", style: "bun", glasses: true };
+const TIO = { skin: SKIN.tio, hair: "#2e2324", shirt: "#c9a27a", style: "short", beard: true };
+
+const blanket = (x, y, w, color = "#fffafa", stripe = "#f6d3da") => `
+  <path d="M${x - w / 2} ${y + 230} Q${x - w / 2 + 20} ${y + 20} ${x} ${y} Q${x + w / 2 - 20} ${y + 20} ${x + w / 2} ${y + 230}Z" fill="${color}"/>
+  <path d="M${x - w / 2 + 40} ${y + 110} Q${x} ${y + 160} ${x + w / 2 - 40} ${y + 110}" stroke="${stripe}" stroke-width="14" fill="none"/>`;
+
+const heart = (x, y, s = 1, c = "#d97a92") => `<path transform="translate(${x} ${y}) scale(${s})" d="M0 18C-10 11-19 4-19-5c0-6 5-11 10-11 4 0 7 2 9 6 2-4 5-6 9-6 5 0 10 5 10 11 0 9-9 16-19 23z" fill="${c}"/>`;
+const balloon = (x, y, c) => `<ellipse cx="${x}" cy="${y}" rx="60" ry="74" fill="${c}"/><path d="M${x} ${y + 74} q-10 60 6 120 q14 60 -6 120" stroke="#cdbfc3" stroke-width="3" fill="none"/>`;
+const label = (text, y = 1240, color = "#4a3b40") => `<text x="540" y="${y}" text-anchor="middle" font-family="Caveat" font-weight="600" font-size="64" fill="${color}">${text}</text>`;
+const bg = (a, b) => `<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient></defs><rect width="1080" height="1350" fill="url(#g)"/>`;
+const cake = (x, y, n, s = 1) => `<g transform="translate(${x} ${y}) scale(${s})">
+  <rect x="-170" y="0" width="340" height="150" rx="26" fill="#f6d3da"/><rect x="-170" y="0" width="340" height="44" rx="20" fill="#fffafa"/>
+  <path d="M-170 36 q28 30 56 0 q28 30 56 0 q28 30 56 0 q28 30 56 0 q28 30 56 0 q28 30 56 0" fill="#fffafa"/>
+  <rect x="-210" y="146" width="420" height="24" rx="12" fill="#e7c3cc"/>
+  <rect x="-18" y="-110" width="36" height="110" rx="10" fill="#d97a92"/>
+  <text x="0" y="-38" font-size="46" text-anchor="middle" fill="#fff" font-family="Nunito" font-weight="800">${n}</text>
+  <path d="M0 -170 Q28 -136 0 -112 Q-28 -136 0 -170Z" fill="#f5b041"/></g>`;
+
+const SCENES = {
+  ultrassom: () => `<rect width="1080" height="1350" fill="#1d1a1c"/>
+    <path d="M540 180 L980 880 Q540 1080 100 880Z" fill="#2c292b"/>
+    <ellipse cx="560" cy="640" rx="230" ry="170" fill="#4a4648" opacity=".9"/>
+    <circle cx="470" cy="600" r="95" fill="#8d8789"/><ellipse cx="620" cy="680" rx="130" ry="90" fill="#7b7577"/>
+    <path d="M700 620 q60 -20 80 30" stroke="#8d8789" stroke-width="26" fill="none" stroke-linecap="round"/>
+    <text x="80" y="120" font-family="monospace" font-size="34" fill="#cfcfcf">GA 12s3d   FHR 158bpm</text>
+    <text x="80" y="1210" font-family="Caveat" font-weight="600" font-size="72" fill="#f6d3da">oi, pequena ♡</text>`,
+  barriga: () => `${bg("#fbe8ec", "#f6d3da")}
+    <circle cx="540" cy="300" r="120" fill="${SKIN.mom}"/><path d="M420 280 Q420 150 540 150 Q660 150 660 280 Q630 200 540 205 Q450 200 420 280Z" fill="#6b4532"/>
+    <path d="M490 300 Q502 288 514 300" stroke="#4a3b40" stroke-width="7" fill="none" stroke-linecap="round"/><path d="M566 300 Q578 288 590 300" stroke="#4a3b40" stroke-width="7" fill="none" stroke-linecap="round"/>
+    <circle cx="478" cy="336" r="16" fill="#f4a5b5" opacity=".55"/><circle cx="602" cy="336" r="16" fill="#f4a5b5" opacity=".55"/>
+    <path d="M515 345 Q540 368 565 345" stroke="#4a3b40" stroke-width="7" fill="none" stroke-linecap="round"/>
+    <path d="M330 1350 Q330 600 540 520 Q750 600 750 1350Z" fill="#d97a92"/>
+    <ellipse cx="610" cy="900" rx="260" ry="250" fill="#e48aa0"/>
+    <path d="M480 900 q60 -50 120 0 q-60 70 -120 0" fill="#fffafa" opacity=".9"/>
+    ${heart(600, 860, 2.2, "#d97a92")}
+    ${label("6 meses de espera", 1260, "#fffafa")}`,
+  quarto: () => `${bg("#eef5ef", "#fbf1e3")}
+    <rect x="0" y="980" width="1080" height="370" fill="#e9dccf"/>
+    <rect x="240" y="640" width="600" height="380" rx="20" fill="#fffafa" stroke="#c9a27a" stroke-width="16"/>
+    ${[0, 1, 2, 3, 4, 5, 6].map((i) => `<rect x="${280 + i * 80}" y="660" width="16" height="330" fill="#c9a27a"/>`).join("")}
+    <rect x="260" y="900" width="560" height="90" rx="20" fill="#f6d3da"/>
+    <path d="M540 120 V300" stroke="#bfb2b6" stroke-width="5"/><path d="M380 300 H700" stroke="#bfb2b6" stroke-width="6"/>
+    ${heart(400, 360, 1.6)}${heart(540, 390, 1.6, "#8fb39b")}${heart(680, 360, 1.6, "#c9a27a")}
+    <text x="540" y="560" text-anchor="middle" font-family="Amatic SC" font-weight="700" font-size="110" fill="#d97a92">ALICE</text>
+    ${label("o quarto ficou pronto", 1250)}`,
+  cha: () => `${bg("#fffafa", "#fbe8ec")}
+    ${balloon(200, 260, "#f6d3da")}${balloon(330, 200, "#d97a92")}${balloon(760, 230, "#8fb39b")}${balloon(890, 290, "#f6d3da")}
+    <path d="M60 520 Q540 640 1020 520" stroke="#d97a92" stroke-width="6" fill="none"/>
+    ${["#d97a92", "#f6d3da", "#8fb39b", "#c9a27a", "#d97a92", "#f6d3da", "#8fb39b"].map((c, i) => `<path d="M${130 + i * 130} ${552 + Math.sin(i / 6 * Math.PI) * 60}l40 70l40 -70z" fill="${c}"/>`).join("")}
+    <rect x="140" y="980" width="800" height="40" rx="10" fill="#e7c3cc"/>
+    ${cake(540, 800, "♡", 1.1)}
+    ${label("chá de bebê da Alice", 1240)}`,
+  nascimento: () => `${bg("#fbe8ec", "#fffafa")}
+    ${blanket(540, 520, 760)}
+    ${babyHead(540, 520, 170)}
+    <rect x="420" y="890" width="240" height="56" rx="28" fill="#fffafa" stroke="#d97a92" stroke-width="5"/>
+    <text x="540" y="930" text-anchor="middle" font-family="Nunito" font-weight="800" font-size="30" fill="#d97a92">ALICE · 12/05</text>
+    ${label("bem-vinda, Alice", 1200)}`,
+  banho: () => `${bg("#eaf2f8", "#fffafa")}
+    <path d="M150 760 H930 Q910 1080 540 1080 Q170 1080 150 760Z" fill="#c9ddf0"/>
+    <rect x="130" y="730" width="820" height="50" rx="25" fill="#9fc0de"/>
+    ${babyHead(540, 600, 150, { smile: true })}
+    ${[[300, 720, 40], [380, 690, 26], [720, 700, 44], [800, 740, 28], [640, 760, 30], [460, 760, 34]].map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${r}" fill="#fff" opacity=".85" stroke="#c9ddf0" stroke-width="4"/>`).join("")}
+    <ellipse cx="860" cy="640" rx="60" ry="44" fill="#f5c84b"/><circle cx="905" cy="610" r="30" fill="#f5c84b"/><path d="M930 612 l26 6 -26 8z" fill="#e8913a"/>
+    ${label("primeiro banho (ela chorou, a gente riu)", 1230)}`,
+  vo: () => `${bg("#fbf1e3", "#fbe8ec")}
+    ${adult(540, 430, 1.6, { ...VO, closed: true })}
+    ${blanket(560, 760, 420, "#fffafa")}
+    ${babyHead(560, 760, 100)}
+    ${heart(820, 330, 2)}
+    ${label("o primeiro colo da vó Lúcia", 1250)}`,
+  papai: () => `${bg("#e3eef8", "#fbe8ec")}
+    <rect x="0" y="880" width="1080" height="470" fill="#c9ddf0"/>
+    ${adult(540, 420, 1.7, { ...DAD, closed: true })}
+    ${babyHead(560, 760, 105)}
+    <path d="M420 870 Q560 940 700 870" fill="#f6d3da"/>
+    <text x="760" y="300" font-family="Amatic SC" font-weight="700" font-size="90" fill="#4f86b8">z z z</text>
+    ${label("plantão de madrugada", 1250)}`,
+  sorriso: () => `${bg("#fffafa", "#fbe8ec")}
+    ${babyHead(540, 600, 300, { awake: true, smile: true })}
+    ${heart(200, 260, 2.4)}${heart(880, 300, 1.8, "#f6d3da")}${heart(860, 980, 2.2)}
+    ${label("o primeiro sorriso de verdade", 1230)}`,
+  passeio: () => `${bg("#eef5ef", "#fffafa")}
+    <circle cx="880" cy="200" r="90" fill="#f5c84b" opacity=".8"/>
+    <rect x="0" y="960" width="1080" height="390" fill="#cfe0d4"/>
+    <circle cx="170" cy="640" r="150" fill="#8fb39b"/><rect x="155" y="760" width="30" height="220" fill="#a37b5c"/>
+    <circle cx="930" cy="700" r="120" fill="#a8c3b0"/><rect x="915" y="800" width="30" height="180" fill="#a37b5c"/>
+    <path d="M380 700 Q380 540 560 540 L700 540 L700 760 L380 760Z" fill="#d97a92"/>
+    <rect x="370" y="740" width="360" height="90" rx="30" fill="#c9667f"/>
+    <circle cx="430" cy="880" r="50" fill="#4a3b40"/><circle cx="680" cy="880" r="50" fill="#4a3b40"/>
+    <path d="M700 560 L800 460" stroke="#4a3b40" stroke-width="16" stroke-linecap="round"/>
+    ${babyHead(530, 660, 70)}
+    ${label("primeiro passeio no parque", 1240)}`,
+  mes3: () => `${bg("#fbe8ec", "#fffafa")}
+    ${babyHead(540, 420, 150, { awake: true, smile: true })}
+    ${cake(540, 830, "3", 1)}
+    ${label("mesversário: 3 meses!", 1240)}`,
+  papinha: () => `${bg("#fbf1e3", "#fffafa")}
+    ${babyHead(540, 520, 190, { awake: true })}
+    <circle cx="470" cy="600" r="22" fill="#f0a94b"/><circle cx="640" cy="470" r="14" fill="#f0a94b"/>
+    <rect x="300" y="760" width="480" height="60" rx="30" fill="#fffafa" stroke="#e7c3cc" stroke-width="6"/>
+    <path d="M690 700 L900 520" stroke="#c9a27a" stroke-width="22" stroke-linecap="round"/><ellipse cx="680" cy="712" rx="44" ry="28" fill="#c9a27a"/><ellipse cx="680" cy="706" rx="32" ry="18" fill="#f0a94b"/>
+    <ellipse cx="540" cy="960" rx="200" ry="60" fill="#fffafa" stroke="#e7c3cc" stroke-width="8"/><ellipse cx="540" cy="950" rx="150" ry="36" fill="#f0a94b"/>
+    ${label("primeira papinha: abóbora (aprovada?)", 1230)}`,
+  tio: () => `${bg("#f3e3c9", "#fbe8ec")}
+    ${adult(380, 430, 1.4, TIO)}
+    <ellipse cx="420" cy="860" rx="150" ry="110" fill="#a8683f"/><rect x="520" y="830" width="300" height="40" rx="10" fill="#7a4a2c"/><circle cx="420" cy="860" r="38" fill="#4a2e1c"/>
+    ${babyHead(780, 560, 110, { awake: true, smile: true })}
+    <text x="760" y="330" font-family="Amatic SC" font-weight="700" font-size="120" fill="#d97a92">♪ ♫</text>
+    ${label("o show particular do tio Beto", 1250)}`,
+  desenho: () => `<rect width="1080" height="1350" fill="#fffdf6"/>
+    <path d="M140 1000 Q300 960 540 1000 T940 990" stroke="#5aa469" stroke-width="22" fill="none" stroke-linecap="round"/>
+    <circle cx="860" cy="210" r="90" fill="none" stroke="#f5b041" stroke-width="18"/>
+    ${[0, 1, 2, 3, 4, 5, 6, 7].map((i) => `<path d="M${860 + Math.cos(i * Math.PI / 4) * 120} ${210 + Math.sin(i * Math.PI / 4) * 120} L${860 + Math.cos(i * Math.PI / 4) * 160} ${210 + Math.sin(i * Math.PI / 4) * 160}" stroke="#f5b041" stroke-width="14" stroke-linecap="round"/>`).join("")}
+    <circle cx="380" cy="560" r="80" fill="none" stroke="#e05a7a" stroke-width="14"/><path d="M380 640 V860 M380 700 L290 780 M380 700 L470 780 M380 860 L310 980 M380 860 L450 980" stroke="#e05a7a" stroke-width="14" stroke-linecap="round" fill="none"/>
+    <circle cx="640" cy="720" r="50" fill="none" stroke="#4f86b8" stroke-width="12"/><path d="M640 770 V880 M640 800 L580 840 M640 800 L700 840 M640 880 L600 980 M640 880 L680 980" stroke="#4f86b8" stroke-width="12" stroke-linecap="round" fill="none"/>
+    <text x="540" y="1180" text-anchor="middle" font-family="Caveat" font-weight="600" font-size="86" fill="#8a6cc1">EU E A ALICE</text>
+    <text x="900" y="1290" text-anchor="end" font-family="Caveat" font-weight="600" font-size="48" fill="#8a7178">— prima Clara, 6 anos</text>`,
+  capa: () => `${bg("#fbe8ec", "#f6d3da")}
+    ${heart(540, 470, 9, "#fffafa")}
+    <text x="540" y="560" text-anchor="middle" font-family="Amatic SC" font-weight="700" font-size="190" fill="#d97a92">Alice</text>
+    <text x="540" y="1000" text-anchor="middle" font-family="Nunito" font-weight="800" font-size="46" fill="#c9667f">baú de demonstração</text>`,
+};
+
+window.SCENES = Object.keys(SCENES);
+window.show = (name) => {
+  document.getElementById("root").innerHTML = `<svg width="1080" height="1350" viewBox="0 0 1080 1350">${SCENES[name]()}</svg>`;
+};
+</script>
+</body>
+</html>

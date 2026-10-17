@@ -32,6 +32,9 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     if (error) throw error;
     const target = (data as Target[] | null)?.[0];
     if (!target) return back("?falha=sem-pessoa");
+    // Token do baú de demonstração: entra na demo compartilhada, sem criar conta
+    const { data: demoVault } = await admin.from("vaults").select("is_demo").eq("id", target.vault_id).maybeSingle();
+    if (demoVault?.is_demo) return NextResponse.redirect(new URL("/demo/entrar?como=familia", origin));
 
     // Já é a pessoa do ursinho neste celular: só troca para o baú dele.
     const current = await createClient();

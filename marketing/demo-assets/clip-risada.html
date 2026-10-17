@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&display=swap" rel="stylesheet">
+<style>* { margin:0 } html,body { width:1080px; height:1920px; overflow:hidden; background: linear-gradient(#fffafa,#fbe8ec); font-family: Caveat; }
+#cap { position:absolute; left:0; right:0; bottom: 260px; text-align:center; font-size: 90px; color:#4a3b40; }</style>
+<script src="../videos/engine.js"></script></head>
+<body>
+<svg id="s" width="1080" height="1920" viewBox="0 0 1080 1920" style="position:absolute;inset:0">
+  <g id="mobile"><path d="M540 0 V260" stroke="#bfb2b6" stroke-width="6"/><path d="M360 260 H720" stroke="#bfb2b6" stroke-width="8"/>
+    <circle id="m1" cx="380" cy="330" r="40" fill="#d97a92"/><circle id="m2" cx="540" cy="350" r="40" fill="#8fb39b"/><circle id="m3" cx="700" cy="330" r="40" fill="#c9a27a"/></g>
+  <ellipse cx="540" cy="1320" rx="420" ry="120" fill="#f6d3da"/>
+  <g id="baby" transform="translate(540 1000)">
+    <circle r="260" fill="#f6d3bd"/>
+    <path d="M-40 -248 Q0 -300 36 -240 Q14 -262 -6 -214Z" fill="#7a5442"/>
+    <path id="eyeL" d="M-140 -10 Q-100 -46 -60 -10" stroke="#4a3b40" stroke-width="16" fill="none" stroke-linecap="round"/>
+    <path id="eyeR" d="M60 -10 Q100 -46 140 -10" stroke="#4a3b40" stroke-width="16" fill="none" stroke-linecap="round"/>
+    <circle cx="-150" cy="80" r="42" fill="#f4a5b5" opacity=".6"/><circle cx="150" cy="80" r="42" fill="#f4a5b5" opacity=".6"/>
+    <path id="mouth" d="M-70 90 Q0 190 70 90Z" fill="#c9667f"/>
+  </g>
+  <g id="hearts"></g>
+</svg>
+<div id="cap">Alice dando risada 😂</div>
+<script>
+const H = document.getElementById("hearts");
+for (let i = 0; i < 7; i++) H.insertAdjacentHTML("beforeend", `<path id="h${i}" d="M0 18C-10 11-19 4-19-5c0-6 5-11 10-11 4 0 7 2 9 6 2-4 5-6 9-6 5 0 10 5 10 11 0 9-9 16-19 23z" fill="${["#d97a92","#f6d3da","#8fb39b"][i%3]}"/>`);
+window.DURATION = 8;
+window.render = (t) => {
+  const g = Math.abs(Math.sin(t * 7));
+  document.getElementById("baby").setAttribute("transform", `translate(540 ${1000 - 30 * g}) rotate(${4 * Math.sin(t * 3.5)}) scale(${1 + 0.03 * g})`);
+  document.getElementById("mouth").setAttribute("d", `M-70 90 Q0 ${150 + 60 * g} 70 90Z`);
+  document.getElementById("mobile").setAttribute("transform", `rotate(${6 * Math.sin(t * 1.2)} 540 0)`);
+  for (let i = 0; i < 7; i++) {
+    const k = ((t * 0.45 + i / 7) % 1);
+    const x = 540 + Math.sin(i * 2.3) * 380 + 40 * Math.sin(t * 2 + i);
+    document.getElementById("h" + i).setAttribute("transform", `translate(${x} ${1500 - 1100 * k}) scale(${2 + 2 * k})`);
+    document.getElementById("h" + i).setAttribute("opacity", Math.sin(Math.PI * k));
+  }
+};
+</script></body></html>

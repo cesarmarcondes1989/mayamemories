@@ -17,6 +17,7 @@ export type EmailState = { ok: boolean; sentTo?: string; error?: string };
 export async function saveMyEmail(_prev: EmailState, formData: FormData): Promise<EmailState> {
   const viewer = await getViewer();
   if (!viewer) return { ok: false, error: "Sua sessão expirou. Encoste o ursinho de novo." };
+  if (viewer.isDemo) return { ok: false, error: "Isto é uma demonstração: o e-mail não pode ser trocado aqui." };
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email) || email.length > 254) {
     return { ok: false, error: "Esse e-mail parece incompleto." };

@@ -4,6 +4,7 @@ import "./globals.css";
 import { HashSessionHandler } from "@/components/auth/hash-session";
 import { getViewer } from "@/lib/permissions/viewer";
 import { isSupabaseConfigured } from "@/lib/env";
+import { DemoBanner } from "@/components/demo/demo-banner";
 
 // Títulos: letra desenhada à mão. Texto: sans arredondada. Cartas: manuscrita.
 const display = Amatic_SC({ subsets: ["latin"], weight: ["400", "700"], variable: "--font-display", display: "swap" });
@@ -31,6 +32,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html lang="pt-BR" data-theme={viewer?.vault?.theme ?? "rosa"} className={`${display.variable} ${body.variable} ${hand.variable}`}>
       <body className="text-ink antialiased">
         <HashSessionHandler />
+        {viewer?.isDemo && <DemoBanner />}
         {children}
       </body>
     </html>

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { ButtonLink, buttonClasses } from "@/components/ui/button";
+import { buttonClasses } from "@/components/ui/button";
 import { TrackView, TrackedLink } from "@/components/analytics/tracker";
 import { Card } from "@/components/ui/card";
 import { HeartDivider, HeartDoodle, SparkleDoodle } from "@/components/ui/doodles";
@@ -113,9 +113,9 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
             <TrackedLink href="/comecar" event="cta_click" className={buttonClasses("primary", "lg", "px-9")}>
               Criar meu baú grátis ♡
             </TrackedLink>
-            <ButtonLink href="#planos" size="lg" variant="secondary" className="px-9">
-              Ver planos
-            </ButtonLink>
+            <TrackedLink href="/demo" event="cta_click" className={buttonClasses("secondary", "lg", "px-9")}>
+              Ver uma demonstração
+            </TrackedLink>
           </div>
           <p className="mt-4 text-sm text-taupe">Sem app para instalar · sem anúncios · só quem você convidar</p>
         </div>

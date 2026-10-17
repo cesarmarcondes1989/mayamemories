@@ -14,6 +14,7 @@ const KNOWN: Array<[RegExp, string]> = [
   [/at least one administrator/i, "É preciso manter pelo menos um administrador."],
   [/own admin role|suspend yourself/i, "Você não pode remover o seu próprio acesso administrativo."],
   [/birth date/i, "Defina a data de nascimento (ou prevista) nas configurações."],
+  [/demo vault is read-only/i, "Isto é uma demonstração: nada é salvo aqui. Crie o seu baú grátis para guardar de verdade ♡"],
   [/vault limit reached/i, "Você já tem o baú do plano Grátis. Para criar outro, escolha um plano."],
   [/vault creation is not open/i, "O cadastro está pausado no momento. Deixe seu contato na página inicial."],
   [/precisa de um evento/i, "Token impessoal (de mesa) precisa de um evento."],

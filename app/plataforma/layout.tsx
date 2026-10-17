@@ -18,6 +18,7 @@ export default async function PlatformLayout({ children }: { children: React.Rea
     { href: "/plataforma/interessados", label: "Interessados", badge: count ?? 0 },
     { href: "/plataforma/planos", label: "Planos e preços" },
     { href: "/plataforma/marca", label: "Marca e contato" },
+    { href: "/plataforma/demo", label: "Demonstração" },
   ];
   return (
     <div className="paper-grain min-h-dvh">
