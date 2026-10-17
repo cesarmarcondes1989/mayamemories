@@ -1,6 +1,6 @@
 "use client";
 import { useActionState } from "react";
-import type { LoginState } from "@/features/auth/actions";
+import { verifyEmailCode, type LoginState } from "@/features/auth/actions";
 import { Field, Input } from "@/components/ui/field";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { Alert } from "@/components/ui/misc";
@@ -19,9 +19,12 @@ export function EmailLinkForm({
   const [state, formAction] = useActionState(action, { status: "idle" });
   if (state.status === "sent") {
     return (
-      <Alert tone="success" title="Confira sua caixa de entrada ✉️">
-        {sentMessage}
-      </Alert>
+      <div className="space-y-5">
+        <Alert tone="success" title="Confira sua caixa de entrada ✉️">
+          {sentMessage}
+        </Alert>
+        {state.email && <CodeForm email={state.email} next={state.next ?? "/inicio"} />}
+      </div>
     );
   }
   return (
@@ -35,6 +38,34 @@ export function EmailLinkForm({
       {state.status === "error" && <Alert tone="error">{state.message}</Alert>}
       <SubmitButton size="lg" className="w-full" pendingText="Enviando link…">
         {submitLabel}
+      </SubmitButton>
+    </form>
+  );
+}
+
+/** Alternativa ao link: o código de 6 dígitos do mesmo e-mail. */
+function CodeForm({ email, next }: { email: string; next: string }) {
+  const [state, formAction] = useActionState(verifyEmailCode, { status: "idle" });
+  return (
+    <form action={formAction} className="space-y-3 border-t border-rose/20 pt-5">
+      <input type="hidden" name="email" value={email} />
+      <input type="hidden" name="next" value={next} />
+      <Field label="Ou digite o código do e-mail" htmlFor="code" hint="Útil se o link abrir em outro aparelho ou disser que expirou.">
+        <Input
+          id="code"
+          name="code"
+          inputMode="numeric"
+          autoComplete="one-time-code"
+          pattern="[0-9 ]{6,12}"
+          maxLength={12}
+          required
+          placeholder="123456"
+          className="text-center text-2xl tracking-[0.4em]"
+        />
+      </Field>
+      {state.status === "error" && <Alert tone="error">{state.message}</Alert>}
+      <SubmitButton size="lg" variant="secondary" className="w-full" pendingText="Conferindo…">
+        Entrar com o código
       </SubmitButton>
     </form>
   );

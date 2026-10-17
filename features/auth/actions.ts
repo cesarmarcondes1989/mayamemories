@@ -8,8 +8,10 @@ import { publicEnv } from "@/lib/env";
 import { emailSchema, safeNextPath } from "@/lib/validation/schemas";
 import { friendlyError } from "@/lib/errors";
 import { canBootstrap } from "@/lib/bootstrap";
+import { markEmailVerifiedIfPending } from "@/lib/auth/mark-verified";
+import type { EmailOtpType } from "@supabase/supabase-js";
 
-export type LoginState = { status: "idle" | "sent" | "error"; message?: string };
+export type LoginState = { status: "idle" | "sent" | "error"; message?: string; email?: string; next?: string };
 
 import { INVITE_COOKIE } from "./constants";
 
@@ -47,15 +49,17 @@ export async function requestLoginLink(_prev: LoginState, formData: FormData): P
   const parsed = emailSchema.safeParse(formData.get("email"));
   if (!parsed.success) return { status: "error", message: "Informe um e-mail válido." };
   const next = safeNextPath(String(formData.get("next") ?? ""), "/inicio");
+  let destination = next;
   try {
     if (await canBootstrap(parsed.data)) {
       await sendMagicLink(parsed.data, "/primeiro-acesso", true);
-      return { status: "sent" };
+      return { status: "sent", email: parsed.data, next: "/primeiro-acesso" };
     }
     const admin = createAdminClient();
     const { data: invited, error } = await admin.rpc("email_has_pending_invitation", { p_email: parsed.data });
     if (error) throw new Error(`invitation check failed: ${error.message}`);
-    await sendMagicLink(parsed.data, invited ? "/convite/concluir" : next, Boolean(invited));
+    if (invited) destination = "/convite/concluir";
+    await sendMagicLink(parsed.data, destination, Boolean(invited));
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e);
     if (message.startsWith("Muitas")) return { status: "error", message };
@@ -63,7 +67,37 @@ export async function requestLoginLink(_prev: LoginState, formData: FormData): P
     console.error("[auth] requestLoginLink", message);
     return { status: "error", message: "Não foi possível enviar o link agora. Tente novamente em instantes." };
   }
-  return { status: "sent" };
+  return { status: "sent", email: parsed.data, next: destination };
+}
+
+/**
+ * Plano B do link: o mesmo e-mail traz um código de 6 dígitos. Funciona em
+ * qualquer aparelho e não "queima" quando o app de e-mail pré-abre o link.
+ */
+export async function verifyEmailCode(_prev: LoginState, formData: FormData): Promise<LoginState> {
+  const parsed = emailSchema.safeParse(formData.get("email"));
+  const code = String(formData.get("code") ?? "").replace(/\D/g, "");
+  const next = safeNextPath(String(formData.get("next") ?? ""), "/inicio");
+  const keep = { email: parsed.success ? parsed.data : undefined, next };
+  if (!parsed.success || code.length < 6 || code.length > 10) {
+    return { status: "error", message: "Digite o código de 6 dígitos que chegou no e-mail.", ...keep };
+  }
+  const supabase = await createClient();
+  let ok = false;
+  // Login comum usa "email"; o primeiro acesso de quem foi convidado usa "invite"
+  for (const type of ["email", "invite"] as EmailOtpType[]) {
+    const { error } = await supabase.auth.verifyOtp({ email: parsed.data, token: code, type });
+    if (!error) {
+      ok = true;
+      break;
+    }
+    if (/rate limit|security purposes/i.test(error.message)) {
+      return { status: "error", message: "Muitas tentativas. Aguarde um minuto e tente de novo.", ...keep };
+    }
+  }
+  if (!ok) return { status: "error", message: "Código inválido ou expirado. Confira o último e-mail ou peça um novo.", ...keep };
+  await markEmailVerifiedIfPending(supabase);
+  redirect(next);
 }
 
 /** Link de convite (segredo): valida e guarda o segredo em cookie httpOnly curto. */
@@ -89,7 +123,7 @@ export async function requestInviteLink(_prev: LoginState, formData: FormData): 
   } catch (e) {
     return { status: "error", message: e instanceof Error ? e.message : friendlyError(e) };
   }
-  return { status: "sent" };
+  return { status: "sent", email: parsed.data, next: "/convite/concluir" };
 }
 
 /** Já autenticado: aceita o convite diretamente. */

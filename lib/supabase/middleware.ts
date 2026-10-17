@@ -19,6 +19,15 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(callback);
   }
 
+  // Link do e-mail expirado/já usado (o Supabase devolve ?error_code=…):
+  // mostramos a tela de entrar com o aviso, em vez de um erro cru.
+  if (request.nextUrl.searchParams.has("error_code") && !request.nextUrl.pathname.startsWith("/auth/")) {
+    const target = new URL("/entrar", request.nextUrl.origin);
+    target.searchParams.set("erro", "link");
+    target.searchParams.set("next", request.nextUrl.pathname === "/" ? "/inicio" : request.nextUrl.pathname);
+    return NextResponse.redirect(target);
+  }
+
   let response = NextResponse.next({ request });
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;

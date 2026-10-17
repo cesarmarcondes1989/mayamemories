@@ -29,7 +29,10 @@ Tempo estimado: 30–40 min. Faça primeiro em um projeto de **desenvolvimento**
    pelo ursinho tem um e-mail interno que não recebe mensagens, então a confirmação vai só para o e-mail novo.
 
    Esses templates usam `/auth/confirm?token_hash=…`, que funciona mesmo se o e-mail for aberto em outro
-   app/navegador do celular.
+   app/navegador do celular. O link leva a uma tela com o botão “Entrar” (o acesso só é gasto no toque, então
+   antivírus/Gmail/Outlook que pré-abrem links não o queimam), e o e-mail traz também um código de 6 dígitos
+   (`{{ .Token }}`) que pode ser digitado na tela de entrar. Se aparecer `otp_expired` vindo de
+   `…supabase.co/auth/v1/verify`, é sinal de que os templates ainda são os padrão do Supabase.
    Em **Authentication → Multi-Factor**, deixe **TOTP (App Authenticator)** habilitado. O dono da plataforma
    (`/plataforma`) é obrigado a usar 2 fatores — a exigência está no banco (`is_platform_admin_strong`, aal2).
 6. **Authentication → SMTP**: configure um SMTP próprio (Resend, Postmark, SES…). O SMTP padrão do Supabase
