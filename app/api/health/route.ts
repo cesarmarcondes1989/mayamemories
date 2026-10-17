@@ -13,6 +13,8 @@ export async function GET() {
     SUPABASE_SERVICE_ROLE_KEY: Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY),
     ADMIN_BOOTSTRAP_EMAILS: bootstrapEmails().length > 0,
   };
+  // Opcional (livro/filme com IA): não entra no "ok"
+  const optional = { ANTHROPIC_API_KEY: Boolean(process.env.ANTHROPIC_API_KEY) };
   let database: "ok" | "migrations_missing" | "unreachable" = "unreachable";
   let hasAdmin: boolean | null = null;
   let nfcMigration: boolean | null = null;
@@ -37,6 +39,7 @@ export async function GET() {
           "013_self_signup": await probe("app_settings", "self_service_vault_limit"),
           "014_brand_guardei": await probe("app_settings", "brand_name"),
           "015_demo_vault": await probe("vaults", "is_demo"),
+          "016_story_texts": await probe("story_selections", "kind"),
         };
         if (migrations["015_demo_vault"]) {
           const { data } = await admin.rpc("demo_vault_id");
@@ -48,5 +51,5 @@ export async function GET() {
     }
   }
   const ok = Object.values(env).every(Boolean) && database === "ok";
-  return NextResponse.json({ ok, env, database, hasAdmin, nfcMigration, migrations, demoReady }, { headers: { "Cache-Control": "no-store" } });
+  return NextResponse.json({ ok, env, optional, database, hasAdmin, nfcMigration, migrations, demoReady }, { headers: { "Cache-Control": "no-store" } });
 }

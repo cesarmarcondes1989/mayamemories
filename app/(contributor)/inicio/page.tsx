@@ -26,6 +26,18 @@ export default async function ContributorHome({ searchParams }: { searchParams: 
       <HomeHero name={viewer.displayName.split(" ")[0]} subject={subjectWords(viewer.vault).of} pronoun={subjectWords(viewer.vault).pronoun} />
       {promptEmail && <EmailOptIn pendingEmail={viewer.pendingEmail} className="mb-6" />}
       {viewer.canContribute && <NudgeCard stats={stats} />}
+      <div className="mb-6 grid grid-cols-2 gap-3">
+        <a href={`/filme/${new Date().getFullYear()}`} className="rounded-3xl bg-paper p-4 shadow-[var(--shadow-soft)]">
+          <span className="text-2xl" aria-hidden="true">🎬</span>
+          <span className="mt-1 block font-semibold text-rose-deep">O filme do ano</span>
+          <span className="text-sm text-taupe">montado sozinho com tudo que a família guardou</span>
+        </a>
+        <a href={`/livro/${new Date().getFullYear()}`} className="rounded-3xl bg-paper p-4 shadow-[var(--shadow-soft)]">
+          <span className="text-2xl" aria-hidden="true">📖</span>
+          <span className="mt-1 block font-semibold text-rose-deep">O livro do ano</span>
+          <span className="text-sm text-taupe">pronto para guardar em PDF ou imprimir</span>
+        </a>
+      </div>
       {viewer.canContribute ? (
         <HomeActions />
       ) : (

@@ -33,6 +33,13 @@ export default function PrivacyPage() {
           de ideia, limpe os dados do site no navegador. Os registros brutos são apagados após 13 meses.
         </p>
         <p>O conteúdo dos baús das famílias nunca entra nessas estatísticas.</p>
+        <h2 className="pt-4 text-3xl">Livro e filme com inteligência artificial</h2>
+        <p>
+          Para montar sozinho o livro e o filme de cada ano, usamos IA (Claude, da Anthropic) para escolher as memórias e escrever os
+          textos de cada capítulo. Só enviamos <strong>texto</strong> — títulos, descrições, nomes de quem guardou e datas. Fotos,
+          vídeos e áudios nunca são enviados. A Anthropic não usa esses dados para treinar modelos. Quem cuida do baú pode
+          desligar a IA a qualquer momento em “Livro e filme”.
+        </p>
         <p>Dúvidas ou pedidos: fale diretamente com quem cuida do baú.</p>
       </div>
     </article>
