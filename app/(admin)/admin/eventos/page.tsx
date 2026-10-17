@@ -12,6 +12,7 @@ import { Alert, EmptyState, PageHeader } from "@/components/ui/misc";
 import { Badge } from "@/components/ui/badge";
 import { publicEnv } from "@/lib/env";
 import { formatDate } from "@/lib/format";
+import { TokenQr } from "@/components/tokens/token-qr";
 
 export const metadata: Metadata = { title: "Eventos" };
 
@@ -99,13 +100,16 @@ export default async function EventsPage({ searchParams }: { searchParams: Promi
                     {eventTokens.map((t) => {
                       const url = `${site}/m/${t.public_id}`;
                       return (
-                        <div key={t.id} className="flex flex-wrap items-center gap-2 rounded-2xl bg-cream px-3 py-2">
-                          <span className="text-sm font-medium">
-                            {t.person_id ? "🧸" : "🍽️"} {t.label ?? (t.person_id ? "Pessoa" : "Mesa")}
-                          </span>
-                          <Badge tone={t.person_id ? "rose" : "sage"}>{t.person_id ? "Pessoa" : "Impessoal"}</Badge>
-                          <code className="min-w-0 flex-1 text-xs break-all text-taupe">{url}</code>
-                          <CopyButton text={url} label="Copiar" />
+                        <div key={t.id} className="rounded-2xl bg-cream px-3 py-2">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="text-sm font-medium">
+                              {t.person_id ? "🧸" : "🍽️"} {t.label ?? (t.person_id ? "Pessoa" : "Mesa")}
+                            </span>
+                            <Badge tone={t.person_id ? "rose" : "sage"}>{t.person_id ? "Pessoa" : "Impessoal"}</Badge>
+                            <code className="min-w-0 flex-1 text-xs break-all text-taupe">{url}</code>
+                            <CopyButton text={url} label="Copiar" />
+                          </div>
+                          <TokenQr tokenId={t.id} url={url} personal={Boolean(t.person_id)} />
                         </div>
                       );
                     })}

@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { NFC_STATUS_LABELS } from "@/lib/constants";
 import { publicEnv } from "@/lib/env";
 import { formatDate, formatDateTime } from "@/lib/format";
+import { TokenQr } from "@/components/tokens/token-qr";
 
 export const metadata: Metadata = { title: "Tokens NFC" };
 
@@ -98,6 +99,7 @@ export default async function TokensPage({ searchParams }: { searchParams: Promi
                   </div>
                   <Badge tone={t.status === "active" ? "ok" : t.status === "prepared" ? "pending" : "neutral"}>{NFC_STATUS_LABELS[t.status]}</Badge>
                 </div>
+                {!["revoked", "replaced"].includes(t.status) && <TokenQr tokenId={t.id} url={url} personal={Boolean(t.person)} />}
                 {!t.person && !t.event_id && !["revoked", "replaced"].includes(t.status) && (
                   <form action={linkNfcToPerson} className="mt-3 flex flex-wrap gap-2 rounded-xl bg-amber-soft p-3">
                     <input type="hidden" name="id" value={t.id} />
