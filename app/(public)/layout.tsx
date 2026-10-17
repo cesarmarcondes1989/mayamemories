@@ -4,6 +4,7 @@ import { buttonClasses } from "@/components/ui/button";
 import { getBrand } from "@/features/plans/queries";
 import { getViewer } from "@/lib/permissions/viewer";
 import { isSupabaseConfigured } from "@/lib/env";
+import { AnalyticsTracker } from "@/components/analytics/tracker";
 
 export default async function PublicLayout({ children }: { children: React.ReactNode }) {
   const [brand, viewer] = await Promise.all([
@@ -37,6 +38,7 @@ export default async function PublicLayout({ children }: { children: React.React
         </nav>
       </header>
       <main className="mx-auto w-full max-w-5xl flex-1 px-5 pb-16">{children}</main>
+      <AnalyticsTracker />
       <footer className="mx-auto w-full max-w-5xl px-5 pb-8 text-sm text-taupe">
         <div className="flex flex-wrap gap-x-5 gap-y-1 border-t border-line pt-5">
           <span>{brand.brand_name} · um espaço privado de família.</span>

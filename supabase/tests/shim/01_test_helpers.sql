@@ -11,6 +11,13 @@ begin
   perform set_config('role', 'authenticated', true);
 end $$;
 
+-- Sessão com 2 fatores verificados (aal2), como o Supabase marca no JWT
+create or replace function tests.login_mfa(p_user uuid) returns void language plpgsql as $$
+begin
+  perform set_config('request.jwt.claims', json_build_object('sub', p_user, 'role', 'authenticated', 'aal', 'aal2')::text, true);
+  perform set_config('role', 'authenticated', true);
+end $$;
+
 create or replace function tests.login_anon() returns void language plpgsql as $$
 begin
   perform set_config('request.jwt.claims', '{"role":"anon"}', true);

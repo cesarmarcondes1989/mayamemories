@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { ButtonLink } from "@/components/ui/button";
+import { ButtonLink, buttonClasses } from "@/components/ui/button";
+import { TrackView, TrackedLink } from "@/components/analytics/tracker";
 import { Card } from "@/components/ui/card";
 import { HeartDivider, HeartDoodle, SparkleDoodle } from "@/components/ui/doodles";
 import { LeadForm } from "@/components/landing/lead-form";
@@ -78,13 +79,14 @@ function PlanCard({ plan }: { plan: Plan }) {
           </li>
         ))}
       </ul>
-      <ButtonLink
+      <TrackedLink
         href={`/?plano=${plan.key}#quero`}
-        variant={plan.highlight ? "primary" : "secondary"}
-        className="mt-6 w-full"
+        event="plan_click"
+        plan={plan.key}
+        className={buttonClasses(plan.highlight ? "primary" : "secondary", "md", "mt-6 w-full")}
       >
         {plan.billing === "free" ? "Começar grátis" : `Quero o ${plan.name}`}
-      </ButtonLink>
+      </TrackedLink>
     </Card>
   );
 }
@@ -108,9 +110,9 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
             para uma criança descobrir ao longo da vida, ou para uma festa nunca ser esquecida.
           </p>
           <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row lg:justify-start">
-            <ButtonLink href="#quero" size="lg" className="px-9">
+            <TrackedLink href="#quero" event="cta_click" className={buttonClasses("primary", "lg", "px-9")}>
               Quero o meu baú ♡
-            </ButtonLink>
+            </TrackedLink>
             <ButtonLink href="#planos" size="lg" variant="secondary" className="px-9">
               Ver planos
             </ButtonLink>
@@ -236,6 +238,7 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
 
       {/* ------------------------------------------------------------ planos */}
       <section id="planos" className="scroll-mt-8">
+        <TrackView event="plans_view" targetId="planos" />
         <h2 className="text-center text-5xl sm:text-6xl">Planos</h2>
         <p className="mx-auto mt-2 max-w-xl text-center text-taupe">
           Comece de graça. Quando a família toda estiver lá dentro, você escolhe o plano que cabe na história de vocês.

@@ -12,6 +12,10 @@ import { cn } from "@/components/ui/cn";
 
 export const metadata = { title: "Interessados" };
 
+const PERSONA: Record<string, string> = {
+  gestante: "gestante", mae_pai: "mãe/pai", avos: "avó/avô", padrinhos: "padrinhos/tios", noivos: "noivos", presente: "presente", outro: "outro",
+};
+
 const STATUS = {
   new: { label: "Novo", tone: "rose" },
   contacted: { label: "Em conversa", tone: "pending" },
@@ -31,6 +35,11 @@ export default async function LeadsPage({ searchParams }: { searchParams: Promis
         eyebrow="Vitrine"
         title="Interessados"
         description="Quem pediu o baú pelo site. Responda pelo WhatsApp ou e-mail e marque o andamento aqui."
+        actions={
+          <a href="/plataforma/interessados/csv" className="inline-flex h-10 items-center rounded-full border border-rose/70 bg-paper px-4 text-sm font-semibold text-rose-deep">
+            ⬇ Planilha (CSV)
+          </a>
+        }
       />
       {sp.erro && <Alert tone="error">{sp.erro}</Alert>}
       {sp.salvo && <Alert tone="success">Atualizado.</Alert>}
@@ -64,6 +73,8 @@ export default async function LeadsPage({ searchParams }: { searchParams: Promis
                         {formatDateTime(l.created_at)} · {l.kind === "event" ? "Evento" : "Criança"}
                         {l.plan_key && ` · plano ${planName.get(l.plan_key) ?? l.plan_key}`}
                         {l.source && l.source !== "site" && ` · veio de ${l.source}`}
+                        {l.persona && ` · ${PERSONA[l.persona] ?? l.persona}`}
+                        {l.age_range && ` · ${l.age_range} anos`}
                       </p>
                     </div>
                     <Badge tone={st.tone}>{st.label}</Badge>

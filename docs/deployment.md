@@ -29,6 +29,8 @@ Tempo estimado: 30–40 min. Faça primeiro em um projeto de **desenvolvimento**
 
    Esses templates usam `/auth/confirm?token_hash=…`, que funciona mesmo se o e-mail for aberto em outro
    app/navegador do celular.
+   Em **Authentication → Multi-Factor**, deixe **TOTP (App Authenticator)** habilitado. O dono da plataforma
+   (`/plataforma`) é obrigado a usar 2 fatores — a exigência está no banco (`is_platform_admin_strong`, aal2).
 6. **Authentication → SMTP**: configure um SMTP próprio (Resend, Postmark, SES…). O SMTP padrão do Supabase
    tem limite muito baixo de envios por hora.
 7. **Storage → Settings**: ajuste o *global file size limit* para comportar vídeos (plano Free = 50 MB; no Pro
@@ -93,3 +95,10 @@ Supabase → Database → Backups (ou `npm run backup`), e só então `npx supab
 Nunca altere migrações já aplicadas. Crie um novo arquivo em `supabase/migrations/` e rode `npx supabase db push`.
 Atenção: funções novas no schema `public` recebem EXECUTE para `anon`/`authenticated` por padrão no Supabase —
 revogue explicitamente o que não deve ser público (veja o final de `..._workflows.sql`).
+
+## Analytics da vitrine
+
+- Coletor próprio em `/api/a` (sem serviço de terceiros). Grava em `analytics_events` pelo service role.
+- Não guarda IP nem User-Agent completo; região vem dos cabeçalhos de geolocalização da Vercel.
+- Identificador de visitante só com o aceite de cookies (banner na vitrine).
+- Retenção: rode `select public.analytics_prune();` uma vez por mês (apaga eventos com mais de 13 meses).

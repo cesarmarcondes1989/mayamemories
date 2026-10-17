@@ -14,6 +14,7 @@ export default async function PlatformLayout({ children }: { children: React.Rea
   const supabase = await createClient();
   const { count } = await supabase.from("leads").select("id", { count: "exact", head: true }).eq("status", "new");
   const links = [
+    { href: "/plataforma/analytics", label: "Analytics" },
     { href: "/plataforma/interessados", label: "Interessados", badge: count ?? 0 },
     { href: "/plataforma/planos", label: "Planos e preços" },
     { href: "/plataforma/marca", label: "Marca e contato" },
@@ -32,6 +33,7 @@ export default async function PlatformLayout({ children }: { children: React.Rea
           <div className="ml-auto flex gap-3 text-sm sm:ml-0">
             <Link href="/" className="text-taupe hover:text-ink">Ver site</Link>
             <Link href="/baus" className="text-taupe hover:text-ink">Meus baús</Link>
+            <span className="hidden text-sage sm:inline" title="Sessão verificada com 2 fatores">🔒 2FA</span>
           </div>
         </div>
       </header>

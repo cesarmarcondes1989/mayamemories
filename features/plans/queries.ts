@@ -46,6 +46,8 @@ export type Lead = {
   source: string | null;
   status: "new" | "contacted" | "converted" | "lost";
   notes: string | null;
+  persona?: string | null;
+  age_range?: string | null;
   created_at: string;
 };
 

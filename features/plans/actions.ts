@@ -13,11 +13,23 @@ export type LeadState = { ok: boolean; error?: string; fields?: Record<string, s
 
 const EMAIL = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
+function parseUtm(raw: string): Record<string, string> {
+  try {
+    const obj = JSON.parse(raw || "{}");
+    return obj && typeof obj === "object" && !Array.isArray(obj) ? obj : {};
+  } catch {
+    return {};
+  }
+}
+
 export async function submitLead(_prev: LeadState, formData: FormData): Promise<LeadState> {
   const get = (k: string) => String(formData.get(k) ?? "").trim();
   // Campo invisível: robôs preenchem, pessoas não.
   if (get("website")) return { ok: true };
-  const fields = { name: get("name"), email: get("email"), phone: get("phone"), kind: get("kind"), plan: get("plan"), message: get("message") };
+  const fields = {
+    name: get("name"), email: get("email"), phone: get("phone"), kind: get("kind"), plan: get("plan"), message: get("message"),
+    persona: get("persona"), age_range: get("age_range"),
+  };
   if (!fields.name) return { ok: false, error: "Como podemos te chamar?", fields };
   if (!fields.email && !fields.phone) return { ok: false, error: "Deixe um e-mail ou WhatsApp para a gente responder.", fields };
   if (fields.email && !EMAIL.test(fields.email)) return { ok: false, error: "Esse e-mail parece incompleto.", fields };
@@ -29,11 +41,11 @@ export async function submitLead(_prev: LeadState, formData: FormData): Promise<
   let source = "site";
   try {
     const u = new URL(referer);
-    source = u.searchParams.get("utm_source") || u.searchParams.get("ref") || "site";
+    source = u.searchParams.get("utm_source") || u.searchParams.get("ref") || parseUtm(get("utm")).utm_source || "site";
   } catch {}
 
   const supabase = await createClient();
-  const { error } = await supabase.rpc("submit_lead", {
+  const base = {
     p_name: fields.name.slice(0, 120),
     p_email: fields.email || null,
     p_phone: phone || null,
@@ -41,7 +53,16 @@ export async function submitLead(_prev: LeadState, formData: FormData): Promise<
     p_plan_key: fields.plan || null,
     p_message: fields.message.slice(0, 1000) || null,
     p_source: source.slice(0, 120),
+  };
+  let { error } = await supabase.rpc("submit_lead", {
+    ...base,
+    p_age_range: fields.age_range || null,
+    p_persona: fields.persona || null,
+    p_utm: parseUtm(get("utm")),
+    p_visitor_id: /^[0-9a-f-]{36}$/i.test(get("vid")) ? get("vid") : null,
   });
+  // Banco ainda sem a migration 012: grava o essencial
+  if (error?.code === "PGRST202") ({ error } = await supabase.rpc("submit_lead", base));
   if (error) return { ok: false, error: friendlyError(error, "Não conseguimos registrar agora. Tente de novo em instantes."), fields };
   return { ok: true };
 }

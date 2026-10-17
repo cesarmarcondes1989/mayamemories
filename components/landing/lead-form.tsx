@@ -1,6 +1,7 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
+import { getIds, getUtm, track } from "@/components/analytics/client";
 import { submitLead, type LeadState } from "@/features/plans/actions";
 import { Field, Input, Select, Textarea } from "@/components/ui/field";
 import { SubmitButton } from "@/components/ui/submit-button";
@@ -15,6 +16,20 @@ export function LeadForm({ plans, defaultPlan }: { plans: Option[]; defaultPlan?
   const [plan, setPlan] = useState(initialPlan);
   const [kind, setKind] = useState(plans.find((p) => p.key === initialPlan)?.audience === "event" ? "event" : "child");
   const f = state.fields ?? {};
+  const started = useRef(false);
+  const [meta, setMeta] = useState<{ utm: string; vid: string }>({ utm: "{}", vid: "" });
+
+  useEffect(() => {
+    setMeta({ utm: JSON.stringify({ ...getUtm(), referrer: document.referrer || undefined }), vid: getIds().vid ?? "" });
+  }, []);
+  useEffect(() => {
+    if (state.ok) track("lead_submit", { plan: plan || undefined });
+  }, [state.ok, plan]);
+  const onStart = () => {
+    if (started.current) return;
+    started.current = true;
+    track("lead_form_start");
+  };
 
   if (state.ok) {
     return (
@@ -29,7 +44,9 @@ export function LeadForm({ plans, defaultPlan }: { plans: Option[]; defaultPlan?
   }
 
   return (
-    <form action={action} className="grid gap-4 sm:grid-cols-2">
+    <form action={action} onFocus={onStart} className="grid gap-4 sm:grid-cols-2">
+      <input type="hidden" name="utm" value={meta.utm} />
+      <input type="hidden" name="vid" value={meta.vid} />
       {/* Armadilha para robôs: invisível para pessoas */}
       <input type="text" name="website" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden="true" />
       <fieldset className="sm:col-span-2">
@@ -74,6 +91,26 @@ export function LeadForm({ plans, defaultPlan }: { plans: Option[]; defaultPlan?
       </Field>
       <Field label="E-mail" htmlFor="lead-email" optional>
         <Input id="lead-email" name="email" type="email" autoComplete="email" defaultValue={f.email} />
+      </Field>
+      <Field label="Você é…" htmlFor="lead-persona" optional>
+        <Select id="lead-persona" name="persona" defaultValue={f.persona ?? ""}>
+          <option value="">Prefiro não dizer</option>
+          <option value="gestante">Gestante / esperando bebê</option>
+          <option value="mae_pai">Mãe ou pai</option>
+          <option value="avos">Avó ou avô</option>
+          <option value="padrinhos">Padrinho, madrinha, tio(a)</option>
+          <option value="noivos">Noivos</option>
+          <option value="presente">Quero dar de presente</option>
+          <option value="outro">Outro</option>
+        </Select>
+      </Field>
+      <Field label="Sua idade" htmlFor="lead-age" optional>
+        <Select id="lead-age" name="age_range" defaultValue={f.age_range ?? ""}>
+          <option value="">Prefiro não dizer</option>
+          {["18-24", "25-34", "35-44", "45-54", "55+"].map((a) => (
+            <option key={a} value={a}>{a} anos</option>
+          ))}
+        </Select>
       </Field>
       <Field label={kind === "event" ? "Conta do evento" : "Conta um pouquinho"} htmlFor="lead-message" optional className="sm:col-span-2">
         <Textarea

@@ -26,6 +26,9 @@ $$;
 create or replace function auth.role() returns text language sql stable as $$
   select (nullif(current_setting('request.jwt.claims', true), '')::jsonb ->> 'role')
 $$;
+create or replace function auth.jwt() returns jsonb language sql stable as $$
+  select coalesce(nullif(current_setting('request.jwt.claims', true), ''), '{}')::jsonb
+$$;
 grant execute on all functions in schema auth to anon, authenticated, service_role;
 
 create table storage.buckets (

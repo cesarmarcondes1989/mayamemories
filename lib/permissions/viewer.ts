@@ -136,5 +136,9 @@ export async function requirePlatformAdmin() {
   const viewer = await getViewer();
   if (!viewer) redirect("/entrar?next=/plataforma");
   if (!viewer.isPlatformAdmin) redirect("/inicio");
+  // Dono da plataforma: sempre com 2 fatores (o banco também exige aal2)
+  const supabase = await createClient();
+  const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+  if (aal?.currentLevel !== "aal2") redirect("/verificacao");
   return viewer;
 }

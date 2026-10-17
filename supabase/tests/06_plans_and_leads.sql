@@ -4,7 +4,7 @@ insert into auth.users (id, email) values
   ('00000000-0000-0000-0000-0000000000a6', 'adm6@example.com'),
   ('00000000-0000-0000-0000-0000000000c6', 'c6@example.com');
 select public.bootstrap_first_admin('adm6@example.com', 'Admin', 'pai');
-select tests.login('00000000-0000-0000-0000-0000000000a6');
+select tests.login_mfa('00000000-0000-0000-0000-0000000000a6');
 insert into public.people (vault_id, id, display_name) values (tests.vault(), '10000000-0000-0000-0000-0000000000c6', 'C6');
 select public.admin_create_invitation('10000000-0000-0000-0000-0000000000c6', 'c6@example.com');
 update public.plans set active = false where key = 'legado';
@@ -29,7 +29,14 @@ update public.plans set price_monthly_cents = 1 where key = 'ninho';
 select tests.expect_count($$ select * from public.plans where price_monthly_cents = 1 $$, 0, 'family member cannot edit plans');
 reset role;
 
+-- Sem o segundo fator, nem o dono da plataforma lê interessados
 select tests.login('00000000-0000-0000-0000-0000000000a6');
+select tests.expect_count($$ select * from public.leads $$, 0, 'platform admin without MFA cannot read leads');
+update public.plans set price_monthly_cents = 7 where key = 'ninho';
+select tests.expect_error($$ select public.platform_analytics(30) $$, 'analytics needs MFA');
+reset role;
+select tests.login_mfa('00000000-0000-0000-0000-0000000000a6');
+select tests.expect_count($$ select * from public.plans where price_monthly_cents = 7 $$, 0, 'platform admin without MFA cannot edit plans');
 select tests.expect_count($$ select * from public.plans $$, 5, 'platform admin sees inactive plans');
 select tests.expect_count($$ select * from public.leads where phone = '11988887777' and plan_key is null $$, 1, 'phone normalized');
 update public.plans set price_monthly_cents = 2990 where key = 'ninho';
