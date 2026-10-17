@@ -1,3 +1,11 @@
+## Exportação pelo painel (ZIP)
+
+Em **Admin → Exportação**, o botão “Baixar tudo” gera um ZIP montado em fluxo no servidor (sem carregar tudo na
+memória), dividido em partes de ~500 MB para caber no tempo máximo da função (300 s na Vercel). A parte 1 traz
+`index.html` (abre offline com a história inteira), `LEIA-ME.txt`, `manifest.json` e planilhas em `dados/`.
+As mídias ficam em `media/ANO/fotos|videos|audios/` com a data do momento no nome. Extraia todas as partes
+na mesma pasta.
+
 # Backup, exportação e restauração
 
 Um arquivo de família para décadas não pode depender de uma única conta ou provedor.

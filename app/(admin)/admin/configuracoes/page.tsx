@@ -8,7 +8,6 @@ import { Field, Input, Select } from "@/components/ui/field";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { Alert, PageHeader } from "@/components/ui/misc";
 import { Badge } from "@/components/ui/badge";
-import { formatDateTime } from "@/lib/format";
 
 export const metadata: Metadata = { title: "Configurações" };
 
@@ -28,10 +27,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
   const viewer = await requireAdmin();
   const s = await getSettings();
   const supabase = await createClient();
-  const [{ data: rel }, { data: jobs }] = await Promise.all([
-    supabase.from("relationship_types").select("key, label, active").order("sort_order"),
-    supabase.from("notification_jobs").select("id, event_type, status, attempts, last_error, created_at").eq("vault_id", viewer.vault.id).order("created_at", { ascending: false }).limit(15),
-  ]);
+  const { data: rel } = await supabase.from("relationship_types").select("key, label, active").order("sort_order");
   const mb = (b: number) => Math.round(b / 1024 / 1024);
   return (
     <div className="max-w-3xl space-y-6">
@@ -129,25 +125,6 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
         )}
       </Card>
 
-      <Card className="p-6">
-        <h2 className="text-2xl">Automações (n8n)</h2>
-        <p className="mt-1 text-[15px] text-taupe">
-          O n8n consome a fila de notificações por endpoints autenticados. A autorização de abertura de cápsulas permanece no banco. Veja docs/automations.md.
-        </p>
-        <ul className="mt-3 divide-y divide-line text-sm">
-          {(jobs ?? []).map((j) => (
-            <li key={j.id} className="flex justify-between gap-2 py-2">
-              <span>
-                <code>{j.event_type}</code> {j.last_error && <span className="text-danger">· {j.last_error}</span>}
-              </span>
-              <span className="text-taupe">
-                {j.status} · {j.attempts}x · {formatDateTime(j.created_at)}
-              </span>
-            </li>
-          ))}
-          {(jobs ?? []).length === 0 && <li className="py-2 text-taupe">Nenhuma notificação na fila.</li>}
-        </ul>
-      </Card>
     </div>
   );
 }
