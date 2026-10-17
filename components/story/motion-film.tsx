@@ -525,7 +525,7 @@ export function MotionFilm({ script, items, subject, contributors, music }: {
           font(800, 20, f.body);
           ctx.fillStyle = "rgba(255,255,255,.85)";
           ctx.globalAlpha = easeOut(prog(lt, 0.3, 0.8)) * (1 - exit);
-          ctx.fillText(`C A P Í T U L O   ${chapter}`, W / 2, H / 2 - (vertical ? 200 : 130) * u);
+          ctx.fillText(`C A P Í T U L O   ${chapter}`, W / 2, H / 2 - (vertical ? 330 : 130) * u);
           ctx.globalAlpha = 1 - exit;
           kinetic(act.heading, W / 2, H / 2 - 20 * u, W - 120 * u, 0.4, { size: vertical ? 150 : 130, family: f.display, color: C.white, maxLines: 2, stagger: 0.14 });
           font(500, 28, f.body);

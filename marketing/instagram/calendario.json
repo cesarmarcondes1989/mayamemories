@@ -1,0 +1,163 @@
+{
+  "links": {
+    "bio": "https://mayamemories.vercel.app/?utm_source=instagram&utm_medium=bio&utm_campaign=perfil",
+    "demo_stories": "https://mayamemories.vercel.app/demo?utm_source=instagram&utm_medium=stories&utm_campaign=demo"
+  },
+  "hashtags": {
+    "maes": "#maternidade #maedeprimeiraviagem #gravidez #gestante #bebe #memoriasdefamilia #chadebebe",
+    "familia": "#familia #avó #avos #memorias #cartaparaofuturo #paternidade #maternidadereal"
+  },
+  "dias": [
+    {
+      "pasta": "semana-1/1-seg-19-10",
+      "dia": "Segunda, 19/10",
+      "feed": {
+        "hora": "19h30",
+        "tipo": "Reel",
+        "titulo": "Quando você crescer",
+        "arquivos": ["../videos/out/guardei-reel-quando-crescer-22s.mp4", "pecas/capa-reel-manifesto.png"],
+        "como": "Novo Reel → escolha o vídeo → Capa: 'Adicionar da galeria' e escolha capa-reel-manifesto.png → cole a legenda → Compartilhar. Depois de publicado: nos três pontinhos do Reel, 'Fixar no perfil'.",
+        "legenda": "Um dia ela vai ter 18 anos. E vai perguntar como foi. 🤍\n\nA voz da vó cantando. A primeira palavra. O dia em que ela chegou.\nHoje, tudo isso se perde num celular.\n\nO Guardei pra você é o baú da família: cada um guarda um pouco, e a criança abre quando crescer.\n\nCrie o baú da sua família, grátis. Link na bio.\n\n#maternidade #maedeprimeiraviagem #gravidez #gestante #bebe #memoriasdefamilia #chadebebe"
+      },
+      "stories": [
+        { "arquivo": null, "como": "Logo depois de postar o Reel: compartilhe o Reel nos stories e escreva 'novo 🤍'." },
+        { "arquivo": "pecas/st-enquete-fotos.png", "como": "Figurinha ENQUETE no espaço vazio do meio. Opções: 'No celular 📱' e 'Bem guardadas 🔐'." }
+      ]
+    },
+    {
+      "pasta": "semana-1/2-ter-20-10",
+      "dia": "Terça, 20/10",
+      "stories": [
+        { "arquivo": "pecas/st-pergunta-infancia.png", "como": "Figurinha CAIXINHA DE PERGUNTAS no meio, com o texto 'Conta aqui 👇'. Guarde as respostas: elas viram story no sábado da semana 2." }
+      ]
+    },
+    {
+      "pasta": "semana-1/3-qua-21-10",
+      "dia": "Quarta, 21/10",
+      "feed": {
+        "hora": "12h",
+        "tipo": "Carrossel (8 imagens)",
+        "titulo": "6 coisas que nenhum álbum guarda",
+        "arquivos": ["pecas/c1-1.png", "pecas/c1-2.png", "pecas/c1-3.png", "pecas/c1-4.png", "pecas/c1-5.png", "pecas/c1-6.png", "pecas/c1-7.png", "pecas/c1-8.png"],
+        "como": "Novo post → selecione as 8 imagens NA ORDEM (1 a 8) → formato 4:5 (retrato) → cole a legenda.",
+        "legenda": "Salva pra não esquecer 📌\n\n6 coisas que nenhum álbum guarda:\n1. A voz da vó cantando pra ele dormir\n2. A primeira palavra, do jeitinho torto que saiu\n3. A carta que o pai escreveu na noite em que ele nasceu\n4. O recado da dinda no chá de bebê\n5. O vídeo da primeira risada\n6. A família inteira contando a história dele\n\nQual dessas você ainda não guardou? Conta aqui 👇\n\nDá pra guardar tudo num baú só da família, e a criança abre quando crescer. Link na bio, é grátis.\n\n#maternidade #maedeprimeiraviagem #gravidez #bebe #memoriasdefamilia #avó #cartaparaofuturo"
+      },
+      "stories": [
+        { "arquivo": null, "como": "Compartilhe o carrossel nos stories com o texto 'salva esse 📌'." }
+      ]
+    },
+    {
+      "pasta": "semana-1/4-qui-22-10",
+      "dia": "Quinta, 22/10",
+      "stories": [
+        { "arquivo": "pecas/st-isto-aquilo.png", "como": "Figurinha ENQUETE no meio. Opções: 'Carta ✉️' e 'Áudio da vó 🎙️'." }
+      ]
+    },
+    {
+      "pasta": "semana-1/5-sex-23-10",
+      "dia": "Sexta, 23/10",
+      "feed": {
+        "hora": "19h30",
+        "tipo": "Reel",
+        "titulo": "Como funciona",
+        "arquivos": ["../videos/out/guardei-video1-motion-52s.mp4", "pecas/capa-reel-como-funciona.png"],
+        "como": "Novo Reel → vídeo → Capa 'Adicionar da galeria' com capa-reel-como-funciona.png → legenda → Compartilhar.",
+        "legenda": "Como funciona, em menos de 1 minuto 👇\n\n1. Você cria o baú, grátis\n2. A família entra pelo QR ou pelo ursinho. Sem app, sem senha\n3. Cada um guarda fotos, vídeos, áudios e cartas\n4. A criança abre quando crescer\n\nQuer ver um baú funcionando? Tem uma demonstração aberta, com a família da Alice. Link na bio.\n\n#maternidade #gravidez #bebe #chadebebe #memoriasdefamilia #familia #avós"
+      },
+      "stories": [
+        { "arquivo": null, "como": "Compartilhe o Reel nos stories." },
+        { "arquivo": "pecas/st-demo.png", "como": "Figurinha LINK com o endereço abaixo e o texto 'ver a demonstração'. Coloque no espaço vazio embaixo das fotos.", "link": "demo_stories" }
+      ]
+    },
+    {
+      "pasta": "semana-1/6-sab-24-10",
+      "dia": "Sábado, 24/10",
+      "stories": [
+        { "arquivo": "pecas/st-slider-chora.png", "como": "Figurinha SLIDER (barra de emoji) no meio, com o emoji 😭." }
+      ]
+    },
+    {
+      "pasta": "semana-1/7-dom-25-10",
+      "dia": "Domingo, 25/10",
+      "stories": [
+        { "arquivo": "pecas/st-fds.png", "como": "Figurinha ADICIONE O SEU no meio, com o texto 'uma foto de hoje 📸'." }
+      ]
+    },
+    {
+      "pasta": "semana-2/1-seg-26-10",
+      "dia": "Segunda, 26/10",
+      "feed": {
+        "hora": "12h",
+        "tipo": "Carrossel (7 imagens)",
+        "titulo": "Como funciona em 4 passos",
+        "arquivos": ["pecas/c2-1.png", "pecas/c2-2.png", "pecas/c2-3.png", "pecas/c2-4.png", "pecas/c2-5.png", "pecas/c2-6.png", "pecas/c2-7.png"],
+        "como": "Novo post → as 7 imagens NA ORDEM → formato 4:5 → legenda. O QR code do slide 3 abre a demonstração de verdade.",
+        "legenda": "Sem app. Sem senha. A família inteira guarda junto. 🧸\n\n1. Crie o baú: grátis, em 1 minuto\n2. Chame a família: pelo QR code ou pelo ursinho. A vó também consegue\n3. Cada um guarda: foto, vídeo, áudio e carta (a carta pode ficar trancada até os 18)\n4. O resto é com a gente: no fim do ano, o filme e o livro ficam prontos sozinhos\n\nÉ privado, sem anúncios, e você baixa tudo quando quiser.\n\nAponte a câmera pro QR do 3º slide e veja a demonstração. Ou link na bio.\n\n#maternidade #gravidez #gestante #bebe #memoriasdefamilia #avós #familia"
+      },
+      "stories": [
+        { "arquivo": null, "como": "Compartilhe o carrossel nos stories com o texto 'arrasta até o fim 👉'." },
+        { "arquivo": "pecas/st-carta.png", "como": "Sem figurinha. Se quiser, adicione a figurinha REAÇÃO com 🥹." }
+      ]
+    },
+    {
+      "pasta": "semana-2/2-ter-27-10",
+      "dia": "Terça, 27/10",
+      "stories": [
+        { "arquivo": "pecas/st-vo-qr.png", "como": "Escreva no espaço de baixo: 'marca aqui a vó que ia amar isso 👵'." }
+      ]
+    },
+    {
+      "pasta": "semana-2/3-qua-28-10",
+      "dia": "Quarta, 28/10",
+      "feed": {
+        "hora": "19h30",
+        "tipo": "Reel",
+        "titulo": "Um ano virou filme",
+        "arquivos": ["../videos/out/guardei-reel-filme-49s.mp4", "pecas/capa-reel-filme.png"],
+        "como": "Novo Reel → vídeo → Capa 'Adicionar da galeria' com capa-reel-filme.png → legenda → Compartilhar.",
+        "legenda": "A família mandou fotos o ano todo. Isso aqui se montou sozinho. 🎬\n\nNinguém editou nada: o Guardei pra você junta o que a família guardou e monta o filme e o livro do ano, prontos pra baixar.\n\nEsse é o baú de demonstração da Alice. Dá pra entrar e ver tudo: link na bio.\n\n#maternidade #bebe #primeiroano #memoriasdefamilia #mesversario #familia #maedeprimeiraviagem"
+      },
+      "stories": [
+        { "arquivo": null, "como": "Compartilhe o Reel nos stories." },
+        { "arquivo": "pecas/st-demo.png", "como": "Figurinha LINK com o endereço abaixo, texto 'ver o filme da Alice'.", "link": "demo_stories" }
+      ]
+    },
+    {
+      "pasta": "semana-2/4-qui-29-10",
+      "dia": "Quinta, 29/10",
+      "stories": [
+        { "arquivo": "pecas/st-pergunta-18.png", "como": "Figurinha CAIXINHA DE PERGUNTAS no meio, texto 'Conta aqui 👇'." }
+      ]
+    },
+    {
+      "pasta": "semana-2/5-sex-30-10",
+      "dia": "Sexta, 30/10",
+      "feed": {
+        "hora": "19h30",
+        "tipo": "Reel",
+        "titulo": "Cada um guarda um pouco",
+        "arquivos": ["../videos/out/guardei-video2-familia-50s.mp4", "pecas/capa-reel-familia.png"],
+        "como": "Novo Reel → vídeo → Capa 'Adicionar da galeria' com capa-reel-familia.png → legenda → Compartilhar.",
+        "legenda": "A mamãe fotografa. A vó grava. O tio filma. A dinda escreve.\nE aos 18, ela abre tudo. 🧸\n\nMarca aqui quem da sua família guardaria uma carta pra sua criança 👇\n\nCrie o baú da sua família, grátis. Link na bio.\n\n#familia #avó #avos #maternidade #memorias #cartaparaofuturo #madrinha"
+      },
+      "stories": [
+        { "arquivo": null, "como": "Compartilhe o Reel nos stories." },
+        { "arquivo": "pecas/st-enquete-quem.png", "como": "Figurinha ENQUETE no meio. Opções: 'Mãe 👩' e 'Vó 👵'." }
+      ]
+    },
+    {
+      "pasta": "semana-2/6-sab-31-10",
+      "dia": "Sábado, 31/10",
+      "stories": [
+        { "arquivo": null, "como": "Abra as respostas das caixinhas (terça 20/10 e quinta 29/10) e compartilhe as 3 mais bonitas, uma por story, com fundo rosa. Peça autorização se a resposta tiver nome." }
+      ]
+    },
+    {
+      "pasta": "semana-2/7-dom-01-11",
+      "dia": "Domingo, 01/11",
+      "stories": [
+        { "arquivo": "pecas/st-fds.png", "como": "Figurinha ADICIONE O SEU no meio, texto 'uma foto de hoje 📸'." }
+      ]
+    }
+  ]
+}

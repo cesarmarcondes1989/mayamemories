@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Guardei pra você — peças do Instagram</title>
+<link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&family=Caveat:wght@500;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root { --cream:#fdf3f4; --paper:#fffafa; --rose:#f6d3da; --deep:#d97a92; --soft:#fbe8ec; --ink:#4a3b40; --taupe:#8a7178; --line:#f1dfe3; --sage:#a8c3b0; }
+  * { box-sizing: border-box; margin: 0; }
+  body { font-family: Nunito, sans-serif; color: var(--ink); background: #ddd; }
+  .slide { position: relative; overflow: hidden; width: 1080px; background: radial-gradient(120% 80% at 50% 0%, #fff8f9 0%, var(--cream) 55%, #f9e4e9 100%); }
+  .feed { height: 1350px; }
+  .story { height: 1920px; }
+  .square { height: 1080px; }
+  .grain { position:absolute; inset:0; opacity:.5; background-image: radial-gradient(rgba(217,122,146,.09) 1.2px, transparent 1.2px); background-size: 7px 7px; pointer-events:none; }
+  .display { font-family: "Amatic SC", cursive; font-weight: 700; line-height: .92; letter-spacing: .5px; }
+  .hand { font-family: Caveat, cursive; }
+  .rose { color: var(--deep); }
+  .taupe { color: var(--taupe); }
+  .kicker { font-weight: 900; letter-spacing: 6px; font-size: 26px; color: var(--deep); text-transform: uppercase; }
+  .foot { position:absolute; left: 80px; right: 80px; bottom: 56px; display:flex; justify-content: space-between; align-items: center; }
+  .foot .brand { font-family: "Amatic SC"; font-weight:700; font-size: 46px; color: var(--deep); }
+  .foot .page { font-weight: 800; font-size: 24px; color: var(--taupe); letter-spacing: 2px; }
+  .pic { border-radius: 48px; overflow: hidden; box-shadow: 0 30px 60px rgba(150,80,100,.18); background: var(--soft); }
+  .pic img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; display:block; }
+  .card { background: var(--paper); border-radius: 40px; box-shadow: 0 24px 50px rgba(150,80,100,.14); }
+  .heart { display:inline-block; }
+  .pill { display:inline-block; padding: 18px 40px; border-radius: 80px; background: var(--deep); color:#fff; font-weight: 900; font-size: 34px; box-shadow: 0 16px 30px rgba(217,122,146,.35); }
+  .num { font-family: "Amatic SC"; font-weight:700; font-size: 220px; line-height: .8; color: var(--deep); }
+  .row { display:flex; gap: 24px; align-items: center; }
+  .ico { width: 96px; height: 96px; border-radius: 30px; background: var(--soft); display:grid; place-items:center; font-size: 50px; flex-shrink: 0; }
+  .item b { display:block; font-size: 34px; }
+  .item span { font-size: 26px; color: var(--taupe); }
+  .center { position:absolute; left:0; right:0; text-align:center; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+const HEART = (size, color = "#d97a92", fill = true) => `<svg class="heart" width="${size}" height="${size * 44 / 48}" viewBox="0 0 48 44"><path d="M24 40C14 33 5 26 4.5 16.5 4.2 10 8.8 5 14.6 5c4.3 0 7.4 2.6 9.4 6.2C26 7.6 29.1 5 33.4 5 39.2 5 43.8 10 43.5 16.5 43 26 34 33 24 40Z" fill="${fill ? color : "none"}" stroke="${color}" stroke-width="2.6" stroke-linejoin="round"/></svg>`;
+const IMG = (f) => `../../public/demo/${f}`;
+const foot = (page) => `<div class="foot"><span class="brand">guardei pra você ${HEART(34)}</span><span class="page">${page ?? ""}</span></div>`;
+
+// ---------------------------------------------------------------- carrossel 1
+const c1Items = [
+  ["vo.jpg", "A voz da vó cantando pra ele dormir."],
+  ["sorriso.jpg", "A primeira palavra, do jeitinho torto que saiu."],
+  ["papai.jpg", "A carta que o pai escreveu na noite em que ele nasceu."],
+  ["cha.jpg", "O recado da dinda no chá de bebê."],
+  ["banho.jpg", "O vídeo da primeira risada. Aquele que está num celular que vai quebrar."],
+  ["nascimento.jpg", "A família inteira contando a história dele."],
+];
+const S = {};
+S["c1-1"] = { cls: "feed", html: `<div class="grain"></div>
+  <div style="position:absolute;left:90px;top:120px;right:90px">
+    <div class="kicker">salve pra não esquecer</div>
+    <div class="display" style="font-size:170px;margin-top:30px">6 coisas que <span class="rose">nenhum álbum</span> guarda</div>
+    <div class="hand taupe" style="font-size:64px;margin-top:26px">e que o seu filho vai querer muito, um dia</div>
+  </div>
+  <div class="pic" style="position:absolute;left:90px;bottom:170px;width:300px;height:360px;transform:rotate(-5deg)"><img src="${IMG("vo.jpg")}"></div>
+  <div class="pic" style="position:absolute;left:390px;bottom:150px;width:300px;height:360px;transform:rotate(3deg)"><img src="${IMG("papai.jpg")}"></div>
+  <div class="pic" style="position:absolute;left:690px;bottom:180px;width:300px;height:360px;transform:rotate(-2deg)"><img src="${IMG("cha.jpg")}"></div>
+  ${foot("arraste →")}` };
+c1Items.forEach(([img, text], i) => {
+  S[`c1-${i + 2}`] = { cls: "feed", html: `<div class="grain"></div>
+    <div class="pic" style="position:absolute;left:90px;right:90px;top:90px;height:700px"><img src="${IMG(img)}"></div>
+    <div style="position:absolute;left:90px;right:90px;top:840px" class="row">
+      <div class="num" style="align-self:flex-start">${i + 1}</div>
+      <div class="display" style="font-size:${text.length > 60 ? 96 : 116}px;line-height:1">${text}</div>
+    </div>
+    ${foot(`${i + 2}/8`)}` };
+});
+S["c1-8"] = { cls: "feed", html: `<div class="grain"></div>
+  <div class="center" style="top:200px">${HEART(150)}</div>
+  <div class="center display" style="top:400px;font-size:132px;padding:0 90px">Dá pra guardar tudo isso num <span class="rose">baú só da família</span>.</div>
+  <div class="center hand taupe" style="top:800px;font-size:70px">e a criança abre quando crescer</div>
+  <div class="center" style="top:960px"><span class="pill">Crie o seu grátis · link na bio</span></div>
+  ${foot("8/8")}` };
+
+// ---------------------------------------------------------------- carrossel 2
+const phone = (inner, h = 760) => `<div style="width:520px;height:${h}px;border-radius:70px;background:#3b3035;padding:18px;box-shadow:0 40px 80px rgba(120,60,80,.25)"><div style="width:100%;height:100%;border-radius:54px;background:var(--cream);overflow:hidden;padding:70px 34px 30px;position:relative">${inner}</div></div>`;
+S["c2-1"] = { cls: "feed", html: `<div class="grain"></div>
+  <div style="position:absolute;left:90px;right:90px;top:150px">
+    <div class="kicker">como funciona</div>
+    <div class="display" style="font-size:210px;margin-top:30px">Sem app.<br>Sem senha.</div>
+    <div class="display rose" style="font-size:120px;margin-top:40px">A família inteira guarda junto.</div>
+  </div>
+  <div style="position:absolute;right:90px;bottom:170px;font-size:180px">🧸</div>
+  <div style="position:absolute;left:90px;bottom:200px" class="hand taupe"><span style="font-size:60px">4 passos, arraste →</span></div>
+  ${foot("1/7")}` };
+const step = (n, title, sub, visual, page) => ({ cls: "feed", html: `<div class="grain"></div>
+  <div style="position:absolute;left:90px;right:90px;top:110px">
+    <div class="row"><div class="num" style="font-size:180px">${n}</div><div class="display" style="font-size:120px">${title}</div></div>
+    <div style="font-size:40px;font-weight:700;margin-top:24px;line-height:1.35">${sub}</div>
+  </div>
+  <div style="position:absolute;left:0;right:0;top:470px;bottom:130px;display:flex;justify-content:center;align-items:center"><div style="transform:scale(1.18)">${visual}</div></div>
+  ${foot(page)}` });
+S["c2-2"] = step(1, "Crie o baú", "Grátis, em 1 minuto. Só o nome da criança e o seu e-mail.", phone(`
+  <div class="display" style="font-size:60px;text-align:center">Vamos criar seu baú</div>
+  <div class="taupe" style="text-align:center;font-size:24px;margin-top:6px">Grátis, em um minuto.</div>
+  <div style="margin-top:22px;font-weight:800;font-size:22px">Nome da criança</div>
+  <div style="margin-top:8px;height:70px;border:3px solid var(--line);border-radius:24px;background:var(--paper);font-size:30px;padding:14px 22px">Alice</div>
+  <div style="margin-top:16px;font-weight:800;font-size:22px">Seu e-mail</div>
+  <div style="margin-top:8px;height:70px;border:3px solid var(--line);border-radius:24px;background:var(--paper);font-size:30px;padding:14px 22px;color:var(--taupe)">voce@email.com</div>
+  <div style="margin-top:26px;height:80px;border-radius:60px;background:var(--deep);color:#fff;font-weight:900;font-size:30px;display:grid;place-items:center">Criar meu baú grátis ♡</div>`, 640), "2/7");
+S["c2-3"] = step(2, "Chame a família", "Cada um entra pelo QR code ou encostando o celular no ursinho. A vó também.", `
+  <div class="row" style="gap:60px">
+    <div class="card" style="padding:40px;text-align:center"><div id="qr" style="width:360px;height:360px"></div><div class="hand taupe" style="font-size:44px;margin-top:10px">aponte a câmera</div></div>
+    <div style="text-align:center"><div style="font-size:220px;line-height:1">🧸</div><div class="hand taupe" style="font-size:44px">ou encoste o celular</div></div>
+  </div>`, "3/7");
+const mem = (ico, t, s) => `<div class="card item row" style="padding:24px 30px;margin-top:18px;width:760px"><div class="ico">${ico}</div><div><b>${t}</b><span>${s}</span></div></div>`;
+S["c2-4"] = step(3, "Cada um guarda", "Foto, vídeo, áudio e carta. A carta pode ficar trancada até os 18 anos.", `<div>
+  ${mem("🎙️", "A vó cantando", "áudio · 1min12 · vó Lúcia")}
+  ${mem("📸", "Primeiro banho", "foto · mamãe")}
+  ${mem("🎥", "A primeira risada", "vídeo · papai")}
+  ${mem("✉️", "Carta para os seus 18", "🔒 abre em 12/05/2044 · dinda Bia")}</div>`, "4/7");
+S["c2-5"] = step(4, "O resto é com a gente", "No fim do ano, o filme e o livro ficam prontos sozinhos. Você não edita nada.", `
+  <div class="row" style="gap:50px;align-items:flex-end">
+    <div style="width:340px;height:604px;border-radius:40px;overflow:hidden;box-shadow:0 30px 60px rgba(120,60,80,.25)"><img src="assets/filme-quadro.png" style="width:100%;height:100%;object-fit:cover"></div>
+    <div style="width:420px;height:420px;border-radius:14px;background:var(--rose);box-shadow:0 30px 60px rgba(120,60,80,.25), inset 18px 0 0 rgba(0,0,0,.06);padding:40px;text-align:center;position:relative">
+      <div class="pic" style="width:250px;height:250px;margin:0 auto;border-radius:20px"><img src="${IMG("sorriso.jpg")}"></div>
+      <div class="display" style="font-size:58px;margin-top:22px">O primeiro ano da Alice</div>
+    </div>
+  </div>`, "5/7");
+S["c2-6"] = { cls: "feed", html: `<div class="grain"></div>
+  <div class="center" style="top:210px;font-size:200px">🔒</div>
+  <div class="center display" style="top:470px;font-size:190px">Só a família vê.</div>
+  <div class="center" style="top:720px;font-size:44px;font-weight:700;line-height:1.45;padding:0 140px">Privado, sem anúncios. E você baixa tudo num arquivo ZIP quando quiser: fotos, vídeos, áudios e cartas.</div>
+  ${foot("6/7")}` };
+S["c2-7"] = { cls: "feed", html: `<div class="grain"></div>
+  <div class="center display" style="top:170px;font-size:150px;padding:0 90px">Quer ver um baú <span class="rose">funcionando</span>?</div>
+  <div class="row" style="position:absolute;left:0;right:0;top:560px;justify-content:center;gap:28px">
+    <div class="pic" style="width:250px;height:300px;transform:rotate(-4deg)"><img src="${IMG("vo.jpg")}"></div>
+    <div class="pic" style="width:250px;height:300px;transform:rotate(2deg)"><img src="${IMG("sorriso.jpg")}"></div>
+    <div class="pic" style="width:250px;height:300px;transform:rotate(-1deg)"><img src="${IMG("passeio.jpg")}"></div>
+  </div>
+  <div class="center hand taupe" style="top:930px;font-size:60px">entre no baú de demonstração da Alice</div>
+  <div class="center" style="top:1040px"><span class="pill">Link na bio · é grátis</span></div>
+  ${foot("7/7")}` };
+
+// ---------------------------------------------------------------- stories (área livre para figurinhas: y 1050–1500)
+const story = (top, bottom = "") => ({ cls: "story", html: `<div class="grain"></div>${top}${bottom}
+  <div class="center" style="bottom:300px"><span style="font-family:'Amatic SC';font-weight:700;font-size:56px;color:var(--deep)">guardei pra você ${HEART(40)}</span></div>` });
+const q = (kicker, text, size = 170) => `<div class="center" style="top:330px;padding:0 90px"><div class="kicker">${kicker}</div><div class="display" style="font-size:${size}px;margin-top:30px">${text}</div></div>`;
+S["st-enquete-fotos"] = story(q("enquete", "Onde estão as fotos do seu filho <span class='rose'>hoje</span>?"));
+S["st-pergunta-infancia"] = story(q("caixinha", "Qual lembrança da <span class='rose'>sua infância</span> você queria ter guardada?", 140));
+S["st-slider-chora"] = story(q("seja sincera", "Quanto você chora vendo <span class='rose'>vídeo antigo</span> da família?", 150));
+S["st-isto-aquilo"] = story(q("isto ou aquilo", "Uma carta escrita à mão ou um <span class='rose'>áudio da vó</span>?", 150));
+S["st-demo"] = story(`<div class="center" style="top:300px;padding:0 90px"><div class="kicker">sem cadastro</div><div class="display" style="font-size:150px;margin-top:30px">Entre num baú de <span class="rose">verdade</span></div><div class="hand taupe" style="font-size:60px;margin-top:20px">a família da Alice deixou você espiar</div></div>
+  <div class="row" style="position:absolute;left:0;right:0;top:880px;justify-content:center;gap:26px">
+    <div class="pic" style="width:280px;height:340px;transform:rotate(-4deg)"><img src="${IMG("vo.jpg")}"></div>
+    <div class="pic" style="width:280px;height:340px;transform:rotate(3deg)"><img src="${IMG("tio.jpg")}"></div></div>`);
+S["st-carta"] = story(`<div class="center" style="top:300px;padding:0 90px"><div class="kicker">você sabia?</div><div class="display" style="font-size:140px;margin-top:30px">A carta fica <span class="rose">trancada</span> até a data que você escolher</div></div>
+  <div class="card" style="position:absolute;left:150px;right:150px;top:930px;padding:60px;transform:rotate(-2deg)">
+    <div class="hand" style="font-size:56px;line-height:1.2">Filha, hoje você fez um mês. Quando ler isto, já vai ser maior que eu…</div>
+    <div class="row" style="margin-top:36px;justify-content:space-between"><span class="hand taupe" style="font-size:40px">— mamãe</span><span style="background:var(--deep);color:#fff;border-radius:40px;padding:12px 26px;font-weight:900;font-size:28px">🔒 abre aos 18</span></div></div>`);
+S["st-vo-qr"] = story(`<div class="center" style="top:300px;padding:0 90px"><div class="kicker">para os avós</div><div class="display" style="font-size:150px;margin-top:30px">Sem app. Sem senha. <span class="rose">A vó consegue.</span></div></div>
+  <div class="row" style="position:absolute;left:0;right:0;top:900px;justify-content:center;gap:50px"><div class="pic" style="width:360px;height:440px"><img src="${IMG("vo.jpg")}"></div><div style="text-align:left"><div style="font-size:200px;line-height:1">🧸</div><div class="hand taupe" style="font-size:50px;width:300px">encosta o celular e grava a voz</div></div></div>`);
+S["st-fds"] = story(q("fim de semana", "Missão: guardar <span class='rose'>1 foto de hoje</span> pra quando ele crescer", 150), `<div class="center hand taupe" style="top:900px;font-size:64px;padding:0 120px">não precisa ser perfeita.<br>precisa ser de verdade.</div>`);
+S["st-pergunta-18"] = story(q("caixinha", "O que você guardaria pro seu filho <span class='rose'>abrir aos 18</span>?", 150));
+S["st-enquete-quem"] = story(q("enquete", "Quem da sua família <span class='rose'>mais guarda</span> foto?", 160));
+
+// ---------------------------------------------------------------- capas dos Reels (texto dentro da área 1080x1350 central)
+const cover = (img, line1, line2) => ({ cls: "story", html: `${img ? `<img src="${IMG(img)}" style="position:absolute;left:0;top:0;width:100%;height:2300px;object-fit:cover;object-position:top">` : `<div class="grain"></div><div class="center" style="top:560px">${HEART(300)}</div>`}
+  <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(253,243,244,.15) 0%,rgba(253,243,244,0) 40%,rgba(74,59,64,.65) 100%)"></div>
+  <div class="center" style="top:1180px;padding:0 90px;color:#fff"><div class="display" style="font-size:150px;text-shadow:0 6px 30px rgba(0,0,0,.25)">${line1}</div><div class="hand" style="font-size:64px;margin-top:10px">${line2}</div></div>` });
+S["capa-reel-manifesto"] = cover("vo.jpg", "Quando você crescer", "a vó deixou isso guardado");
+S["capa-reel-como-funciona"] = cover(null, "Como funciona", "em menos de 1 minuto");
+S["capa-reel-filme"] = cover("sorriso.jpg", "Um ano virou filme", "e ninguém editou nada");
+S["capa-reel-familia"] = cover("tio.jpg", "Cada um guarda um pouco", "e aos 18 ela abre tudo");
+
+// ---------------------------------------------------------------- perfil
+S["perfil-foto"] = { cls: "square", html: `<div style="position:absolute;inset:0;background:var(--deep)"></div><div class="center" style="top:300px">${HEART(330, "#fff")}</div><div class="center display" style="top:700px;color:#fff;font-size:120px">guardei</div>` };
+const hl = (icon, label) => ({ cls: "story", html: `<div style="position:absolute;inset:0;background:var(--soft)"></div><div class="center" style="top:760px;font-size:300px;line-height:1">${icon}</div><div class="center display rose" style="top:1120px;font-size:90px">${label}</div>` });
+S["destaque-como-funciona"] = hl("🧸", "como funciona");
+S["destaque-demo"] = hl("👀", "demonstração");
+S["destaque-planos"] = hl("🎁", "planos");
+S["destaque-duvidas"] = hl("💬", "dúvidas");
+
+window.SLIDES = S;
+window.show = (id) => {
+  const s = S[id];
+  document.getElementById("root").innerHTML = `<div class="slide ${s.cls}" id="slide">${s.html}</div>`;
+  if (window.QR && document.getElementById("qr")) document.getElementById("qr").innerHTML = window.QR;
+};
+show(location.hash.slice(1) || "c1-1");
+</script>
+</body>
+</html>

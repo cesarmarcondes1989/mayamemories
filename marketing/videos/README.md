@@ -9,6 +9,10 @@ em alta.
 | `out/guardei-video1-motion-52s.mp4` | 52 s | Manifesto + produto: a dor, a marca, o site em 3 passos, "18 anos depois", CTA |
 | `out/guardei-video2-familia-50s.mp4` | 50 s | A família guardando (mãe, vó, tio, dinda) → baú → filme e livro → "aos 18, ela abre tudo" |
 | `out/guardei-teaser-15s.mp4` | 15 s | Corte para anúncio pago: gancho + marca + CTA |
+| `out/guardei-reel-quando-crescer-22s.mp4` | 22 s | Reel manifesto "Quando você crescer" (`reel-quando-crescer.html`) |
+| `out/guardei-reel-filme-49s.mp4` | 49 s | O filme em motion do produto, no formato stories, com a demo da Alice |
+
+Os posts prontos (calendário, legendas, carrosséis e stories) ficam em `../instagram/`.
 
 ## Como editar e gerar de novo
 
