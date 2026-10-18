@@ -14,7 +14,23 @@ type Scene =
   | { kind: "open" | "stats" | "ending" | "credits"; dur: number }
   | { kind: "act"; dur: number; act: FilmAct; chapter: number };
 
-const C = { cream: "#fdf3f4", rose: "#f6d3da", deep: "#d97a92", soft: "#fbe8ec", ink: "#4a3b40", taupe: "#8a7178", paper: "#fffaf7", sage: "#a8c3b0", white: "#ffffff" };
+// Mesmas paletas dos temas dos baús (app/globals.css): o filme acompanha a cor do baú
+const THEMES: Record<string, [string, string, string, string, string, string, string]> = {
+  // cream, paper, rose, deep, soft, ink, taupe
+  rosa: ["#fdf3f4", "#fffaf7", "#f6d3da", "#d97a92", "#fbe8ec", "#4a3b40", "#8a7178"],
+  azul: ["#f1f6fb", "#fafcff", "#c9ddf0", "#4f86b8", "#e3eef8", "#33404c", "#6f7d8a"],
+  salvia: ["#f4f6f0", "#fbfcf8", "#cfdac6", "#6f8a63", "#e8eee2", "#3a4136", "#747c6d"],
+  marronzinho: ["#f8f2ec", "#fdf9f5", "#e6cdb6", "#a8683f", "#f3e6da", "#45362c", "#85705f"],
+  lavanda: ["#f6f3fb", "#fcfaff", "#dccff0", "#8a6cc1", "#eee7f8", "#3f3850", "#7c7290"],
+  vermelho: ["#fcf3f2", "#fffafa", "#f2c4c2", "#c1403f", "#fae4e3", "#4a3332", "#8a6c6b"],
+  amarelo: ["#fcf8ec", "#fffdf6", "#f2e0a6", "#b8892a", "#f8efcf", "#4a4130", "#85795f"],
+  noite: ["#1f2738", "#283146", "#4a5570", "#d8b46a", "#323c55", "#f2ede3", "#b9b2a5"],
+};
+const paletteFor = (theme?: string) => {
+  const [cream, paper, rose, deep, soft, ink, taupe] = THEMES[theme ?? ""] ?? THEMES.rosa;
+  return { cream, paper, rose, deep, soft, ink, taupe, sage: "#a8c3b0", white: "#ffffff" };
+};
+const alpha = (hex: string, a: number) => `rgba(${parseInt(hex.slice(1, 3), 16)},${parseInt(hex.slice(3, 5), 16)},${parseInt(hex.slice(5, 7), 16)},${a})`;
 const FORMATS = { h: { w: 1280, h: 720, label: "Horizontal" }, v: { w: 1080, h: 1920, label: "Vertical (stories)" } } as const;
 type Format = keyof typeof FORMATS;
 
@@ -56,12 +72,13 @@ function actDuration(act: FilmAct, items: Record<string, FilmItem>, lengths: Map
   }
 }
 
-export function MotionFilm({ script, items, subject, contributors, music }: {
+export function MotionFilm({ script, items, subject, contributors, music, theme }: {
   script: FilmScript;
   items: Record<string, FilmItem>;
   subject: string;
   contributors: string[];
   music: string;
+  theme?: string;
 }) {
   const canvas = useRef<HTMLCanvasElement>(null);
   const [format, setFormat] = useState<Format>("h");
@@ -185,6 +202,7 @@ export function MotionFilm({ script, items, subject, contributors, music }: {
 
   // ---------------------------------------------------------------- desenho
   function draw(t: number) {
+    const C = paletteFor(theme);
     const cv = canvas.current;
     const ctx = cv?.getContext("2d");
     if (!cv || !ctx) return;
@@ -394,7 +412,7 @@ export function MotionFilm({ script, items, subject, contributors, music }: {
           ctx.arc(W / 2, H / 2, r, 0, Math.PI * 2);
           ctx.clip();
           coverDraw(img, img.naturalWidth, img.naturalHeight, 0, 0, W, H, 1.15 - 0.1 * prog(lt, 2.4, d));
-          ctx.fillStyle = "rgba(253,243,244,.78)";
+          ctx.fillStyle = alpha(C.cream, 0.78);
           ctx.fillRect(0, 0, W, H);
           ctx.restore();
         }
@@ -486,7 +504,7 @@ export function MotionFilm({ script, items, subject, contributors, music }: {
         ctx.globalAlpha = clamp(e) * (1 - shrink);
         ctx.translate(x, y);
         ctx.scale(e, e);
-        ctx.fillStyle = [C.deep, C.sage, "#e7a9b7", "#c9a98f"][n % 4];
+        ctx.fillStyle = [C.deep, C.sage, C.taupe, "#c9a98f"][n % 4];
         ctx.beginPath();
         ctx.arc(0, 0, size / 2, 0, Math.PI * 2);
         ctx.fill();
@@ -514,7 +532,7 @@ export function MotionFilm({ script, items, subject, contributors, music }: {
         ctx.globalAlpha = 1;
       }
       const fade = prog(lt, d - 1, d);
-      if (fade > 0) { ctx.fillStyle = `rgba(253,243,244,${fade})`; ctx.fillRect(0, 0, W, H); }
+      if (fade > 0) { ctx.fillStyle = alpha(C.cream, fade); ctx.fillRect(0, 0, W, H); }
     } else {
       const { act, chapter } = scene as Extract<Scene, { kind: "act" }>;
       const first = items[act.items[0]];
@@ -616,7 +634,7 @@ export function MotionFilm({ script, items, subject, contributors, music }: {
         }
         case "polaroids":
         case "collage": {
-          background(act.style === "polaroids" ? "#f7ece6" : C.cream);
+          background(act.style === "polaroids" ? C.soft : C.cream);
           const n = act.items.length;
           ctx.save();
           const zoom = 1 + 0.05 * prog(lt, 0, d);
@@ -710,7 +728,7 @@ export function MotionFilm({ script, items, subject, contributors, music }: {
           break;
         }
         case "letter": {
-          background("#f3e6e0", C.deep, 0.12);
+          background(C.soft, C.deep, 0.12);
           const pw = Math.min(W - 120 * u, (vertical ? 900 : 860) * u), ph = H - (vertical ? 420 : 110) * u;
           const unfold = back(prog(lt, 0.2, 0.9));
           ctx.save();
@@ -724,7 +742,7 @@ export function MotionFilm({ script, items, subject, contributors, music }: {
           rrect(-pw / 2, -ph / 2, pw, ph, 16 * u);
           ctx.fill();
           ctx.shadowBlur = 0;
-          ctx.strokeStyle = "rgba(217,122,146,.18)";
+          ctx.strokeStyle = alpha(C.deep, 0.18);
           ctx.lineWidth = 2 * u;
           const lh = (vertical ? 66 : 50) * u;
           for (let y = -ph / 2 + 150 * u; y < ph / 2 - 40 * u; y += lh) {
@@ -767,7 +785,7 @@ export function MotionFilm({ script, items, subject, contributors, music }: {
           ctx.globalAlpha = 1 - exit;
           for (let k = 0; k < 3; k++) {
             const ph = (lt * 0.7 + k / 3) % 1;
-            ctx.strokeStyle = `rgba(217,122,146,${0.5 * (1 - ph)})`;
+            ctx.strokeStyle = alpha(C.deep, 0.5 * (1 - ph));
             ctx.lineWidth = 4 * u;
             ctx.beginPath(); ctx.arc(W / 2, cy, R * e + ph * 160 * u, 0, Math.PI * 2); ctx.stroke();
           }
@@ -841,7 +859,7 @@ export function MotionFilm({ script, items, subject, contributors, music }: {
           if (v && v.readyState >= 2) ctx.drawImage(v, -fw / 2, -fh / 2, fw, fh);
           ctx.restore();
           // fita adesiva
-          ctx.fillStyle = "rgba(246,211,218,.85)";
+          ctx.fillStyle = alpha(C.rose, 0.85);
           ctx.save(); ctx.translate(-fw / 2 + 30 * u, -fh / 2 - 6 * u); ctx.rotate(-0.5); ctx.fillRect(-60 * u, -16 * u, 120 * u, 32 * u); ctx.restore();
           ctx.save(); ctx.translate(fw / 2 - 30 * u, -fh / 2 - 6 * u); ctx.rotate(0.5); ctx.fillRect(-60 * u, -16 * u, 120 * u, 32 * u); ctx.restore();
           ctx.restore();
@@ -859,7 +877,7 @@ export function MotionFilm({ script, items, subject, contributors, music }: {
     }
 
     // Transição: faixas diagonais varrem a tela no corte entre cenas
-    const tones = [C.deep, C.rose, C.sage, "#e7a9b7"];
+    const tones = [C.deep, C.rose, C.sage, C.taupe];
     for (const boundary of [i, i + 1]) {
       if (boundary <= 0 || boundary >= scenes.length) continue;
       const T = starts[boundary];

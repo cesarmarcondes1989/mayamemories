@@ -11,7 +11,7 @@ export const maxDuration = 120;
 /** Filme do período em motion: roteiro escrito pelo diretor (IA) e animado no navegador. */
 export default async function FilmPage({ params }: { params: Promise<{ periodo: string }> }) {
   const { periodo } = await params;
-  const { story, film, working, rationale, totalAll } = await loadStory(periodo, "film");
+  const { story, film, working, rationale, totalAll, viewer } = await loadStory(periodo, "film");
   const count = story.chapters.reduce((a, c) => a + c.items.length, 0);
   return (
     <div className="paper-grain min-h-dvh px-4 py-6">
@@ -41,6 +41,7 @@ export default async function FilmPage({ params }: { params: Promise<{ periodo: 
             subject={story.subject}
             contributors={story.contributors}
             music="/audio/trilha-caixinha.mp3"
+            theme={viewer.vault.theme}
             items={Object.fromEntries(
               story.chapters.flatMap((c) => c.items).map(({ id, title, description, author, date, media }): [string, FilmItem] => [id, { title, description, author, date, media }]),
             )}

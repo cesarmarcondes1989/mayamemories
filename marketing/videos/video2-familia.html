@@ -4,26 +4,26 @@
 <meta charset="utf-8">
 <title>Guardei pra você — a família guardando</title>
 <link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&family=Caveat:wght@500;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="../palettes.js"></script>
 <style>
-  :root { --cream:#fdf3f4; --paper:#fffafa; --rose:#f6d3da; --rose-deep:#d97a92; --rose-soft:#fbe8ec; --ink:#4a3b40; --taupe:#8a7178; --line:#f1dfe3; }
-  * { box-sizing: border-box; margin: 0; }
+    * { box-sizing: border-box; margin: 0; }
   html, body { width: 1080px; height: 1920px; overflow: hidden; }
-  body { background: radial-gradient(120% 80% at 50% 10%, #fff7f8 0%, var(--cream) 55%, #f9e4e9 100%); color: var(--ink); font-family: Nunito, sans-serif; position: relative; }
+  body { background: radial-gradient(120% 80% at 50% 10%, color-mix(in srgb, var(--cream) 60%, var(--paper)) 0%, var(--cream) 55%, color-mix(in srgb, var(--rose-soft) 70%, var(--rose)) 100%); color: var(--ink); font-family: Nunito, sans-serif; position: relative; }
   .abs { position: absolute; left: 0; right: 0; text-align: center; }
   .display { font-family: "Amatic SC", cursive; font-weight: 700; line-height: .95; }
   .hand { font-family: Caveat, cursive; }
   .scene { position: absolute; inset: 0; display: none; }
-  .grain { position:absolute; inset:0; opacity:.35; background-image: radial-gradient(rgba(217,122,146,.08) 1px, transparent 1px); background-size: 6px 6px; }
+  .grain { position:absolute; inset:0; opacity:.35; background-image: radial-gradient(color-mix(in srgb, var(--rose-deep) 8%, transparent) 1px, transparent 1px); background-size: 6px 6px; }
 
   #q1 { top: 640px; font-size: 140px; padding: 0 80px; }
   #q2 { top: 1080px; font-size: 70px; font-weight: 800; color: var(--rose-deep); }
 
   .cap { top: 250px; font-size: 120px; }
   .cap small { display:block; font-family: Nunito; font-size: 44px; font-weight: 700; color: var(--taupe); margin-top: 10px; }
-  .stage { position:absolute; left: 140px; top: 560px; width: 800px; height: 900px; border-radius: 70px; background: var(--paper); box-shadow: 0 50px 100px rgba(150,80,100,.18); overflow: hidden; }
-  .who { position:absolute; left: 50%; top: 1500px; transform: translateX(-50%); display:flex; align-items:center; gap: 24px; padding: 18px 40px 18px 18px; border-radius: 120px; background: var(--paper); box-shadow: 0 20px 40px rgba(150,80,100,.12); font-size: 46px; font-weight: 800; white-space: nowrap; }
+  .stage { position:absolute; left: 140px; top: 560px; width: 800px; height: 900px; border-radius: 70px; background: var(--paper); box-shadow: 0 50px 100px color-mix(in srgb, var(--ink) 18%, transparent); overflow: hidden; }
+  .who { position:absolute; left: 50%; top: 1500px; transform: translateX(-50%); display:flex; align-items:center; gap: 24px; padding: 18px 40px 18px 18px; border-radius: 120px; background: var(--paper); box-shadow: 0 20px 40px color-mix(in srgb, var(--ink) 12%, transparent); font-size: 46px; font-weight: 800; white-space: nowrap; }
   .who svg { width: 130px; height: 130px; }
-  .toast { position:absolute; left: 50%; top: 1700px; transform: translateX(-50%); padding: 22px 46px; border-radius: 80px; background: var(--rose-deep); color: #fff; font-size: 42px; font-weight: 800; white-space: nowrap; box-shadow: 0 16px 34px rgba(217,122,146,.4); }
+  .toast { position:absolute; left: 50%; top: 1700px; transform: translateX(-50%); padding: 22px 46px; border-radius: 80px; background: var(--rose-deep); color: #fff; font-size: 42px; font-weight: 800; white-space: nowrap; box-shadow: 0 16px 34px color-mix(in srgb, var(--rose-deep) 40%, transparent); }
 
   .corner { position:absolute; width: 90px; height: 90px; border: 10px solid #fff; }
   .flash { position:absolute; inset:0; background:#fff; }
@@ -34,39 +34,39 @@
   .wave { position:absolute; left: 70px; right: 70px; top: 560px; height: 160px; display:flex; gap: 10px; align-items:center; }
   .wave i { flex:1; border-radius: 8px; background: var(--rose-deep); display:block; }
   .timer { position:absolute; left: 0; right: 0; top: 760px; text-align:center; font-size: 56px; font-weight: 800; color: var(--taupe); }
-  .paper { position:absolute; inset: 60px; padding: 60px; background: repeating-linear-gradient(#fffafa 0 78px, #f1dfe3 78px 80px); border-radius: 30px; }
+  .paper { position:absolute; inset: 60px; padding: 60px; background: repeating-linear-gradient(var(--paper) 0 78px, var(--line) 78px 80px); border-radius: 30px; }
   .paper p { font-size: 70px; line-height: 80px; }
   .lockbadge { position:absolute; right: 50px; bottom: 60px; padding: 18px 30px; border-radius: 60px; background: var(--rose-soft); color: var(--rose-deep); font-weight: 800; font-size: 38px; }
 
   #chest { position:absolute; left: 50%; top: 820px; width: 640px; margin-left: -320px; }
-  .fly { position:absolute; width: 150px; height: 150px; border-radius: 44px; background: var(--paper); display:grid; place-items:center; font-size: 80px; box-shadow: 0 20px 40px rgba(150,80,100,.18); }
+  .fly { position:absolute; width: 150px; height: 150px; border-radius: 44px; background: var(--paper); display:grid; place-items:center; font-size: 80px; box-shadow: 0 20px 40px color-mix(in srgb, var(--ink) 18%, transparent); }
   #c-cap { top: 300px; font-size: 130px; }
   #c-sub { top: 1500px; font-size: 54px; font-weight: 700; padding: 0 100px; line-height: 1.25; }
 
-  #tv { position:absolute; left: 90px; top: 700px; width: 900px; height: 560px; border-radius: 40px; background: #3b3035; padding: 26px; box-shadow: 0 50px 100px rgba(120,60,80,.25); }
+  #tv { position:absolute; left: 90px; top: 700px; width: 900px; height: 560px; border-radius: 40px; background: #3b3035; padding: 26px; box-shadow: 0 50px 100px color-mix(in srgb, var(--ink) 25%, transparent); }
   #tv-screen { position:relative; width:100%; height:100%; border-radius: 20px; overflow:hidden; background: #2a2226; }
   .slide { position:absolute; inset:0; display:grid; place-items:center; }
   #tv-title { position:absolute; left: 0; right: 0; bottom: 50px; text-align:center; color:#fff; font-family: "Amatic SC"; font-weight: 700; font-size: 80px; text-shadow: 0 4px 20px rgba(0,0,0,.4); }
   #tv-bar { position:absolute; left: 40px; right: 40px; bottom: 24px; height: 8px; border-radius: 4px; background: rgba(255,255,255,.25); }
   #tv-bar i { display:block; height:100%; border-radius: 4px; background: var(--rose-deep); }
   #book { position:absolute; left: 50%; top: 640px; width: 900px; height: 640px; margin-left: -450px; perspective: 2200px; }
-  .page { position:absolute; top:0; width: 450px; height: 640px; background: var(--paper); box-shadow: 0 30px 60px rgba(150,80,100,.2); }
+  .page { position:absolute; top:0; width: 450px; height: 640px; background: var(--paper); box-shadow: 0 30px 60px color-mix(in srgb, var(--ink) 20%, transparent); }
   .page.l { left: 0; border-radius: 26px 0 0 26px; }
   .page.r { left: 450px; border-radius: 0 26px 26px 0; }
-  #cover { position:absolute; left: 450px; top: 0; width: 450px; height: 640px; transform-origin: 0 50%; border-radius: 0 26px 26px 0; background: var(--rose-deep); color: #fff; display:grid; place-items:center; text-align:center; backface-visibility: hidden; box-shadow: 0 30px 60px rgba(150,80,100,.25); }
+  #cover { position:absolute; left: 450px; top: 0; width: 450px; height: 640px; transform-origin: 0 50%; border-radius: 0 26px 26px 0; background: var(--rose-deep); color: #fff; display:grid; place-items:center; text-align:center; backface-visibility: hidden; box-shadow: 0 30px 60px color-mix(in srgb, var(--ink) 25%, transparent); }
   #cover b { font-family: "Amatic SC"; font-size: 130px; line-height: .9; display:block; }
   .ph { position:absolute; border-radius: 18px; display:grid; place-items:center; font-size: 70px; }
   #d-cap { top: 300px; font-size: 130px; }
   #d-sub { top: 1400px; font-size: 54px; font-weight: 700; }
 
   #e-cap { top: 420px; font-size: 140px; padding: 0 60px; }
-  #glow { position:absolute; left: 50%; top: 820px; width: 900px; height: 900px; margin-left: -450px; border-radius: 50%; background: radial-gradient(circle, rgba(255,240,200,.9), rgba(253,243,244,0) 65%); }
+  #glow { position:absolute; left: 50%; top: 820px; width: 900px; height: 900px; margin-left: -450px; border-radius: 50%; background: radial-gradient(circle, rgba(255,240,200,.9), color-mix(in srgb, var(--cream) 0%, transparent) 65%); }
   .heart { position:absolute; font-size: 70px; color: var(--rose-deep); }
 
   #end-heart { position:absolute; left: 50%; top: 470px; width: 200px; margin-left: -100px; }
   #end-word { top: 730px; font-size: 175px; color: var(--rose-deep); }
   #end-cta { top: 1020px; font-size: 52px; font-weight: 700; }
-  #end-url { position:absolute; left: 50%; top: 1110px; transform: translateX(-50%); padding: 26px 56px; border-radius: 80px; background: var(--rose-deep); color:#fff; font-size: 60px; font-weight: 800; white-space: nowrap; box-shadow: 0 20px 40px rgba(217,122,146,.4); }
+  #end-url { position:absolute; left: 50%; top: 1110px; transform: translateX(-50%); padding: 26px 56px; border-radius: 80px; background: var(--rose-deep); color:#fff; font-size: 60px; font-weight: 800; white-space: nowrap; box-shadow: 0 20px 40px color-mix(in srgb, var(--rose-deep) 40%, transparent); }
   #end-small { top: 1290px; font-size: 38px; color: var(--taupe); font-weight: 600; }
 </style>
 <script src="engine.js"></script>
@@ -85,13 +85,13 @@
   <div class="abs display" id="c-cap">Tudo num baú só</div>
   <svg id="chest" viewBox="0 0 320 260" style="overflow:visible">
     <g id="lid">
-      <path d="M40 110 Q40 40 160 40 Q280 40 280 110 Z" fill="#d97a92"/>
-      <path d="M60 110 Q60 58 160 58 Q260 58 260 110" fill="none" stroke="#f6d3da" stroke-width="6"/>
+      <path d="M40 110 Q40 40 160 40 Q280 40 280 110 Z" style="fill:var(--rose-deep)"/>
+      <path d="M60 110 Q60 58 160 58 Q260 58 260 110" fill="none" style="stroke:var(--rose)" stroke-width="6"/>
     </g>
     <rect x="40" y="110" width="240" height="130" rx="18" fill="#c9667f"/>
     <rect x="40" y="110" width="240" height="22" fill="#b85a72"/>
     <rect x="58" y="150" width="204" height="6" rx="3" fill="#e79aad"/>
-    <path id="lock" d="M160 196c-10-7-18-13-18-21a9 9 0 0 1 18-2 9 9 0 0 1 18 2c0 8-8 14-18 21z" fill="#fffafa"/>
+    <path id="lock" d="M160 196c-10-7-18-13-18-21a9 9 0 0 1 18-2 9 9 0 0 1 18 2c0 8-8 14-18 21z" style="fill:var(--paper)"/>
   </svg>
   <div class="fly" id="f1">📸</div><div class="fly" id="f2">🎙️</div><div class="fly" id="f3">🎥</div><div class="fly" id="f4">✉️</div>
   <div class="abs" id="c-sub">Privado. Só a família vê.<br>E nada aparece sem você aprovar.</div>
@@ -100,7 +100,7 @@
 <section class="scene" id="D">
   <div class="abs display" id="d-cap">E todo ano vira…</div>
   <div id="tv"><div id="tv-screen">
-    <div class="slide" id="sl1" style="background:linear-gradient(135deg,#f6d3da,#d97a92)"></div>
+    <div class="slide" id="sl1" style="background:linear-gradient(135deg,var(--rose),var(--rose-deep))"></div>
     <div class="slide" id="sl2" style="background:linear-gradient(135deg,#cfe0d4,#8fb39b)"></div>
     <div class="slide" id="sl3" style="background:linear-gradient(135deg,#f3e3c9,#d9a76b)"></div>
     <div id="tv-title">Alice · o filme de 2026</div>
@@ -108,13 +108,13 @@
   </div></div>
   <div id="book">
     <div class="page l" id="pl">
-      <div class="ph" style="left:40px;top:50px;width:370px;height:300px;background:#fbe8ec">👶</div>
+      <div class="ph" style="left:40px;top:50px;width:370px;height:300px;background:var(--rose-soft)">👶</div>
       <p class="hand" style="position:absolute;left:44px;top:380px;font-size:50px;line-height:1.1">Primeiro banho.<br>Você chorou, a gente riu.</p>
     </div>
     <div class="page r" id="pr">
       <div class="ph" style="left:40px;top:50px;width:175px;height:175px;background:#eef5ef">🎂</div>
       <div class="ph" style="left:235px;top:50px;width:175px;height:175px;background:#fbf1e3">👵</div>
-      <div class="ph" style="left:40px;top:245px;width:370px;height:200px;background:#fbe8ec">🧸</div>
+      <div class="ph" style="left:40px;top:245px;width:370px;height:200px;background:var(--rose-soft)">🧸</div>
       <p class="hand" style="position:absolute;left:44px;top:470px;font-size:46px;line-height:1.1">1 ano! A vó cantou<br>a mesma música de sempre.</p>
     </div>
     <div id="cover"><div><b>Alice</b><span style="font-size:44px;font-weight:800">2026</span></div></div>
@@ -127,19 +127,19 @@
   <div class="abs display" id="e-cap">E aos 18, ela abre tudo.</div>
   <svg id="chest2" viewBox="0 0 320 260" style="overflow:visible;position:absolute;left:50%;top:900px;width:640px;margin-left:-320px">
     <g id="lid2">
-      <path d="M40 110 Q40 40 160 40 Q280 40 280 110 Z" fill="#d97a92"/>
-      <path d="M60 110 Q60 58 160 58 Q260 58 260 110" fill="none" stroke="#f6d3da" stroke-width="6"/>
+      <path d="M40 110 Q40 40 160 40 Q280 40 280 110 Z" style="fill:var(--rose-deep)"/>
+      <path d="M60 110 Q60 58 160 58 Q260 58 260 110" fill="none" style="stroke:var(--rose)" stroke-width="6"/>
     </g>
     <rect x="40" y="110" width="240" height="130" rx="18" fill="#c9667f"/>
     <rect x="40" y="110" width="240" height="22" fill="#b85a72"/>
     <rect x="58" y="150" width="204" height="6" rx="3" fill="#e79aad"/>
-    <path d="M160 196c-10-7-18-13-18-21a9 9 0 0 1 18-2 9 9 0 0 1 18 2c0 8-8 14-18 21z" fill="#fffafa"/>
+    <path d="M160 196c-10-7-18-13-18-21a9 9 0 0 1 18-2 9 9 0 0 1 18 2c0 8-8 14-18 21z" style="fill:var(--paper)"/>
   </svg>
   <div class="heart" id="h1">♥</div><div class="heart" id="h2">♥</div><div class="heart" id="h3">♥</div><div class="heart" id="h4">♥</div><div class="heart" id="h5">♥</div>
 </section>
 
 <section class="scene" id="H">
-  <svg id="end-heart" viewBox="0 0 48 44" fill="none"><path d="M24 40C14 33 5 26 4.5 16.5 4.2 10 8.8 5 14.6 5c4.3 0 7.4 2.6 9.4 6.2C26 7.6 29.1 5 33.4 5 39.2 5 43.8 10 43.5 16.5 43 26 34 33 24 40Z" fill="#fbe8ec" stroke="#d97a92" stroke-width="2.6" stroke-linejoin="round"/></svg>
+  <svg id="end-heart" viewBox="0 0 48 44" fill="none"><path d="M24 40C14 33 5 26 4.5 16.5 4.2 10 8.8 5 14.6 5c4.3 0 7.4 2.6 9.4 6.2C26 7.6 29.1 5 33.4 5 39.2 5 43.8 10 43.5 16.5 43 26 34 33 24 40Z" style="fill:var(--rose-soft);stroke:var(--rose-deep)" stroke-width="2.6" stroke-linejoin="round"/></svg>
   <div class="abs display" id="end-word">guardei pra você</div>
   <div class="abs" id="end-cta">Crie o baú da sua família, grátis</div>
   <div id="end-url">link na bio ♡</div>
@@ -150,45 +150,45 @@
 const DURATION = 50;
 
 // --- personagens (SVG simples, traço da marca) ---
-function person({ skin = "#f2c7a5", hair = "#5a3b2e", shirt = "#d97a92", style = "short", glasses = false, beard = false }) {
+function person({ skin = "#f2c7a5", hair = "#5a3b2e", shirt = "var(--rose-deep)", style = "short", glasses = false, beard = false }) {
   const hairs = {
     short: `<path d="M38 52 Q40 22 70 22 Q100 22 102 52 Q92 36 70 38 Q48 36 38 52Z" fill="${hair}"/>`,
     pony: `<path d="M36 58 Q36 20 70 20 Q104 20 104 58 Q96 34 70 36 Q44 34 36 58Z" fill="${hair}"/><path d="M100 40 Q122 52 112 86 Q104 70 98 56Z" fill="${hair}"/>`,
     long: `<path d="M34 96 Q28 20 70 20 Q112 20 106 96 Q100 60 98 48 Q84 34 70 36 Q56 34 42 48 Q40 60 34 96Z" fill="${hair}"/>`,
     bun: `<circle cx="70" cy="18" r="13" fill="${hair}"/><path d="M38 54 Q38 24 70 24 Q102 24 102 54 Q92 38 70 40 Q48 38 38 54Z" fill="${hair}"/>`,
   };
-  return `<svg viewBox="0 0 140 140"><circle cx="70" cy="70" r="68" fill="#fbe8ec"/>
+  return `<svg viewBox="0 0 140 140"><circle cx="70" cy="70" r="68" style="fill:var(--rose-soft)"/>
     <path d="M24 140 Q26 104 70 102 Q114 104 116 140Z" fill="${shirt}"/>
     <circle cx="70" cy="62" r="32" fill="${skin}"/>
     ${hairs[style]}
-    <circle cx="59" cy="64" r="3.2" fill="#4a3b40"/><circle cx="81" cy="64" r="3.2" fill="#4a3b40"/>
+    <circle cx="59" cy="64" r="3.2" style="fill:var(--ink)"/><circle cx="81" cy="64" r="3.2" style="fill:var(--ink)"/>
     <circle cx="53" cy="74" r="5" fill="#f4a5b5" opacity=".6"/><circle cx="87" cy="74" r="5" fill="#f4a5b5" opacity=".6"/>
-    <path d="M62 76 Q70 83 78 76" stroke="#4a3b40" stroke-width="3" fill="none" stroke-linecap="round"/>
-    ${glasses ? '<circle cx="59" cy="64" r="9" fill="none" stroke="#4a3b40" stroke-width="2.5"/><circle cx="81" cy="64" r="9" fill="none" stroke="#4a3b40" stroke-width="2.5"/><path d="M68 64h4" stroke="#4a3b40" stroke-width="2.5"/>' : ""}
+    <path d="M62 76 Q70 83 78 76" style="stroke:var(--ink)" stroke-width="3" fill="none" stroke-linecap="round"/>
+    ${glasses ? '<circle cx="59" cy="64" r="9" fill="none" style="stroke:var(--ink)" stroke-width="2.5"/><circle cx="81" cy="64" r="9" fill="none" style="stroke:var(--ink)" stroke-width="2.5"/><path d="M68 64h4" style="stroke:var(--ink)" stroke-width="2.5"/>' : ""}
     ${beard ? `<path d="M44 70 Q46 96 70 98 Q94 96 96 70 Q90 88 70 88 Q50 88 44 70Z" fill="${hair}"/>` : ""}
   </svg>`;
 }
 const baby = `<svg viewBox="0 0 400 400" width="560" height="560">
-  <circle cx="200" cy="200" r="190" fill="#fbe8ec"/>
-  <path d="M60 380 Q70 270 200 260 Q330 270 340 380Z" fill="#fffafa"/><path d="M90 300 Q200 340 310 300" stroke="#f6d3da" stroke-width="10" fill="none"/>
+  <circle cx="200" cy="200" r="190" style="fill:var(--rose-soft)"/>
+  <path d="M60 380 Q70 270 200 260 Q330 270 340 380Z" style="fill:var(--paper)"/><path d="M90 300 Q200 340 310 300" style="stroke:var(--rose)" stroke-width="10" fill="none"/>
   <circle cx="200" cy="175" r="105" fill="#f6d3bd"/>
   <path d="M180 74 Q200 52 214 76 Q206 66 198 84Z" fill="#7a5442"/>
-  <path d="M150 180 Q164 170 178 180" stroke="#4a3b40" stroke-width="6" fill="none" stroke-linecap="round"/>
-  <path d="M222 180 Q236 170 250 180" stroke="#4a3b40" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <path d="M150 180 Q164 170 178 180" style="stroke:var(--ink)" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <path d="M222 180 Q236 170 250 180" style="stroke:var(--ink)" stroke-width="6" fill="none" stroke-linecap="round"/>
   <circle cx="140" cy="212" r="16" fill="#f4a5b5" opacity=".6"/><circle cx="260" cy="212" r="16" fill="#f4a5b5" opacity=".6"/>
-  <path d="M188 222 Q200 232 212 222" stroke="#4a3b40" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <path d="M188 222 Q200 232 212 222" style="stroke:var(--ink)" stroke-width="5" fill="none" stroke-linecap="round"/>
 </svg>`;
 const cake = `<svg viewBox="0 0 400 400" width="520" height="520">
-  <rect x="80" y="220" width="240" height="110" rx="20" fill="#f6d3da"/><rect x="80" y="220" width="240" height="34" rx="16" fill="#fffafa"/>
-  <path d="M80 250 q20 22 40 0 q20 22 40 0 q20 22 40 0 q20 22 40 0 q20 22 40 0 q20 22 40 0" fill="#fffafa"/>
+  <rect x="80" y="220" width="240" height="110" rx="20" style="fill:var(--rose)"/><rect x="80" y="220" width="240" height="34" rx="16" style="fill:var(--paper)"/>
+  <path d="M80 250 q20 22 40 0 q20 22 40 0 q20 22 40 0 q20 22 40 0 q20 22 40 0 q20 22 40 0" style="fill:var(--paper)"/>
   <rect x="50" y="326" width="300" height="18" rx="9" fill="#e7c3cc"/>
-  <rect x="188" y="140" width="24" height="80" rx="8" fill="#d97a92"/>
+  <rect x="188" y="140" width="24" height="80" rx="8" style="fill:var(--rose-deep)"/>
   <text x="200" y="196" font-size="34" text-anchor="middle" fill="#fff" font-family="Nunito" font-weight="800">1</text>
   <path id="flame" d="M200 96 Q220 120 200 140 Q180 120 200 96Z" fill="#f5b041"/>
 </svg>`;
 
 const VIGNETTES = [
-  { cap: "A mamãe fotografa", sub: "o primeiro banho", who: "Mamãe", p: { style: "pony", hair: "#6b4532", shirt: "#d97a92" }, kind: "photo" },
+  { cap: "A mamãe fotografa", sub: "o primeiro banho", who: "Mamãe", p: { style: "pony", hair: "#6b4532", shirt: "var(--rose-deep)" }, kind: "photo" },
   { cap: "A vó grava", sub: "a música de ninar", who: "Vó Lúcia", p: { style: "bun", hair: "#bdb6b8", shirt: "#8fb39b", glasses: true, skin: "#e8b896" }, kind: "audio" },
   { cap: "O tio filma", sub: "o primeiro aniversário", who: "Tio Beto", p: { style: "short", hair: "#2e2324", shirt: "#4f86b8", beard: true, skin: "#c98f6b" }, kind: "video" },
   { cap: "A dinda escreve", sub: "uma carta para os 18", who: "Dinda Bia", p: { style: "long", hair: "#a5603c", shirt: "#c9a27a" }, kind: "letter" },
@@ -197,7 +197,7 @@ const LETTER = "Alice, quando você ler isso já vai ter 18 anos. Eu estava lá 
 const B = A.$("#B");
 VIGNETTES.forEach((v, i) => {
   const inner = {
-    photo: `<div class="slide" style="position:absolute;inset:0;display:grid;place-items:center;background:#fbe8ec">${baby}</div>
+    photo: `<div class="slide" style="position:absolute;inset:0;display:grid;place-items:center;background:var(--rose-soft)">${baby}</div>
             <div class="corner" style="left:60px;top:60px;border-right:0;border-bottom:0"></div><div class="corner" style="right:60px;top:60px;border-left:0;border-bottom:0"></div>
             <div class="corner" style="left:60px;bottom:60px;border-right:0;border-top:0"></div><div class="corner" style="right:60px;bottom:60px;border-left:0;border-top:0"></div>
             <div class="flash" id="flash${i}"></div>`,

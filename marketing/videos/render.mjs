@@ -9,7 +9,7 @@ const [, , input, output, fpsArg, flag, list] = process.argv;
 const fps = Number(fpsArg || 30);
 const browser = await chromium.launch();
 const page = await browser.newPage({ viewport: { width: 1080, height: 1920 }, deviceScaleFactor: 1 });
-await page.goto("file://" + resolve(input), { waitUntil: "networkidle" });
+await page.goto("file://" + resolve(input) + (process.env.TEMA ? `?tema=${process.env.TEMA}` : ""), { waitUntil: "networkidle" });
 await page.evaluate(() => document.fonts.ready);
 const duration = await page.evaluate(() => window.DURATION);
 mkdirSync(dirname(output), { recursive: true });

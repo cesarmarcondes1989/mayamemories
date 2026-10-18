@@ -4,15 +4,15 @@
 <meta charset="utf-8">
 <title>Guardei pra você — peças do Instagram</title>
 <link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&family=Caveat:wght@500;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<script src="../palettes.js"></script>
 <style>
-  :root { --cream:#fdf3f4; --paper:#fffafa; --rose:#f6d3da; --deep:#d97a92; --soft:#fbe8ec; --ink:#4a3b40; --taupe:#8a7178; --line:#f1dfe3; --sage:#a8c3b0; }
-  * { box-sizing: border-box; margin: 0; }
+    * { box-sizing: border-box; margin: 0; }
   body { font-family: Nunito, sans-serif; color: var(--ink); background: #ddd; }
-  .slide { position: relative; overflow: hidden; width: 1080px; background: radial-gradient(120% 80% at 50% 0%, #fff8f9 0%, var(--cream) 55%, #f9e4e9 100%); }
+  .slide { position: relative; overflow: hidden; width: 1080px; color: var(--ink); background: radial-gradient(120% 80% at 50% 0%, color-mix(in srgb, var(--cream) 60%, var(--paper)) 0%, var(--cream) 55%, color-mix(in srgb, var(--rose-soft) 70%, var(--rose)) 100%); }
   .feed { height: 1350px; }
   .story { height: 1920px; }
   .square { height: 1080px; }
-  .grain { position:absolute; inset:0; opacity:.5; background-image: radial-gradient(rgba(217,122,146,.09) 1.2px, transparent 1.2px); background-size: 7px 7px; pointer-events:none; }
+  .grain { position:absolute; inset:0; opacity:.5; background-image: radial-gradient(color-mix(in srgb, var(--rose-deep) 9%, transparent) 1.2px, transparent 1.2px); background-size: 7px 7px; pointer-events:none; }
   .display { font-family: "Amatic SC", cursive; font-weight: 700; line-height: .92; letter-spacing: .5px; }
   .hand { font-family: Caveat, cursive; }
   .rose { color: var(--deep); }
@@ -21,11 +21,11 @@
   .foot { position:absolute; left: 80px; right: 80px; bottom: 56px; display:flex; justify-content: space-between; align-items: center; }
   .foot .brand { font-family: "Amatic SC"; font-weight:700; font-size: 46px; color: var(--deep); }
   .foot .page { font-weight: 800; font-size: 24px; color: var(--taupe); letter-spacing: 2px; }
-  .pic { border-radius: 48px; overflow: hidden; box-shadow: 0 30px 60px rgba(150,80,100,.18); background: var(--soft); }
+  .pic { border-radius: 48px; overflow: hidden; box-shadow: 0 30px 60px color-mix(in srgb, var(--ink) 18%, transparent); background: var(--soft); }
   .pic img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; display:block; }
-  .card { background: var(--paper); border-radius: 40px; box-shadow: 0 24px 50px rgba(150,80,100,.14); }
+  .card { background: var(--paper); border-radius: 40px; box-shadow: 0 24px 50px color-mix(in srgb, var(--ink) 14%, transparent); }
   .heart { display:inline-block; }
-  .pill { display:inline-block; padding: 18px 40px; border-radius: 80px; background: var(--deep); color:#fff; font-weight: 900; font-size: 34px; box-shadow: 0 16px 30px rgba(217,122,146,.35); }
+  .pill { display:inline-block; padding: 18px 40px; border-radius: 80px; background: var(--deep); color:#fff; font-weight: 900; font-size: 34px; box-shadow: 0 16px 30px color-mix(in srgb, var(--rose-deep) 35%, transparent); }
   .num { font-family: "Amatic SC"; font-weight:700; font-size: 220px; line-height: .8; color: var(--deep); }
   .row { display:flex; gap: 24px; align-items: center; }
   .ico { width: 96px; height: 96px; border-radius: 30px; background: var(--soft); display:grid; place-items:center; font-size: 50px; flex-shrink: 0; }
@@ -37,7 +37,7 @@
 <body>
 <div id="root"></div>
 <script>
-const HEART = (size, color = "#d97a92", fill = true) => `<svg class="heart" width="${size}" height="${size * 44 / 48}" viewBox="0 0 48 44"><path d="M24 40C14 33 5 26 4.5 16.5 4.2 10 8.8 5 14.6 5c4.3 0 7.4 2.6 9.4 6.2C26 7.6 29.1 5 33.4 5 39.2 5 43.8 10 43.5 16.5 43 26 34 33 24 40Z" fill="${fill ? color : "none"}" stroke="${color}" stroke-width="2.6" stroke-linejoin="round"/></svg>`;
+const HEART = (size, color = "var(--rose-deep)", fill = true) => `<svg class="heart" width="${size}" height="${size * 44 / 48}" viewBox="0 0 48 44"><path d="M24 40C14 33 5 26 4.5 16.5 4.2 10 8.8 5 14.6 5c4.3 0 7.4 2.6 9.4 6.2C26 7.6 29.1 5 33.4 5 39.2 5 43.8 10 43.5 16.5 43 26 34 33 24 40Z" style="fill:${fill ? color : "none"};stroke:${color}" stroke-width="2.6" stroke-linejoin="round"/></svg>`;
 const IMG = (f) => `../../public/demo/${f}`;
 const foot = (page) => `<div class="foot"><span class="brand">guardei pra você ${HEART(34)}</span><span class="page">${page ?? ""}</span></div>`;
 
@@ -78,7 +78,7 @@ S["c1-8"] = { cls: "feed", html: `<div class="grain"></div>
   ${foot("8/8")}` };
 
 // ---------------------------------------------------------------- carrossel 2
-const phone = (inner, h = 760) => `<div style="width:520px;height:${h}px;border-radius:70px;background:#3b3035;padding:18px;box-shadow:0 40px 80px rgba(120,60,80,.25)"><div style="width:100%;height:100%;border-radius:54px;background:var(--cream);overflow:hidden;padding:70px 34px 30px;position:relative">${inner}</div></div>`;
+const phone = (inner, h = 760) => `<div style="width:520px;height:${h}px;border-radius:70px;background:#3b3035;padding:18px;box-shadow:0 40px 80px color-mix(in srgb, var(--ink) 25%, transparent)"><div style="width:100%;height:100%;border-radius:54px;background:var(--cream);overflow:hidden;padding:70px 34px 30px;position:relative">${inner}</div></div>`;
 S["c2-1"] = { cls: "feed", html: `<div class="grain"></div>
   <div style="position:absolute;left:90px;right:90px;top:150px">
     <div class="kicker">como funciona</div>
@@ -116,8 +116,8 @@ S["c2-4"] = step(3, "Cada um guarda", "Foto, vídeo, áudio e carta. A carta pod
   ${mem("✉️", "Carta para os seus 18", "🔒 abre em 12/05/2044 · dinda Bia")}</div>`, "4/7");
 S["c2-5"] = step(4, "O resto é com a gente", "No fim do ano, o filme e o livro ficam prontos sozinhos. Você não edita nada.", `
   <div class="row" style="gap:50px;align-items:flex-end">
-    <div style="width:340px;height:604px;border-radius:40px;overflow:hidden;box-shadow:0 30px 60px rgba(120,60,80,.25)"><img src="assets/filme-quadro.png" style="width:100%;height:100%;object-fit:cover"></div>
-    <div style="width:420px;height:420px;border-radius:14px;background:var(--rose);box-shadow:0 30px 60px rgba(120,60,80,.25), inset 18px 0 0 rgba(0,0,0,.06);padding:40px;text-align:center;position:relative">
+    <div style="width:340px;height:604px;border-radius:40px;overflow:hidden;box-shadow:0 30px 60px color-mix(in srgb, var(--ink) 25%, transparent)"><img src="assets/filme-quadro.png" style="width:100%;height:100%;object-fit:cover"></div>
+    <div style="width:420px;height:420px;border-radius:14px;background:var(--rose);box-shadow:0 30px 60px color-mix(in srgb, var(--ink) 25%, transparent), inset 18px 0 0 rgba(0,0,0,.06);padding:40px;text-align:center;position:relative">
       <div class="pic" style="width:250px;height:250px;margin:0 auto;border-radius:20px"><img src="${IMG("sorriso.jpg")}"></div>
       <div class="display" style="font-size:58px;margin-top:22px">O primeiro ano da Alice</div>
     </div>
@@ -161,9 +161,10 @@ S["st-pergunta-18"] = story(q("caixinha", "O que você guardaria pro seu filho <
 S["st-enquete-quem"] = story(q("enquete", "Quem da sua família <span class='rose'>mais guarda</span> foto?", 160));
 
 // ---------------------------------------------------------------- capas dos Reels (texto dentro da área 1080x1350 central)
-const cover = (img, line1, line2) => ({ cls: "story", html: `${img ? `<img src="${IMG(img)}" style="position:absolute;left:0;top:0;width:100%;height:2300px;object-fit:cover;object-position:top">` : `<div class="grain"></div><div class="center" style="top:560px">${HEART(300)}</div>`}
-  <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(253,243,244,.15) 0%,rgba(253,243,244,0) 40%,rgba(74,59,64,.65) 100%)"></div>
-  <div class="center" style="top:1180px;padding:0 90px;color:#fff"><div class="display" style="font-size:150px;text-shadow:0 6px 30px rgba(0,0,0,.25)">${line1}</div><div class="hand" style="font-size:64px;margin-top:10px">${line2}</div></div>` });
+const cover = (img, line1, line2) => ({ cls: "story", html: `<div style="position:absolute;inset:0;background:var(--soft)"></div>
+  ${img ? `<img src="${IMG(img)}" style="position:absolute;left:0;top:0;width:100%;height:1350px;object-fit:cover;object-position:50% 0%">` : `<div class="grain"></div><div class="center" style="top:420px">${HEART(320)}</div>`}
+  <div style="position:absolute;left:0;right:0;top:900px;bottom:0;background:linear-gradient(180deg,transparent 0%,var(--deep) 30%,var(--deep) 100%)"></div>
+  <div class="center" style="top:1180px;padding:0 90px;color:#fff"><div class="display" style="font-size:150px">${line1}</div><div class="hand" style="font-size:64px;margin-top:10px">${line2}</div></div>` });
 S["capa-reel-manifesto"] = cover("vo.jpg", "Quando você crescer", "a vó deixou isso guardado");
 S["capa-reel-como-funciona"] = cover(null, "Como funciona", "em menos de 1 minuto");
 S["capa-reel-filme"] = cover("sorriso.jpg", "Um ano virou filme", "e ninguém editou nada");
@@ -177,10 +178,19 @@ S["destaque-demo"] = hl("👀", "demonstração");
 S["destaque-planos"] = hl("🎁", "planos");
 S["destaque-duvidas"] = hl("💬", "dúvidas");
 
+// Cada peça tem a sua cor (os temas dos baús), para o feed ciclar
+const TEMA = {
+  c1: "azul", c2: "salvia",
+  "capa-reel-manifesto": "rosa", "capa-reel-como-funciona": "amarelo", "capa-reel-filme": "marronzinho", "capa-reel-familia": "vermelho",
+  "st-enquete-fotos": "rosa", "st-pergunta-infancia": "lavanda", "st-isto-aquilo": "azul", "st-demo": "amarelo", "st-slider-chora": "vermelho",
+  "st-fds": "salvia", "st-carta": "noite", "st-vo-qr": "marronzinho", "st-pergunta-18": "lavanda", "st-enquete-quem": "vermelho",
+  "perfil-foto": "rosa", "destaque-como-funciona": "rosa", "destaque-demo": "azul", "destaque-planos": "amarelo", "destaque-duvidas": "salvia",
+};
 window.SLIDES = S;
 window.show = (id) => {
   const s = S[id];
   document.getElementById("root").innerHTML = `<div class="slide ${s.cls}" id="slide">${s.html}</div>`;
+  window.applyTheme(TEMA[id] ?? TEMA[id.split("-")[0]] ?? "rosa", document.getElementById("slide"));
   if (window.QR && document.getElementById("qr")) document.getElementById("qr").innerHTML = window.QR;
 };
 show(location.hash.slice(1) || "c1-1");
