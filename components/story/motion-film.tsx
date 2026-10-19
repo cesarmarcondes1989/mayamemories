@@ -118,6 +118,8 @@ export function MotionFilm({ script, items, subject, contributors, music, theme 
   const media = useRef(new Map<string, HTMLMediaElement>());
   const audio = useRef<{ ctx: AudioContext; dest: MediaStreamAudioDestinationNode; music: GainNode; analyser: AnalyserNode; el: HTMLAudioElement } | null>(null);
   const wired = useRef(new Set<string>());
+  const unlocked = useRef(new Set<HTMLMediaElement>());
+  const currentMedia = useRef<HTMLMediaElement | null>(null);
   const clock = useRef({ t: 0, last: 0, running: false, scene: -1 });
   const recorder = useRef<MediaRecorder | null>(null);
   const fonts = useRef({ display: "cursive", body: "sans-serif", hand: "cursive" });
@@ -150,7 +152,13 @@ export function MotionFilm({ script, items, subject, contributors, music, theme 
       const el = m.type === "video" ? document.createElement("video") : new Audio();
       el.crossOrigin = "anonymous";
       el.preload = "auto";
-      if (el instanceof HTMLVideoElement) el.playsInline = true;
+      if (el instanceof HTMLVideoElement) {
+        el.playsInline = true;
+        el.setAttribute("playsinline", "");
+        // No iPhone, vídeo fora da página às vezes não entrega quadros ao canvas
+        Object.assign(el.style, { position: "fixed", left: "0", top: "0", width: "2px", height: "2px", opacity: "0", pointerEvents: "none" });
+        document.body.appendChild(el);
+      }
       media.current.set(m.url, el);
       jobs.push(new Promise((ok) => {
         const end = () => { if (Number.isFinite(el.duration)) found.set(m.url, el.duration); tick(); ok(); };
@@ -165,6 +173,24 @@ export function MotionFilm({ script, items, subject, contributors, music, theme 
       setState((s) => (s === "loading" ? "ready" : s));
     });
   }, [script, items]);
+
+  useEffect(() => () => {
+    for (const el of media.current.values()) { el.pause(); if (el instanceof HTMLVideoElement) el.remove(); }
+  }, []);
+
+  /**
+   * O Safari do iPhone só deixa tocar mídia com som se o play() vier de um toque.
+   * As cenas tocam vídeo/áudio sozinhas, mais tarde: então "destravamos" cada
+   * elemento aqui, dentro do toque em Assistir/Baixar (toca e pausa na hora).
+   */
+  function unlockMedia() {
+    for (const el of media.current.values()) {
+      if (unlocked.current.has(el)) continue;
+      unlocked.current.add(el);
+      const p = el.play();
+      p?.then(() => { if (el !== currentMedia.current) el.pause(); }).catch(() => {});
+    }
+  }
 
   function ensureAudio() {
     if (!audio.current) {
@@ -221,6 +247,7 @@ export function MotionFilm({ script, items, subject, contributors, music, theme 
       mediaOf(scenes[clock.current.scene])?.pause();
       clock.current.scene = i;
       const el = mediaOf(scene);
+      currentMedia.current = el;
       if (el) {
         el.currentTime = Math.min(Math.max(0, lt - 0.3), Number.isFinite(el.duration) ? el.duration : 0);
         if (clock.current.running) el.play().catch(() => {});
@@ -941,6 +968,7 @@ export function MotionFilm({ script, items, subject, contributors, music, theme 
 
   function play(fromStart = false) {
     ensureAudio();
+    unlockMedia();
     const a = audio.current!;
     a.ctx.resume();
     if (fromStart) { clock.current.t = 0; a.el.currentTime = 0; }
@@ -963,6 +991,7 @@ export function MotionFilm({ script, items, subject, contributors, music, theme 
 
   function record() {
     ensureAudio();
+    unlockMedia();
     setError(null);
     setDownload(null);
     const stream = canvas.current!.captureStream(30);
