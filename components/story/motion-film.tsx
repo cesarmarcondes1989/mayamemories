@@ -120,6 +120,8 @@ export function MotionFilm({ script, items, subject, contributors, music, theme 
   const wired = useRef(new Set<string>());
   const unlocked = useRef(new Set<HTMLMediaElement>());
   const currentMedia = useRef<HTMLMediaElement | null>(null);
+  const musicEl = useRef<HTMLAudioElement | null>(null);
+  const startId = useRef(0);
   const clock = useRef({ t: 0, last: 0, running: false, scene: -1 });
   const recorder = useRef<MediaRecorder | null>(null);
   const fonts = useRef({ display: "cursive", body: "sans-serif", hand: "cursive" });
@@ -187,10 +189,26 @@ export function MotionFilm({ script, items, subject, contributors, music, theme 
     for (const el of media.current.values()) {
       if (unlocked.current.has(el)) continue;
       unlocked.current.add(el);
+      // No mudo e pausando na hora: só destrava, sem vazar o som do vídeo no começo
+      el.muted = true;
       const p = el.play();
-      p?.then(() => { if (el !== currentMedia.current) el.pause(); }).catch(() => {});
+      el.pause();
+      const unmute = () => { el.muted = false; };
+      if (p) p.then(() => { el.pause(); unmute(); }, unmute);
+      else unmute();
     }
   }
+
+  // A trilha começa a carregar já, para não entrar atrasada depois do toque
+  useEffect(() => {
+    const el = new Audio(music);
+    el.crossOrigin = "anonymous";
+    el.loop = true;
+    el.preload = "auto";
+    el.load();
+    musicEl.current = el;
+    return () => el.pause();
+  }, [music]);
 
   function ensureAudio() {
     if (!audio.current) {
@@ -202,7 +220,7 @@ export function MotionFilm({ script, items, subject, contributors, music, theme 
       musicGain.connect(dest);
       const analyser = ctx.createAnalyser();
       analyser.fftSize = 128;
-      const el = new Audio(music);
+      const el = musicEl.current ?? new Audio(music);
       el.crossOrigin = "anonymous";
       el.loop = true;
       ctx.createMediaElementSource(el).connect(musicGain);
@@ -253,7 +271,7 @@ export function MotionFilm({ script, items, subject, contributors, music, theme 
         if (clock.current.running) el.play().catch(() => {});
       }
       const a = audio.current;
-      if (a) a.music.gain.setTargetAtTime(el ? 0.05 : 0.32, a.ctx.currentTime, 0.35);
+      if (a) a.music.gain.setTargetAtTime(el ? 0.12 : 0.32, a.ctx.currentTime, 0.35);
     }
 
     const font = (weight: number | string, size: number, family: string) => { ctx.font = `${weight} ${Math.round(size * u)}px ${family}`; };
@@ -966,18 +984,28 @@ export function MotionFilm({ script, items, subject, contributors, music, theme 
     for (const el of media.current.values()) el.pause();
   }
 
-  function play(fromStart = false) {
+  function play(fromStart = false, onStart?: () => void) {
     ensureAudio();
     unlockMedia();
     const a = audio.current!;
     a.ctx.resume();
     if (fromStart) { clock.current.t = 0; a.el.currentTime = 0; }
     clock.current.scene = -1; // reinicia a mídia da cena atual
-    a.el.play().catch(() => {});
-    clock.current.running = true;
+    const started = a.el.play().catch(() => {});
     setState("playing");
+    // Só começa a contar quando a trilha já está tocando (ou depois de 4 s, sem ela)
+    const id = ++startId.current;
+    const go = () => {
+      if (id !== startId.current) return;
+      onStart?.();
+      clock.current.last = performance.now();
+      clock.current.running = true;
+    };
+    if (a.el.readyState >= 3) { go(); return; }
+    Promise.race([started.then(() => new Promise<void>((r) => (a.el.readyState >= 3 ? r() : a.el.addEventListener("playing", () => r(), { once: true })))), new Promise<void>((r) => setTimeout(r, 4000))]).then(go);
   }
   function pause() {
+    startId.current++;
     clock.current.running = false;
     stopAll();
     setState("paused");
@@ -1009,8 +1037,7 @@ export function MotionFilm({ script, items, subject, contributors, music, theme 
       setDownload({ url: URL.createObjectURL(blob), name: `filme-${slug}${format === "v" ? "-stories" : ""}.${ext}` });
     };
     recorder.current = rec;
-    rec.start(1000);
-    play(true);
+    play(true, () => rec.start(1000)); // grava a partir do momento em que a trilha começa
     setState("recording");
   }
 
