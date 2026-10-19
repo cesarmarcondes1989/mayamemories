@@ -8,7 +8,8 @@ import { Alert, ProgressBar } from "@/components/ui/misc";
 import { Spinner } from "@/components/ui/spinner";
 import { AudioRecorder } from "./audio-recorder";
 import { readMediaDuration, uploadToSignedUrl } from "./upload-engine";
-import { checkFileAgainstLimits, type UploadLimits } from "@/lib/storage/limits";
+import { SERVER_MAX_BYTES, canShrinkVideo, primeVideo, releaseVideo, shrinkVideo } from "./video-shrink";
+import { checkFileAgainstLimits, guessMime, type UploadLimits } from "@/lib/storage/limits";
 import { formatBytes } from "@/lib/format";
 import type { SubjectWords } from "@/lib/subject";
 import { VISIBILITY_OPTIONS, VISIT_TYPES } from "@/lib/constants";
@@ -25,7 +26,7 @@ import {
 export type ComposerKind = "photo" | "audio" | "text" | "letter" | "visit" | "drawing";
 
 type Picked = { file: File; preview?: string; duration?: number; error?: string };
-type Progress = { name: string; fraction: number; state: "waiting" | "uploading" | "verifying" | "done" | "failed"; error?: string };
+type Progress = { name: string; fraction: number; state: "preparing" | "waiting" | "uploading" | "verifying" | "done" | "failed"; error?: string };
 
 export function MemoryComposer({
   kind,
@@ -66,6 +67,9 @@ export function MemoryComposer({
   const aborters = useRef<Record<string, () => void>>({});
   const draftId = useRef<string | null>(null);
   const tickets = useRef<UploadTicket[]>([]);
+  // Lista atual (pode trocar um vídeo grande pela versão comprimida no meio do envio)
+  const filesRef = useRef<Picked[]>(files);
+  filesRef.current = files;
 
   useEffect(() => () => files.forEach((f) => f.preview && URL.revokeObjectURL(f.preview)), [files]);
 
@@ -81,7 +85,7 @@ export function MemoryComposer({
     if (kind === "audio") return `Áudios até ${mb(limits.audio.max_bytes)} e ${Math.round((limits.audio.max_seconds ?? 0) / 60)} min.`;
     if (kind === "drawing") return `PDF ou imagem até ${mb(limits.document.max_bytes)}.`;
     if (kind === "photo")
-      return `Fotos até ${mb(limits.image.max_bytes)}; vídeos até ${mb(limits.video.max_bytes)} e ${Math.round((limits.video.max_seconds ?? 0) / 60)} min. Até ${limits.max_files_per_memory} arquivos.`;
+      return `Fotos até ${mb(limits.image.max_bytes)}; vídeos até ${Math.round((limits.video.max_seconds ?? 0) / 60)} min (acima de ${mb(SERVER_MAX_BYTES)} a gente reduz o vídeo antes de enviar). Até ${limits.max_files_per_memory} arquivos.`;
     return `Fotos até ${mb(limits.image.max_bytes)}.`;
   }, [kind, limits]);
 
@@ -130,6 +134,10 @@ export function MemoryComposer({
           setP({ state: "failed", error: "Envio cancelado." });
           return false;
         }
+        if ((e as Error).message === "too_large") {
+          setP({ state: "failed", error: `O servidor recusou: o arquivo passa de ${Math.round(SERVER_MAX_BYTES / 1024 / 1024)} MB. Corte o vídeo no app de fotos e envie de novo.` });
+          return false;
+        }
         if (attempt === 2) {
           setP({ state: "failed", error: "A conexão falhou. Verifique a internet e tente novamente." });
           return false;
@@ -151,7 +159,7 @@ export function MemoryComposer({
 
   async function runUploads(list: UploadTicket[]) {
     const results = [];
-    for (const t of list) results.push(await uploadOne(t, files[t.fileIndex].file));
+    for (const t of list) results.push(await uploadOne(t, filesRef.current[t.fileIndex].file));
     return results.every(Boolean);
   }
 
@@ -176,7 +184,45 @@ export function MemoryComposer({
       setError("Escolha quando a carta poderá ser aberta.");
       return;
     }
+    // Vídeos acima do limite do Storage: comprime aqui mesmo antes de enviar.
+    // primeVideo precisa rodar ainda dentro do toque (antes de qualquer await).
+    const big = files.map((f, i) => ({ f, i })).filter(({ f }) => f.file.size > SERVER_MAX_BYTES);
+    if (big.some(({ f }) => !guessMime(f.file.name, f.file.type).startsWith("video/"))) {
+      setError(`Arquivos acima de ${Math.round(SERVER_MAX_BYTES / 1024 / 1024)} MB não podem ser enviados.`);
+      return;
+    }
+    if (big.length && !canShrinkVideo()) {
+      setError(`Este vídeo passa de ${Math.round(SERVER_MAX_BYTES / 1024 / 1024)} MB e este navegador não consegue reduzi-lo. Corte o vídeo no app de fotos ou envie pelo celular.`);
+      return;
+    }
+    const primed = big.map(({ f }) => primeVideo(f.file));
     setPhase("sending");
+    let list = files;
+    if (big.length) {
+      setProgress(Object.fromEntries(big.map(({ f, i }) => [`prep-${i}`, { name: f.file.name, fraction: 0, state: "preparing" as const }])));
+      list = [...files];
+      for (const [k, { f, i }] of big.entries()) {
+        const key = `prep-${i}`;
+        try {
+          const small = await shrinkVideo(primed[k], f.file, SERVER_MAX_BYTES, (fraction) =>
+            setProgress((prev) => ({ ...prev, [key]: { ...prev[key], fraction } })),
+          );
+          list[i] = { ...f, file: small };
+          setProgress((prev) => ({ ...prev, [key]: { ...prev[key], fraction: 1, state: "done" } }));
+        } catch (err) {
+          console.error("[upload] compressão do vídeo", err);
+          primed.forEach(releaseVideo);
+          setError(`Não deu para reduzir o vídeo "${f.file.name}" (${formatBytes(f.file.size)}). Corte o vídeo no app de fotos e tente de novo.`);
+          setProgress({});
+          setPhase("form");
+          return;
+        } finally {
+          releaseVideo(primed[k]);
+        }
+      }
+      filesRef.current = list;
+      setFiles(list);
+    }
     const result = await createMemoryDraft({
       kind,
       title: title || undefined,
@@ -187,7 +233,7 @@ export function MemoryComposer({
       unlockAt: unlockAt || null,
       requestedCapsuleId: capsuleId || null,
       eventId: eventId || null,
-      files: files.map((f) => ({ name: f.file.name, size: f.file.size, type: f.file.type, durationSeconds: f.duration })),
+      files: list.map((f) => ({ name: f.file.name, size: f.file.size, type: f.file.type, durationSeconds: f.duration })),
       visit: kind === "visit" ? { occurredAt, visitType: visitType as "home", companions: companions || undefined } : undefined,
     });
     if (!result.ok) {
@@ -203,7 +249,7 @@ export function MemoryComposer({
     tickets.current = result.data.uploads;
     setProgress(
       Object.fromEntries(
-        result.data.uploads.map((t) => [t.assetId, { name: files[t.fileIndex].file.name, fraction: 0, state: "waiting" as const }]),
+        result.data.uploads.map((t) => [t.assetId, { name: list[t.fileIndex].file.name, fraction: 0, state: "waiting" as const }]),
       ),
     );
     const allOk = await runUploads(result.data.uploads);
@@ -248,6 +294,9 @@ export function MemoryComposer({
     return (
       <div className="space-y-4" aria-live="polite">
         <h2 className="text-3xl">{phase === "partial" ? "Alguns arquivos não foram enviados" : "Guardando com cuidado…"}</h2>
+        {items.some(([, p]) => p.state === "preparing") && (
+          <p className="text-sm text-taupe">O vídeo é grande, então estamos deixando ele mais leve aqui no aparelho. Mantenha esta tela aberta.</p>
+        )}
         {items.length === 0 && (
           <p className="flex items-center gap-2 text-taupe">
             <Spinner /> Preparando…
@@ -259,6 +308,7 @@ export function MemoryComposer({
               <div className="mb-2 flex items-center justify-between gap-3 text-sm">
                 <span className="truncate">{p.name}</span>
                 <span className="shrink-0 text-taupe">
+                  {p.state === "preparing" && `Reduzindo o vídeo… ${Math.round(p.fraction * 100)}%`}
                   {p.state === "uploading" && `${Math.round(p.fraction * 100)}%`}
                   {p.state === "verifying" && "Verificando…"}
                   {p.state === "done" && "✓ Recebido"}

@@ -19,7 +19,12 @@ export function uploadToSignedUrl(
     xhr.upload.onprogress = (e) => {
       if (e.lengthComputable) onProgress(e.loaded / e.total);
     };
-    xhr.onload = () => (xhr.status >= 200 && xhr.status < 300 ? resolve() : reject(new Error(`upload_failed_${xhr.status}`)));
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) return resolve();
+      // O Storage recusa arquivos acima do limite do projeto com 413 ("Payload too large")
+      const tooLarge = xhr.status === 413 || /payload too large|maximum allowed size|exceeded/i.test(xhr.responseText ?? "");
+      reject(new Error(tooLarge ? "too_large" : `upload_failed_${xhr.status}`));
+    };
     xhr.onerror = () => reject(new Error("network_error"));
     xhr.onabort = () => reject(new Error("aborted"));
     const body = new FormData();
