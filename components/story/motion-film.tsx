@@ -119,10 +119,13 @@ export function MotionFilm({ script, items, subject, contributors, music, theme 
   const audio = useRef<{ ctx: AudioContext; dest: MediaStreamAudioDestinationNode; music: GainNode; analyser: AnalyserNode; el: HTMLAudioElement } | null>(null);
   const wired = useRef(new Set<string>());
   const unlocked = useRef(new Set<HTMLMediaElement>());
-  const currentMedia = useRef<HTMLMediaElement | null>(null);
+  const pending = useRef(new Set<HTMLMediaElement>());
+  const lastTry = useRef(new Map<HTMLMediaElement, number>());
+  const ducked = useRef<boolean | null>(null);
+  const hold = useRef({ scene: -1, waited: 0 });
   const musicEl = useRef<HTMLAudioElement | null>(null);
   const startId = useRef(0);
-  const clock = useRef({ t: 0, last: 0, running: false, scene: -1 });
+  const clock = useRef({ t: 0, last: 0, running: false });
   const recorder = useRef<MediaRecorder | null>(null);
   const fonts = useRef({ display: "cursive", body: "sans-serif", hand: "cursive" });
   const freq = useRef<Uint8Array<ArrayBuffer> | null>(null);
@@ -194,7 +197,7 @@ export function MotionFilm({ script, items, subject, contributors, music, theme 
       const p = el.play();
       el.pause();
       const unmute = () => { el.muted = false; };
-      if (p) p.then(() => { el.pause(); unmute(); }, unmute);
+      if (p) p.then(unmute, unmute);
       else unmute();
     }
   }
@@ -260,19 +263,6 @@ export function MotionFilm({ script, items, subject, contributors, music, theme 
     const lt = t - starts[i];
     const d = scene.dur;
     const exit = easeInOut(prog(lt, d - 0.5, d));
-
-    if (clock.current.scene !== i) {
-      mediaOf(scenes[clock.current.scene])?.pause();
-      clock.current.scene = i;
-      const el = mediaOf(scene);
-      currentMedia.current = el;
-      if (el) {
-        el.currentTime = Math.min(Math.max(0, lt - 0.3), Number.isFinite(el.duration) ? el.duration : 0);
-        if (clock.current.running) el.play().catch(() => {});
-      }
-      const a = audio.current;
-      if (a) a.music.gain.setTargetAtTime(el ? 0.12 : 0.32, a.ctx.currentTime, 0.35);
-    }
 
     const font = (weight: number | string, size: number, family: string) => { ctx.font = `${weight} ${Math.round(size * u)}px ${family}`; };
     const wrap = (text: string, maxW: number) => {
@@ -959,8 +949,10 @@ export function MotionFilm({ script, items, subject, contributors, music, theme 
     let raf = 0;
     const loop = (now: number) => {
       const c = clock.current;
+      const dt = Math.min(0.1, (now - c.last) / 1000);
+      c.last = now;
       if (c.running) {
-        c.t += Math.min(0.1, (now - c.last) / 1000);
+        advance(dt);
         if (c.t >= total) {
           c.t = total - 0.01;
           c.running = false;
@@ -969,7 +961,7 @@ export function MotionFilm({ script, items, subject, contributors, music, theme 
           if (recorder.current?.state === "recording") recorder.current.stop();
         }
       }
-      c.last = now;
+      syncMedia();
       draw(c.t);
       setProgress(c.t / total);
       raf = requestAnimationFrame(loop);
@@ -978,6 +970,72 @@ export function MotionFilm({ script, items, subject, contributors, music, theme 
     return () => cancelAnimationFrame(raf);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scenes, total, format]);
+
+  const LEAD = 0.3; // a mídia começa 0,3 s depois da cena
+  const sceneAt = (t: number) => {
+    const i = starts.findIndex((st, k) => t >= st && t < st + scenes[k].dur);
+    return i < 0 ? scenes.length - 1 : i;
+  };
+  const mediaLen = (el: HTMLMediaElement) => (Number.isFinite(el.duration) && el.duration > 0 ? el.duration : Infinity);
+
+  /**
+   * Avança o relógio. Numa cena de vídeo/voz a própria mídia manda no tempo:
+   * se ela engasga (carregando), o filme espera junto em vez de cortar a fala.
+   */
+  function advance(dt: number) {
+    const c = clock.current;
+    const i = sceneAt(c.t);
+    const el = mediaOf(scenes[i]);
+    if (!el) { c.t += dt; return; }
+    const expected = c.t - starts[i] - LEAD;
+    const shouldPlay = expected >= 0 && expected < Math.min(mediaLen(el), scenes[i].dur - LEAD) - 0.05 && !el.ended;
+    if (!shouldPlay) { c.t += dt; return; }
+    if (!el.paused && !el.seeking && el.readyState >= 3) {
+      c.t = Math.max(c.t, starts[i] + LEAD + el.currentTime);
+      return;
+    }
+    // Mídia ainda não tocando: espera até 3 s por cena; depois segue sem ela
+    if (hold.current.scene !== i) hold.current = { scene: i, waited: 0 };
+    hold.current.waited += dt;
+    if (hold.current.waited > 3) c.t += dt;
+  }
+
+  /** A cada quadro: deixa cada mídia exatamente como o relógio pede. */
+  function syncMedia() {
+    const c = clock.current;
+    const i = sceneAt(c.t);
+    const current = mediaOf(scenes[i]);
+    for (const el of media.current.values()) {
+      if (el !== current && !el.paused) el.pause();
+    }
+    const a = audio.current;
+    if (a) {
+      if (c.running && a.el.paused && !pending.current.has(a.el)) {
+        pending.current.add(a.el);
+        a.el.play().catch(() => {}).finally(() => pending.current.delete(a.el));
+      } else if (!c.running && !a.el.paused) a.el.pause();
+      const duck = Boolean(current);
+      if (ducked.current !== duck) {
+        ducked.current = duck;
+        a.music.gain.setTargetAtTime(duck ? 0.12 : 0.32, a.ctx.currentTime, 0.35);
+      }
+    }
+    if (!current) return;
+    const expected = c.t - starts[i] - LEAD;
+    const inRange = expected >= 0 && expected < Math.min(mediaLen(current), scenes[i].dur - LEAD) - 0.05;
+    if (!c.running || !inRange) {
+      if (!current.paused) current.pause();
+      if (expected < 0 && current.currentTime > 0.05 && !current.seeking) current.currentTime = 0;
+      return;
+    }
+    const now = performance.now();
+    if (current.paused && !current.ended && !pending.current.has(current) && now - (lastTry.current.get(current) ?? 0) > 800) {
+      lastTry.current.set(current, now);
+      if (Math.abs(current.currentTime - expected) > 0.3) current.currentTime = expected;
+      pending.current.add(current);
+      current.play().catch(() => {}).finally(() => pending.current.delete(current));
+    }
+  }
 
   function stopAll() {
     audio.current?.el.pause();
@@ -990,7 +1048,6 @@ export function MotionFilm({ script, items, subject, contributors, music, theme 
     const a = audio.current!;
     a.ctx.resume();
     if (fromStart) { clock.current.t = 0; a.el.currentTime = 0; }
-    clock.current.scene = -1; // reinicia a mídia da cena atual
     const started = a.el.play().catch(() => {});
     setState("playing");
     // Só começa a contar quando a trilha já está tocando (ou depois de 4 s, sem ela)
@@ -1013,8 +1070,8 @@ export function MotionFilm({ script, items, subject, contributors, music, theme 
   function seek(fraction: number) {
     if (state === "recording" || state === "loading") return;
     clock.current.t = clamp(fraction) * total;
-    clock.current.scene = -1;
-    if (!clock.current.running) stopAll();
+    hold.current = { scene: -1, waited: 0 };
+    for (const el of media.current.values()) el.pause(); // o sincronizador recoloca no ponto certo
   }
 
   function record() {
