@@ -15,8 +15,11 @@ import { normalizeLimits } from "@/lib/storage/limits";
 // o cliente do usuário — o banco confere de novo (RLS / RPC com is_admin()).
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+// Os formulários mandam o registro em "rid", não em "id": um campo chamado "id"
+// sobrescreve form.id no navegador, e o React então descarta o botão clicado
+// (aprovar/excluir…) do envio. "id" segue aceito por compatibilidade.
 function id(formData: FormData, key = "id"): string {
-  const v = String(formData.get(key) ?? "");
+  const v = String((key === "id" ? formData.get("rid") : null) ?? formData.get(key) ?? "");
   if (!UUID.test(v)) throw new Error("invalid id");
   return v;
 }
@@ -32,7 +35,7 @@ function fail(path: string, error: unknown): never {
 // ---------------------------------------------------------------- moderação
 export async function moderateMemory(formData: FormData) {
   await requireAdmin();
-  const action = String(formData.get("action"));
+  const action = String(formData.get("op"));
   const note = String(formData.get("note") ?? "").trim() || null;
   const memoryId = id(formData);
   const supabase = await createClient();
@@ -60,7 +63,7 @@ export async function bulkApprove(formData: FormData) {
 export async function moderateComment(formData: FormData) {
   await requireAdmin();
   const supabase = await createClient();
-  const { error } = await supabase.rpc("moderate_comment", { p_comment_id: id(formData), p_action: String(formData.get("action")) });
+  const { error } = await supabase.rpc("moderate_comment", { p_comment_id: id(formData), p_action: String(formData.get("op")) });
   const to = back(formData, "/admin/aprovacao?filtro=comentarios");
   if (error) fail(to, error);
   revalidatePath("/admin", "layout");

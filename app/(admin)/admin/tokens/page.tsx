@@ -102,7 +102,7 @@ export default async function TokensPage({ searchParams }: { searchParams: Promi
                 {!["revoked", "replaced"].includes(t.status) && <TokenQr tokenId={t.id} url={url} personal={Boolean(t.person)} />}
                 {!t.person && !t.event_id && !["revoked", "replaced"].includes(t.status) && (
                   <form action={linkNfcToPerson} className="mt-3 flex flex-wrap gap-2 rounded-xl bg-amber-soft p-3">
-                    <input type="hidden" name="id" value={t.id} />
+                    <input type="hidden" name="rid" value={t.id} />
                     <span className="w-full text-sm text-[#7a5b26]">Sem dono: este ursinho ainda não abre direto.</span>
                     <Select name="personId" className="h-10 flex-1" aria-label="Pessoa" required defaultValue="">
                       <option value="" disabled>Vincular a…</option>
@@ -117,7 +117,7 @@ export default async function TokensPage({ searchParams }: { searchParams: Promi
                   <div className="mt-3 flex flex-wrap gap-2">
                     <CopyButton text={url} label="Copiar URL" />
                     <form action={setNfcStatus}>
-                      <input type="hidden" name="id" value={t.id} />
+                      <input type="hidden" name="rid" value={t.id} />
                       {t.status === "active" ? (
                         <Button size="sm" variant="ghost" name="status" value="suspended">Suspender</Button>
                       ) : (

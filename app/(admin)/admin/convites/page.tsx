@@ -55,12 +55,12 @@ export default async function InvitationsPage({ searchParams }: { searchParams: 
                       <>
                         {i.email && (
                           <form action={resendInvitation}>
-                            <input type="hidden" name="id" value={i.id} />
+                            <input type="hidden" name="rid" value={i.id} />
                             <Button size="sm" variant="ghost">Reenviar</Button>
                           </form>
                         )}
                         <form action={revokeInvitation}>
-                          <input type="hidden" name="id" value={i.id} />
+                          <input type="hidden" name="rid" value={i.id} />
                           <Button size="sm" variant="ghost">Revogar</Button>
                         </form>
                       </>

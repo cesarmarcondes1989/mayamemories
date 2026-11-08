@@ -83,7 +83,7 @@ export default async function PersonPage({
                   <li key={role} className="flex items-center justify-between gap-2">
                     <span className="text-[15px]">{ROLE_LABELS[role]}</span>
                     <form action={setPersonRole}>
-                      <input type="hidden" name="id" value={id} />
+                      <input type="hidden" name="rid" value={id} />
                       <input type="hidden" name="role" value={role} />
                       <input type="hidden" name="enabled" value={has ? "0" : "1"} />
                       <Button size="sm" variant={has ? "secondary" : "soft"} disabled={!person.profile_id}>
@@ -96,7 +96,7 @@ export default async function PersonPage({
               <li className="flex items-center justify-between gap-2 border-t border-line pt-2">
                 <span className="text-[15px]">Grupo “Família autorizada”</span>
                 <form action={setFamilyMembership}>
-                  <input type="hidden" name="id" value={id} />
+                  <input type="hidden" name="rid" value={id} />
                   <input type="hidden" name="enabled" value={ov?.in_family ? "0" : "1"} />
                   <Button size="sm" variant={ov?.in_family ? "secondary" : "soft"}>{ov?.in_family ? "Remover" : "Incluir"}</Button>
                 </form>
@@ -104,7 +104,7 @@ export default async function PersonPage({
             </ul>
             <div className="mt-4 flex gap-2 border-t border-line pt-4">
               <form action={setPersonStatus}>
-                <input type="hidden" name="id" value={id} />
+                <input type="hidden" name="rid" value={id} />
                 {person.status === "suspended" ? (
                   <Button size="sm" variant="secondary" name="status" value="active">Reativar conta</Button>
                 ) : (

@@ -62,7 +62,7 @@ export default async function AdminMemoryPage({
           ))}
           <Card className="p-5">
             <form action={updateMemoryAdmin} className="space-y-4">
-              <input type="hidden" name="id" value={memory.id} />
+              <input type="hidden" name="rid" value={memory.id} />
               <Field label="Título" htmlFor="title" optional>
                 <Input id="title" name="title" defaultValue={memory.title ?? ""} />
               </Field>
@@ -107,11 +107,11 @@ export default async function AdminMemoryPage({
                     </p>
                     <p className="mt-1 whitespace-pre-wrap">{c.body}</p>
                     <form action={moderateComment} className="mt-2 flex gap-2">
-                      <input type="hidden" name="id" value={c.id} />
+                      <input type="hidden" name="rid" value={c.id} />
                       <input type="hidden" name="returnTo" value={returnTo} />
-                      {c.status !== "approved" && <Button size="sm" name="action" value="approve">Aprovar</Button>}
-                      <Button size="sm" variant="secondary" name="action" value="hide">Ocultar</Button>
-                      <Button size="sm" variant="danger" name="action" value="remove">Remover</Button>
+                      {c.status !== "approved" && <Button size="sm" name="op" value="approve">Aprovar</Button>}
+                      <Button size="sm" variant="secondary" name="op" value="hide">Ocultar</Button>
+                      <Button size="sm" variant="danger" name="op" value="remove">Remover</Button>
                     </form>
                   </li>
                 ))}
@@ -123,16 +123,16 @@ export default async function AdminMemoryPage({
           <Card className="p-5">
             <h2 className="mb-3 text-2xl">Moderação</h2>
             <form action={moderateMemory} className="space-y-3">
-              <input type="hidden" name="id" value={memory.id} />
+              <input type="hidden" name="rid" value={memory.id} />
               <input type="hidden" name="returnTo" value={returnTo} />
               <Input name="note" placeholder="Recado ao autor (opcional)" />
               <div className="flex flex-wrap gap-2">
-                {memory.moderation_status !== "approved" && <Button size="sm" name="action" value="approve">Aprovar</Button>}
-                {memory.moderation_status === "hidden" && <Button size="sm" name="action" value="restore">Reexibir</Button>}
-                <Button size="sm" variant="secondary" name="action" value="request_changes">Pedir ajuste</Button>
-                {memory.moderation_status !== "hidden" && <Button size="sm" variant="secondary" name="action" value="hide">Ocultar</Button>}
-                <Button size="sm" variant="secondary" name="action" value="reject">Rejeitar</Button>
-                <Button size="sm" variant="danger" name="action" value="remove">Excluir</Button>
+                {memory.moderation_status !== "approved" && <Button size="sm" name="op" value="approve">Aprovar</Button>}
+                {memory.moderation_status === "hidden" && <Button size="sm" name="op" value="restore">Reexibir</Button>}
+                <Button size="sm" variant="secondary" name="op" value="request_changes">Pedir ajuste</Button>
+                {memory.moderation_status !== "hidden" && <Button size="sm" variant="secondary" name="op" value="hide">Ocultar</Button>}
+                <Button size="sm" variant="secondary" name="op" value="reject">Rejeitar</Button>
+                <Button size="sm" variant="danger" name="op" value="remove">Excluir</Button>
               </div>
             </form>
           </Card>
@@ -140,7 +140,7 @@ export default async function AdminMemoryPage({
             <h2 className="mb-1 text-2xl">Cápsulas</h2>
             <p className="mb-3 text-sm text-taupe">Uma memória pode estar na linha do tempo e em várias cápsulas, sem duplicar arquivos.</p>
             <form action={setMemoryCapsules} className="space-y-2">
-              <input type="hidden" name="id" value={memory.id} />
+              <input type="hidden" name="rid" value={memory.id} />
               {(capsules ?? []).map((c) => (
                 <label key={c.id} className="flex items-center gap-2 text-[15px]">
                   <input type="checkbox" name="capsules" value={c.id} defaultChecked={inCapsules.has(c.id)} className="size-4 accent-[var(--rose-deep)]" />
@@ -158,7 +158,7 @@ export default async function AdminMemoryPage({
                 <li key={g.id} className="flex items-center justify-between">
                   {nameByProfile.get(g.grantee_profile_id) ?? "—"}
                   <form action={revokeAccess}>
-                    <input type="hidden" name="id" value={g.id} />
+                    <input type="hidden" name="rid" value={g.id} />
                     <input type="hidden" name="returnTo" value={returnTo} />
                     <Button size="sm" variant="ghost">Revogar</Button>
                   </form>

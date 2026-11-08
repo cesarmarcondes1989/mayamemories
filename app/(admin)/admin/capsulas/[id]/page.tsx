@@ -120,7 +120,7 @@ export default async function AdminCapsulePage({
             <div className="mt-4 flex flex-wrap gap-2">
               {capsule.status === "draft" && (
                 <form action={setCapsuleStatus}>
-                  <input type="hidden" name="id" value={id} />
+                  <input type="hidden" name="rid" value={id} />
                   <Button size="sm" name="status" value="scheduled">Programar (mostrar à família)</Button>
                 </form>
               )}
@@ -137,19 +137,19 @@ export default async function AdminCapsulePage({
               )}
               {capsule.status !== "sealed" && capsule.status !== "draft" && (
                 <form action={setCapsuleStatus}>
-                  <input type="hidden" name="id" value={id} />
+                  <input type="hidden" name="rid" value={id} />
                   <Button size="sm" variant="secondary" name="status" value="sealed">Fechar temporariamente</Button>
                 </form>
               )}
               {capsule.status === "sealed" && (
                 <form action={setCapsuleStatus}>
-                  <input type="hidden" name="id" value={id} />
+                  <input type="hidden" name="rid" value={id} />
                   <Button size="sm" variant="secondary" name="status" value="scheduled">Reprogramar</Button>
                 </form>
               )}
               {capsule.status !== "archived" && (
                 <form action={setCapsuleStatus}>
-                  <input type="hidden" name="id" value={id} />
+                  <input type="hidden" name="rid" value={id} />
                   <Button size="sm" variant="ghost" name="status" value="archived">Arquivar</Button>
                 </form>
               )}
@@ -163,7 +163,7 @@ export default async function AdminCapsulePage({
                 <li key={g.id} className="flex items-center justify-between text-[15px]">
                   {nameByProfile.get(g.grantee_profile_id) ?? "—"}
                   <form action={revokeAccess}>
-                    <input type="hidden" name="id" value={g.id} />
+                    <input type="hidden" name="rid" value={g.id} />
                     <input type="hidden" name="returnTo" value={returnTo} />
                     <Button size="sm" variant="ghost">Revogar</Button>
                   </form>

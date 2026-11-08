@@ -16,7 +16,7 @@ type Capsule = {
 export function CapsuleForm({ action, capsule = {}, submitLabel }: { action: (fd: FormData) => Promise<void>; capsule?: Capsule; submitLabel: string }) {
   return (
     <form action={action} className="space-y-4">
-      {capsule.id && <input type="hidden" name="id" value={capsule.id} />}
+      {capsule.id && <input type="hidden" name="rid" value={capsule.id} />}
       <Field label="Nome" htmlFor="title">
         <Input id="title" name="title" required maxLength={200} defaultValue={capsule.title} />
       </Field>

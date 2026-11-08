@@ -98,7 +98,7 @@ export default async function LeadsPage({ searchParams }: { searchParams: Promis
                     )}
                   </div>
                   <form action={updateLead} className="mt-4 grid gap-3 sm:grid-cols-[180px_1fr_auto] sm:items-start">
-                    <input type="hidden" name="id" value={l.id} />
+                    <input type="hidden" name="rid" value={l.id} />
                     <Select name="status" defaultValue={l.status} aria-label="Andamento">
                       {Object.entries(STATUS).map(([k, v]) => (
                         <option key={k} value={k}>

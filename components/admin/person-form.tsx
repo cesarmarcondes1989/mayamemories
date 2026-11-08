@@ -14,7 +14,7 @@ export function PersonForm({
 }) {
   return (
     <form action={action} className="space-y-4">
-      {person && <input type="hidden" name="id" value={person.id} />}
+      {person && <input type="hidden" name="rid" value={person.id} />}
       <Field label="Nome de exibição" htmlFor="displayName">
         <Input id="displayName" name="displayName" required maxLength={120} defaultValue={person?.display_name} placeholder="Vovó Lúcia" />
       </Field>

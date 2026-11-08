@@ -101,7 +101,7 @@ export async function updatePlan(formData: FormData) {
 
 export async function updateLead(formData: FormData) {
   await requirePlatformAdmin();
-  const id = String(formData.get("id") ?? "");
+  const id = String(formData.get("rid") ?? formData.get("id") ?? ""); // "rid": veja features/admin/actions.ts
   const status = String(formData.get("status") ?? "");
   const notes = String(formData.get("notes") ?? "").trim().slice(0, 2000) || null;
   if (!["new", "contacted", "converted", "lost"].includes(status)) fail("/plataforma", "invalid status");

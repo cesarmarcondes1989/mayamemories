@@ -154,7 +154,7 @@ async function MemoryQueue({ supabase, types, returnTo }: { supabase: Sb; types:
                   )}
                 </dl>
                 <form action={moderateMemory} className="mt-4 space-y-3">
-                  <input type="hidden" name="id" value={m.id} />
+                  <input type="hidden" name="rid" value={m.id} />
                   <input type="hidden" name="returnTo" value={returnTo} />
                   <label htmlFor={`note-${m.id}`} className="sr-only">
                     Recado ao autor
@@ -167,19 +167,19 @@ async function MemoryQueue({ supabase, types, returnTo }: { supabase: Sb; types:
                     maxLength={2000}
                   />
                   <div className="flex flex-wrap gap-2">
-                    <Button size="sm" name="action" value="approve">
+                    <Button size="sm" name="op" value="approve">
                       Aprovar
                     </Button>
-                    <Button size="sm" variant="secondary" name="action" value="request_changes">
+                    <Button size="sm" variant="secondary" name="op" value="request_changes">
                       Solicitar ajuste
                     </Button>
-                    <Button size="sm" variant="secondary" name="action" value="hide">
+                    <Button size="sm" variant="secondary" name="op" value="hide">
                       Ocultar
                     </Button>
-                    <Button size="sm" variant="secondary" name="action" value="reject">
+                    <Button size="sm" variant="secondary" name="op" value="reject">
                       Rejeitar
                     </Button>
-                    <Button size="sm" variant="danger" name="action" value="remove">
+                    <Button size="sm" variant="danger" name="op" value="remove">
                       Excluir
                     </Button>
                     <Link href={`/admin/memorias/${m.id}`} className="ml-auto self-center text-sm text-rose-deep hover:underline">
@@ -227,14 +227,14 @@ async function CommentsQueue({ supabase }: { supabase: Sb }) {
             </p>
             <p className="mt-2 whitespace-pre-wrap">{c.body}</p>
             <form action={moderateComment} className="mt-3 flex flex-wrap gap-2">
-              <input type="hidden" name="id" value={c.id} />
-              <Button size="sm" name="action" value="approve">
+              <input type="hidden" name="rid" value={c.id} />
+              <Button size="sm" name="op" value="approve">
                 Aprovar
               </Button>
-              <Button size="sm" variant="secondary" name="action" value="hide">
+              <Button size="sm" variant="secondary" name="op" value="hide">
                 Ocultar
               </Button>
-              <Button size="sm" variant="danger" name="action" value="remove">
+              <Button size="sm" variant="danger" name="op" value="remove">
                 Remover
               </Button>
             </form>
@@ -279,7 +279,7 @@ async function DeletionQueue({ supabase }: { supabase: Sb }) {
             </p>
             {r.reason && <p className="mt-2 text-taupe">“{r.reason}”</p>}
             <form action={resolveDeletion} className="mt-3 flex gap-2">
-              <input type="hidden" name="id" value={r.id} />
+              <input type="hidden" name="rid" value={r.id} />
               <Button size="sm" variant="danger" name="accept" value="1">
                 Excluir memória e arquivos
               </Button>
