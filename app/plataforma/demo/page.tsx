@@ -6,11 +6,13 @@ import { Alert, PageHeader } from "@/components/ui/misc";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { buttonClasses } from "@/components/ui/button";
 import { formatDateTime } from "@/lib/format";
+import { requirePlatformAdmin } from "@/lib/permissions/viewer";
 
 export const metadata = { title: "Demonstração" };
 export const maxDuration = 60;
 
 export default async function DemoAdminPage({ searchParams }: { searchParams: Promise<{ criado?: string; erro?: string }> }) {
+  await requirePlatformAdmin(); // usa o service role abaixo: confere aqui também, não só no layout
   const sp = await searchParams;
   const admin = createAdminClient();
   const { data: vault } = await admin.from("vaults").select("id, title, created_at").eq("is_demo", true).maybeSingle();

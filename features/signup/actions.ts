@@ -9,6 +9,7 @@ import { emailSchema } from "@/lib/validation/schemas";
 import { CURRENT_VAULT_COOKIE } from "@/lib/permissions/vault-cookie";
 import { createVaultAsUser, vaultSchema } from "@/features/vaults/create";
 import { parseUserAgent } from "@/lib/analytics/ua";
+import { TOO_MANY, allow, clientIp } from "@/lib/rate-limit";
 
 export type SignupState = { status: "idle" | "error" | "exists"; message?: string; fields?: Record<string, string> };
 
@@ -28,6 +29,10 @@ export async function signUp(_prev: SignupState, formData: FormData): Promise<Si
   }
   const email = emailSchema.safeParse(raw.email);
   if (!email.success) return { status: "error", message: "Informe um e-mail válido.", fields };
+  const ip = await clientIp();
+  if (!(await allow(`signup:ip:${ip}`, 3600, 5)) || !(await allow(`signup:email:${email.data}`, 3600, 3))) {
+    return { status: "error", message: TOO_MANY, fields };
+  }
   if (raw.terms !== "on") return { status: "error", message: "Para criar a conta, aceite os termos e a privacidade.", fields };
   const vault = vaultSchema.safeParse({ ...raw, myName: raw.myName });
   if (!vault.success) return { status: "error", message: vault.error.issues[0]?.message, fields };
@@ -105,7 +110,7 @@ export async function signUp(_prev: SignupState, formData: FormData): Promise<Si
 export async function resendVerification() {
   const supabase = await createClient();
   const { data } = await supabase.auth.getUser();
-  if (data.user?.email) {
+  if (data.user?.email && (await allow(`resend:${data.user.id}`, 3600, 3))) {
     await supabase.auth.signInWithOtp({
       email: data.user.email,
       options: { shouldCreateUser: false, emailRedirectTo: `${publicEnv.siteUrl()}/inicio?email=confirmado` },

@@ -36,8 +36,8 @@ export const createMemorySchema = z
     visibility: z.enum(["family", "private", "capsule", "selected"]).default("family"),
     recipient: optionalText(120),
     unlockAt: isoDate.optional().nullable(),
-    requestedCapsuleId: z.string().uuid().optional().nullable(),
-    eventId: z.string().uuid().optional().nullable(),
+    requestedCapsuleId: z.guid().optional().nullable(),
+    eventId: z.guid().optional().nullable(),
     files: z.array(fileDescriptorSchema).max(20).default([]),
     visit: z
       .object({
@@ -65,7 +65,7 @@ export const createMemorySchema = z
 export type CreateMemoryInput = z.input<typeof createMemorySchema>;
 
 export const commentSchema = z.object({
-  memoryId: z.string().uuid(),
+  memoryId: z.guid(),
   body: z.string().trim().min(1, "Escreva um comentário.").max(4000),
 });
 
@@ -76,7 +76,7 @@ export const personSchema = z.object({
 });
 
 export const invitationSchema = z.object({
-  personId: z.string().uuid(),
+  personId: z.guid(),
   email: z.union([emailSchema, z.literal("")]).optional(),
   expiresInDays: z.coerce.number().int().min(1).max(365).default(30),
   addToFamily: z.boolean().default(true),

@@ -58,7 +58,8 @@ export async function resolveStoryTexts(vaultId: string, story: Story): Promise<
     const row = stored.get(s.section);
     const key = keyFor(s.items);
     const fresh = row && (row.source === "edited" || row.source_key === key);
-    texts[s.section] = row?.body ?? template(s.kind, story, s.items, "chapter" in s ? s.chapter : undefined);
+    // Texto desatualizado pode citar algo que saiu do baú: mostra o modelo até a IA reescrever
+    texts[s.section] = (fresh ? row?.body : undefined) ?? template(s.kind, story, s.items, "chapter" in s ? s.chapter : undefined);
     const pending = row?.source_key?.startsWith("pending") && Date.now() - new Date(row.updated_at).getTime() < 3 * 60_000;
     if (!fresh && !pending) stale.push(s.section);
   }

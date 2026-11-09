@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Amatic_SC, Caveat, Nunito } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import { HashSessionHandler } from "@/components/auth/hash-session";
 import { getViewer } from "@/lib/permissions/viewer";
@@ -7,9 +7,18 @@ import { isSupabaseConfigured } from "@/lib/env";
 import { DemoBanner } from "@/components/demo/demo-banner";
 
 // Títulos: letra desenhada à mão. Texto: sans arredondada. Cartas: manuscrita.
-const display = Amatic_SC({ subsets: ["latin"], weight: ["400", "700"], variable: "--font-display", display: "swap" });
-const body = Nunito({ subsets: ["latin"], weight: ["400", "500", "600", "700"], variable: "--font-body", display: "swap" });
-const hand = Caveat({ subsets: ["latin"], weight: ["400", "500"], variable: "--font-hand", display: "swap" });
+// Arquivos da Google Fonts (licença OFL) hospedados no projeto: o build não
+// depende do Google responder (ele às vezes devolve endereços que o Next não lê).
+const display = localFont({
+  src: [
+    { path: "./fonts/amatic-400-latin.woff2", weight: "400" },
+    { path: "./fonts/amatic-700-latin.woff2", weight: "700" },
+  ],
+  variable: "--font-display",
+  display: "swap",
+});
+const body = localFont({ src: "./fonts/nunito-200-1000-latin.woff2", weight: "200 1000", variable: "--font-body", display: "swap" });
+const hand = localFont({ src: "./fonts/caveat-400-700-latin.woff2", weight: "400 700", variable: "--font-hand", display: "swap" });
 
 export const metadata: Metadata = {
   title: { default: "Guardei pra você", template: "%s · Guardei pra você" },

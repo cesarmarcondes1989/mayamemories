@@ -9,8 +9,8 @@ const COLUMNS = ["created_at", "name", "email", "phone", "kind", "plan_key", "pe
 
 function cell(v: unknown): string {
   const s = v == null ? "" : String(v);
-  // Evita fórmula no Excel (=, +, -, @) e escapa aspas
-  const safe = /^[=+\-@]/.test(s) ? `'${s}` : s;
+  // Evita fórmula no Excel (=, +, -, @, tab, CR, também depois de espaços) e escapa aspas
+  const safe = /^\s*[=+\-@\t\r]/.test(s) ? `'${s}` : s;
   return `"${safe.replace(/"/g, '""')}"`;
 }
 

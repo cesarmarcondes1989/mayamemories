@@ -1,7 +1,6 @@
 import type { NextConfig } from "next";
 
 const securityHeaders = [
-  { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" },
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "X-Frame-Options", value: "DENY" },
   { key: "Referrer-Policy", value: "no-referrer" },
@@ -15,7 +14,12 @@ const nextConfig: NextConfig = {
     serverActions: { bodySizeLimit: "1mb" },
   },
   async headers() {
-    return [{ source: "/:path*", headers: securityHeaders }];
+    const noindex = [{ key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" }];
+    // Vitrine (/, /comecar, /demo, /tutoriais, /privacidade) pode aparecer no Google; o resto não
+    return [
+      { source: "/:path*", headers: securityHeaders },
+      { source: "/:path((?!$|comecar|demo$|tutoriais|privacidade).*)", headers: noindex },
+    ];
   },
 };
 

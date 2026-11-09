@@ -1,6 +1,6 @@
 import "server-only";
 import { after } from "next/server";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { requireMember } from "@/lib/permissions/viewer";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -23,6 +23,9 @@ export async function loadStory(periodo: string, kind: StoryKind) {
   if (!/^(\d{4}|tudo)$/.test(periodo)) notFound();
   const viewer = await requireMember();
   const supabase = await createClient();
+  // Livro e filme mostram o que a família inteira vê: convidados de evento não entram
+  const { data: family } = await supabase.rpc("in_vault_family", { p_vault: viewer.vault.id });
+  if (!viewer.isAdmin && !family) redirect("/inicio");
   const { data: vault } = await supabase.from("vaults").select("id, title, subject_name, ai_enabled").eq("id", viewer.vault.id).maybeSingle();
   if (!vault) notFound();
   const admin = createAdminClient();
@@ -69,7 +72,8 @@ export async function loadStory(periodo: string, kind: StoryKind) {
     vault,
     story: current.story,
     texts,
-    rationale: current.rationale,
+    // O "porquê" cita quem a família pediu para tirar: só o admin vê
+    rationale: viewer.isAdmin ? current.rationale : null,
     totalAll,
     working: stale.length > 0 || current.rationale === null || filmWorking,
   };

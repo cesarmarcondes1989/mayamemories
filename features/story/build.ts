@@ -1,9 +1,12 @@
 import "server-only";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { MEMORY_SELECT, attachMediaUrls, type MemoryRow } from "@/features/memories/queries";
 
 // Junta as memórias aprovadas de um período em capítulos (um por mês).
-// Base do livro e do filme. Cartas ainda trancadas e memórias privadas ficam de fora.
+// Base do livro e do filme. Sempre a MESMA visão para todos ("o que a família
+// inteira vê"): só visibilidade "família", sem cápsulas ainda lacradas, sem
+// privadas ou seletivas, sem cartas trancadas. Assim os textos e a seleção que
+// ficam guardados para o baú nunca carregam algo que alguém não poderia ver.
 
 export type StoryMedia = { type: string; url: string; mime: string };
 export type StoryItem = {
@@ -36,15 +39,15 @@ export const monthLabel = (key: string) => {
 };
 
 export async function getStory(vault: { id: string; title: string; subject_name: string }, period: string): Promise<Story> {
-  const supabase = await createClient();
+  const admin = createAdminClient();
   const now = new Date().toISOString();
-  let q = supabase
+  let q = admin
     .from("memories")
     .select(MEMORY_SELECT)
     .eq("vault_id", vault.id)
     .eq("moderation_status", "approved")
     .is("deleted_at", null)
-    .in("visibility", ["family", "capsule"])
+    .eq("visibility", "family")
     .or(`unlock_at.is.null,unlock_at.lte.${now}`)
     .order("occurred_at", { ascending: true, nullsFirst: false })
     .order("created_at", { ascending: true })
@@ -56,7 +59,7 @@ export async function getStory(vault: { id: string; title: string; subject_name:
 
   const ids = rows.map((r) => r.id);
   const { data: comments } = ids.length
-    ? await supabase
+    ? await admin
         .from("memory_comments")
         .select("memory_id, body, author:people!memory_comments_author_person_id_fkey(id, display_name)")
         .in("memory_id", ids)
@@ -92,10 +95,11 @@ export async function getStory(vault: { id: string; title: string; subject_name:
   }
 
   // Anos disponíveis para o seletor
-  const { data: dates } = await supabase
+  const { data: dates } = await admin
     .from("memories")
     .select("occurred_at")
     .eq("vault_id", vault.id)
+    .eq("visibility", "family")
     .eq("moderation_status", "approved")
     .is("deleted_at", null)
     .not("occurred_at", "is", null)

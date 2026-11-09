@@ -52,7 +52,7 @@ export async function buildExportManifest(supabase: SupabaseClient, vaultId: str
     people,
     visits,
     memories,
-    media: (media as Array<{ processing_status: string }>).filter((m) => m.processing_status !== "deleted"),
+    media: (media as Array<{ processing_status: string }>).filter((m) => m.processing_status === "ready"), // só arquivos verificados
     comments,
     capsules,
     capsule_items: capsuleItems,

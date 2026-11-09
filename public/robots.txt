@@ -2,4 +2,7 @@ User-agent: *
 # Só a vitrine é pública; os baús das famílias nunca são indexados.
 Allow: /$
 Allow: /privacidade$
+Allow: /comecar
+Allow: /demo$
+Allow: /tutoriais$
 Disallow: /

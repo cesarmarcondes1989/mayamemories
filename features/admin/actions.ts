@@ -524,6 +524,14 @@ export async function updateSettings(formData: FormData) {
   if (Number.isInteger(files) && files >= 1 && files <= 50) limits.max_files_per_memory = files;
   const quota = Number(formData.get("quotaGb"));
   if (Number.isFinite(quota) && quota > 0 && quota <= 1000) limits.max_bytes_per_person = Math.round(quota * 1024 ** 3);
+  // O baú pode apertar os limites, nunca passar dos da plataforma (custo de armazenamento)
+  const cap = normalizeLimits(platform?.upload_limits);
+  for (const k of ["image", "video", "audio", "document"] as const) {
+    limits[k].max_bytes = Math.min(limits[k].max_bytes, cap[k].max_bytes);
+    if (cap[k].max_seconds && limits[k].max_seconds) limits[k].max_seconds = Math.min(limits[k].max_seconds!, cap[k].max_seconds!);
+  }
+  limits.max_files_per_memory = Math.min(limits.max_files_per_memory, cap.max_files_per_memory);
+  limits.max_bytes_per_person = Math.min(limits.max_bytes_per_person, cap.max_bytes_per_person);
   const theme = String(formData.get("theme") ?? "");
   const gender = String(formData.get("gender") ?? "");
 

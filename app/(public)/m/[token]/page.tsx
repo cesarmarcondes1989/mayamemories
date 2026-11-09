@@ -136,7 +136,13 @@ export default async function NfcEntryPage({
       <p className="font-display text-7xl">♡</p>
       <h1 className="mt-2 text-4xl">Você faz parte da história dela</h1>
       <Card className="mt-8 p-6 text-left">
-        {sp.admin ? (
+        {sp.falha === "confirmar" ? (
+          <div className="mb-4 text-center">
+            <ButtonLink href={`/m/${encodeURIComponent(token)}/entrar`} size="lg" className="w-full">
+              Entrar no baú ♡
+            </ButtonLink>
+          </div>
+        ) : sp.admin ? (
           <p className="mb-4 text-[15px] text-taupe">
             Este ursinho é de um <strong className="text-rose-deep">administrador</strong>. Por segurança, ursinhos de
             administradores não abrem sozinhos: entre com o link enviado ao e-mail dessa pessoa.
@@ -151,7 +157,9 @@ export default async function NfcEntryPage({
             <Alert tone="warn">
               {sp.falha === "sem-pessoa"
                 ? "Este ursinho ainda não está ligado a uma pessoa. Peça a quem cuida do baú para vinculá-lo."
-                : "Não conseguimos abrir o acesso direto agora. Você pode entrar com seu e-mail."}
+                : sp.falha === "email"
+                  ? "Esta pessoa já entra com o próprio e-mail. Por segurança, o ursinho não abre a conta dela sozinho: receba o link no e-mail."
+                  : "Não conseguimos abrir o acesso direto agora. Você pode entrar com seu e-mail."}
               <span className="mt-1 block text-xs opacity-70">Código: {sp.falha}</span>
             </Alert>
           </div>

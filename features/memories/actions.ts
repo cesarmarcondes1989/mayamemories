@@ -227,6 +227,16 @@ export async function finalizeAsset(assetId: string): Promise<ActionResult<{ sta
   const settings = await getSettings();
   const limit = settings.limits[asset.media_type as MediaKind];
   if (!size || size > limit.max_bytes) return fail("O arquivo excede o tamanho permitido.");
+  // Cota com o tamanho REAL (o rascunho só conhecia o tamanho declarado pelo navegador)
+  const { data: used } = await admin
+    .from("media_assets")
+    .select("size_bytes")
+    .eq("vault_id", viewer.vault!.id)
+    .eq("created_by_profile_id", viewer.profileId!)
+    .eq("processing_status", "ready")
+    .neq("id", asset.id);
+  const total = (used ?? []).reduce((acc, r) => acc + (r.size_bytes ?? 0), 0) + size;
+  if (total > settings.limits.max_bytes_per_person) return fail("Você atingiu o espaço disponível para envios.");
 
   const { data: signed } = await admin.storage.from(BUCKET).createSignedUrl(asset.storage_path, 60);
   if (!signed) return { ok: false, error: "Não foi possível verificar o arquivo agora." };

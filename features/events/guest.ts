@@ -8,6 +8,7 @@ import { publicEnv } from "@/lib/env";
 import { friendlyError } from "@/lib/errors";
 import { guestPlaceholderEmail } from "@/lib/email-identity";
 import { CURRENT_VAULT_COOKIE } from "@/lib/permissions/vault-cookie";
+import { TOO_MANY, allow, clientIp } from "@/lib/rate-limit";
 
 export type JoinState = { error?: string };
 
@@ -30,6 +31,8 @@ export async function joinEventAsGuest(token: string, _prev: JoinState, formData
   let email: string | null = null;
 
   if (!userId) {
+    // Cada entrada cria uma conta: limite por IP antes de criar
+    if (!(await allow(`guest:ip:${await clientIp()}`, 600, 20))) return { error: TOO_MANY };
     email = guestPlaceholderEmail(new URL(publicEnv.siteUrl()).hostname);
     const { data: created, error } = await admin.auth.admin.createUser({
       email,

@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { isSupabaseConfigured, publicEnv } from "@/lib/env";
 import { parseUserAgent, sanitizePath } from "@/lib/analytics/ua";
+import { allow } from "@/lib/rate-limit";
 
 export const dynamic = "force-dynamic";
 
@@ -27,6 +28,9 @@ const header = (req: NextRequest, name: string, max: number) => {
 export async function POST(request: NextRequest) {
   const done = new NextResponse(null, { status: 204 });
   if (!isSupabaseConfigured()) return done;
+  if (Number(request.headers.get("content-length") ?? 0) > 2000) return done;
+  const ip = (request.headers.get("x-forwarded-for")?.split(",")[0] || "desconhecido").trim().slice(0, 64);
+  if (!(await allow(`analytics:${ip}`, 60, 120))) return done;
   const raw = await request.text();
   if (raw.length > 2000) return done;
   let body: Record<string, unknown>;

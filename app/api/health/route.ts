@@ -1,10 +1,14 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { adminExists, bootstrapEmails } from "@/lib/bootstrap";
+import { getViewer } from "@/lib/permissions/viewer";
 
 export const dynamic = "force-dynamic";
 
-/** Diagnóstico de configuração. Só booleanos — nenhum valor secreto. */
+/**
+ * Diagnóstico de configuração. Para o público: só "ok". O detalhe (variáveis,
+ * migrações, se já existe admin) aparece apenas para o dono da plataforma logado.
+ */
 export async function GET() {
   const env = {
     NEXT_PUBLIC_SUPABASE_URL: Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL),
@@ -20,6 +24,23 @@ export async function GET() {
   let nfcMigration: boolean | null = null;
   let migrations: Record<string, boolean> | null = null;
   let demoReady: boolean | null = null;
+  let detailed = false;
+  try {
+    detailed = Boolean((await getViewer())?.isPlatformAdmin);
+  } catch {
+    detailed = false;
+  }
+  if (!detailed) {
+    let reachable = false;
+    if (env.NEXT_PUBLIC_SUPABASE_URL && env.SUPABASE_SERVICE_ROLE_KEY) {
+      try {
+        reachable = !(await createAdminClient().from("app_settings").select("id").limit(1)).error;
+      } catch {
+        reachable = false;
+      }
+    }
+    return NextResponse.json({ ok: Object.values(env).every(Boolean) && reachable }, { headers: { "Cache-Control": "no-store" } });
+  }
   if (env.NEXT_PUBLIC_SUPABASE_URL && env.SUPABASE_SERVICE_ROLE_KEY) {
     try {
       const { error } = await createAdminClient().from("app_settings").select("id").limit(1);
@@ -41,6 +62,7 @@ export async function GET() {
           "015_demo_vault": await probe("vaults", "is_demo"),
           "016_story_texts": await probe("story_selections", "kind"),
           "017_story_films": await probe("story_films", "source"),
+          "018_security_hardening": !(await admin.rpc("rate_limit_hit", { p_key: "health", p_window_seconds: 1, p_max: 1000 })).error,
         };
         if (migrations["015_demo_vault"]) {
           const { data } = await admin.rpc("demo_vault_id");

@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { publicEnv } from "@/lib/env";
 import { CURRENT_VAULT_COOKIE } from "@/lib/permissions/vault-cookie";
+import { isPlaceholderEmail } from "@/lib/email-identity";
 
 export const dynamic = "force-dynamic";
 
@@ -11,7 +12,12 @@ type Target = { person_id: string; display_name: string; auth_email: string | nu
 /**
  * Acesso direto pelo ursinho: o token É a identidade da pessoa.
  * Cria (uma vez) a conta dela, abre a sessão sem enviar e-mail e volta para
- * a página do ursinho. Ursinho de admin abre a mesma página, com atalho para o painel.
+ * a página do ursinho.
+ *
+ * Segurança: o ursinho só abre contas que nasceram dele (e-mail interno
+ * nfc-<pessoa>@…). Conta com e-mail real, ou de administrador, entra por e-mail:
+ * do contrário, quem cria um baú poderia apontar um ursinho para o e-mail de
+ * outra pessoa e entrar na conta dela.
  */
 export async function GET(request: NextRequest, { params }: { params: Promise<{ token: string }> }) {
   const { token } = await params;
@@ -24,6 +30,10 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     return res;
   };
   if (!/^[A-Za-z0-9_-]{16,64}$/.test(token)) return back("?falha=1");
+  // Só abre sessão para quem chegou pelo ursinho/QR ou pelo próprio site, nunca
+  // por uma imagem ou link escondido em outro site (login forçado)
+  const site = request.headers.get("sec-fetch-site");
+  if (site && site !== "same-origin" && site !== "none") return back("?falha=confirmar");
 
   let step = "rpc";
   try {
@@ -42,8 +52,11 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     const me = Array.isArray(mine) ? mine[0] : null;
     if (me?.is_my_token) return back("", target.vault_id);
 
+    if (target.is_admin) return back("?admin=1");
+    if (target.auth_email && !isPlaceholderEmail(target.auth_email)) return back("?falha=email");
+
     const host = new URL(publicEnv.siteUrl()).hostname;
-    const email = target.auth_email ?? target.invitation_email ?? `nfc-${target.person_id}@${host}`;
+    const email = target.auth_email ?? `nfc-${target.person_id}@${host}`;
 
     step = "conta";
     if (!target.auth_email) {

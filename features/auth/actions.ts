@@ -10,6 +10,7 @@ import { friendlyError } from "@/lib/errors";
 import { canBootstrap } from "@/lib/bootstrap";
 import { markEmailVerifiedIfPending } from "@/lib/auth/mark-verified";
 import type { EmailOtpType } from "@supabase/supabase-js";
+import { TOO_MANY, allow, clientIp } from "@/lib/rate-limit";
 
 export type LoginState = { status: "idle" | "sent" | "error"; message?: string; email?: string; next?: string };
 
@@ -49,6 +50,10 @@ export async function requestLoginLink(_prev: LoginState, formData: FormData): P
   const parsed = emailSchema.safeParse(formData.get("email"));
   if (!parsed.success) return { status: "error", message: "Informe um e-mail válido." };
   const next = safeNextPath(String(formData.get("next") ?? ""), "/inicio");
+  const ip = await clientIp();
+  if (!(await allow(`login:ip:${ip}`, 600, 10)) || !(await allow(`login:email:${parsed.data}`, 600, 5))) {
+    return { status: "error", message: TOO_MANY };
+  }
   let destination = next;
   try {
     if (await canBootstrap(parsed.data)) {
@@ -82,6 +87,11 @@ export async function verifyEmailCode(_prev: LoginState, formData: FormData): Pr
   if (!parsed.success || code.length < 6 || code.length > 10) {
     return { status: "error", message: "Digite o código de 6 dígitos que chegou no e-mail.", ...keep };
   }
+  // Código de 6 dígitos: poucas tentativas por e-mail e por IP (sem força bruta)
+  const ip = await clientIp();
+  if (!(await allow(`code:email:${parsed.data}`, 900, 8)) || !(await allow(`code:ip:${ip}`, 900, 30))) {
+    return { status: "error", message: TOO_MANY, ...keep };
+  }
   const supabase = await createClient();
   let ok = false;
   // Login comum usa "email"; o primeiro acesso de quem foi convidado usa "invite"
@@ -110,6 +120,7 @@ export async function requestInviteLink(_prev: LoginState, formData: FormData): 
   if (!allowed) {
     return { status: "error", message: "Este convite não pode ser usado com este e-mail. Confira o endereço ou fale com os pais da Maya." };
   }
+  if (!(await allow(`invite:ip:${await clientIp()}`, 600, 10))) return { status: "error", message: TOO_MANY };
   const store = await cookies();
   store.set(INVITE_COOKIE, secret, {
     httpOnly: true,

@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
   const supabase = await createClient();
   const { data } = await supabase.auth.getUser();
   const email = data.user?.email?.toLowerCase();
-  if (!data.user || !email || !data.user.email_confirmed_at) {
+  if (!data.user || !email || !data.user.email_confirmed_at || data.user.app_metadata?.email_verified === false) {
     return NextResponse.redirect(new URL("/entrar?erro=link", origin));
   }
   if (!bootstrapEmails().includes(email) || (await adminExists())) {
